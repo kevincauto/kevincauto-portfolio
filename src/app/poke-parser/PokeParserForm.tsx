@@ -1,29 +1,44 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import styles from './PokeParserForm.module.css';
+
+type Parsed = {
+  p1: { name: string; team: string[] };
+  p2: { name: string; team: string[] };
+  kos: { attacker: string; victim: string }[];
+};
 
 export default function PokeParserForm() {
   const [url, setUrl] = useState('');
-  const [result, setResult] = useState<string | null>(null);
-  const [error,  setError]  = useState<string | null>(null);
+  const [data, setData] = useState<Parsed | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setResult(null); setError(null);
+    setLoading(true);
+    setError(null);
+    setData(null);
 
-    const res = await fetch('/api/poke-parser', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:   JSON.stringify({ url }),
-    });
+    try {
+      const res = await fetch('/api/poke-parser', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+      });
 
-    if (res.ok) {
-        const { parsed } = await res.json();
-        setResult(JSON.stringify(parsed, null, 2));   // pretty-print
-    } else {
+      if (!res.ok) {
         const { message } = await res.json();
-        setError(message ?? 'Unknown error');
+        throw new Error(message ?? 'Unknown server error');
+      }
+
+      const { parsed } = await res.json();
+      setData(parsed);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -31,19 +46,45 @@ export default function PokeParserForm() {
     <>
       <form onSubmit={handleSubmit} className={styles.parser}>
         <input
-          name="logUrl"
           type="url"
-          placeholder="Paste draft log URL"
+          placeholder="Paste draft replay URL"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           required
           className={styles.parser__input}
         />
-        <button className={styles.parser__button}>Parse</button>
+        <button className={styles.parser__button} disabled={loading}>
+          {loading ? 'Parsing…' : 'Parse'}
+        </button>
       </form>
 
-        {result && <pre style={{whiteSpace:'pre-wrap'}}>{result}</pre>}
-        {error && <p style={{color:'red'}}>{error}</p>}
+      {/* Results ----------------------------------------------------------- */}
+      {error && <p className={styles.error}>{error}</p>}
+
+      {data && (
+        <div className={styles.results}>
+          {/* left column – raw JSON */}
+          <pre className={styles.results__json}>
+            {JSON.stringify(data, null, 2)}
+          </pre>
+
+          {/* right column – KO list */}
+          <div className={styles.results__kos}>
+            <h3>Knock-outs</h3>
+            {data.kos.length === 0 ? (
+              <p>No KOs recorded.</p>
+            ) : (
+              <ul>
+                {data.kos.map((k, i) => (
+                  <li key={i}>
+                    <strong>{k.attacker}</strong> KO’s {k.victim}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }
