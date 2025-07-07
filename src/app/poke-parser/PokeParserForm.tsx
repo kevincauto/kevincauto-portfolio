@@ -35,8 +35,9 @@ export default function PokeParserForm() {
 
       const { parsed } = await res.json();
       setData(parsed);
-    } catch (err: any) {
-      setError(err.message);
+        } catch (err: unknown) {
+        if (err instanceof Error) setError(err.message);
+        else setError('Unknown error'); 
     } finally {
       setLoading(false);
     }
