@@ -19,11 +19,11 @@ export default function PokeParserForm() {
     });
 
     if (res.ok) {
-      const { log } = await res.json();
-      setResult(log.slice(0, 500) + '…');           // show first 500 chars
+        const { parsed } = await res.json();
+        setResult(JSON.stringify(parsed, null, 2));   // pretty-print
     } else {
-      const { message } = await res.json();
-      setError(message ?? 'Unknown error');
+        const { message } = await res.json();
+        setError(message ?? 'Unknown error');
     }
   }
 
@@ -42,10 +42,8 @@ export default function PokeParserForm() {
         <button className={styles.parser__button}>Parse</button>
       </form>
 
-      {result && (
-        <pre style={{whiteSpace:'pre-wrap', marginTop:'1rem'}}>{result}</pre>
-      )}
-      {error && <p style={{color:'red'}}>{error}</p>}
+        {result && <pre style={{whiteSpace:'pre-wrap'}}>{result}</pre>}
+        {error && <p style={{color:'red'}}>{error}</p>}
     </>
   );
 }
