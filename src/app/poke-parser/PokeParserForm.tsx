@@ -6,7 +6,7 @@ import styles from './PokeParserForm.module.css';
 type Parsed = {
   p1: { name: string; team: string[] };
   p2: { name: string; team: string[] };
-  kos: { attacker: string; victim: string }[];
+  kos: { attacker: string; victim: string; hazard?: string }[];
 };
 
 export default function PokeParserForm() {
@@ -78,7 +78,8 @@ export default function PokeParserForm() {
               <ul>
                 {data.kos.map((k, i) => (
                   <li key={i}>
-                    <strong>{k.attacker}</strong> KO’s {k.victim}
+                    <strong>{k.attacker}</strong> KO&apos;s {k.victim}
+                    {k.hazard && ` (${k.hazard})`}
                   </li>
                 ))}
               </ul>

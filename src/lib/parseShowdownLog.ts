@@ -1,77 +1,153 @@
-export interface KO {
-  attacker: string;   // species
-  victim:   string;   // species
+/* ---------------------------------------------------------------------- */
+/*  Pokémon Showdown draft-log parser                                     */
+/*  – extracts teams, direct KOs, and hazard-based KOs                    */
+/* ---------------------------------------------------------------------- */
+
+export interface KO { 
+  attacker: string; 
+  victim: string; 
+  hazard?: string; // 'Spikes', 'Stealth Rock', or 'Toxic Spikes'
 }
+
 export interface DraftResult {
-  p1: { name: string; team: string[] };
-  p2: { name: string; team: string[] };
-  kos: KO[];
+  p1: { name: string; team: string[] }
+  p2: { name: string; team: string[] }
+  kos: KO[]
 }
+
+type LastHit = { attacker: string; turn: number }
+type Hazards = { spikes?: string; rocks?: string; tspikes?: string }
 
 export function parseShowdownLog(log: string): DraftResult | null {
-  // --- player names --------------------------------------------------------
-  const p1Match = log.match(/\|player\|p1\|([^\|\n]+)/);
-  const p2Match = log.match(/\|player\|p2\|([^\|\n]+)/);
-  if (!p1Match || !p2Match) return null;
-  const p1Name = p1Match[1].trim();
-  const p2Name = p2Match[1].trim();
+  /* --- player names --------------------------------------------------- */
+  const p1Name = log.match(/\|player\|p1\|([^\|\n]+)/)?.[1]?.trim()
+  const p2Name = log.match(/\|player\|p2\|([^\|\n]+)/)?.[1]?.trim()
+  if (!p1Name || !p2Name) return null
 
-  // --- helpers -------------------------------------------------------------
-  const p1Team: string[] = [];
-  const p2Team: string[] = [];
-  const kos: KO[] = [];
+  /* --- accumulators --------------------------------------------------- */
+  const p1Team: string[] = []
+  const p2Team: string[] = []
+  const kos: KO[] = []
 
-  /** nickname → species */
-  const nickToSpecies: Record<string, string> = {};
-  /** victimSpecies → lastAttackerSpecies */
-  const lastHit: Record<string, string> = {};
+  const nickToSpecies: Record<string, string> = {}
+  const lastHit: Record<string, LastHit> = {}
+  const hazardSetter: Record<'p1' | 'p2', Hazards> = { p1: {}, p2: {} }
 
-  // --- log scan ------------------------------------------------------------
-  log.split('\n').forEach((line) => {
-    /* A) initial team: |poke|p1|Klefki, M|item */
+  let currentTurn = 0
+  const lines = log.split('\n')
+
+  /* helper: given "p2a: Hop on Minecraft" → "p2" */
+  const sideOfNick = (nickField: string): 'p1' | 'p2' =>
+    (nickField.split(':')[0] as 'p1a' | 'p2a').slice(0, 2) as 'p1' | 'p2'
+
+  lines.forEach((line, idx) => {
+    /* ---------------- turn marker ---------------- */
+    if (line.startsWith('|turn|')) {
+      currentTurn = Number(line.split('|')[2])
+    }
+
+    /* ---------------- team lists ----------------- */
     if (line.startsWith('|poke|')) {
-      const [, , player, raw] = line.split('|');
-      const species = raw.split(',')[0].trim();
-      (player === 'p1' ? p1Team : p2Team).push(species);
+      const [, , player, raw] = line.split('|')
+      const species = raw.split(',')[0].trim()
+      ;(player === 'p1' ? p1Team : p2Team).push(species)
     }
 
-    /* B) switch gives us nickname ↔ species */
+    /* ---------------- nickname map --------------- */
     if (line.startsWith('|switch|')) {
-      // |switch|p2a: Doc|Aromatisse, F|100/100
-      const parts = line.split('|');
-      if (parts.length >= 4) {
-        const nick = parts[2].split(':')[1].trim();
-        const species = parts[3].split(',')[0].trim();
-        nickToSpecies[nick] = species;
-      }
+      // |switch|p2a: Nick|Species, F|HP
+      const parts = line.split('|')
+      const nick = parts[2].split(':')[1].trim()
+      const species = parts[3].split(',')[0].trim()
+      nickToSpecies[nick] = species
     }
 
-    /* C) move line: remember last attacker → target */
+    /* ---------------- last damaging hit ---------- */
     if (line.startsWith('|move|')) {
-      // |move|p2a: Jolteon|Volt Switch|p1a: Blissey
-      const parts = line.split('|');
-      if (parts.length >= 5) {
-        const atkNick  = parts[2].split(':')[1].trim();
-        const defNick  = parts[4].split(':')[1].trim();
-        const atkSpec  = nickToSpecies[atkNick] || atkNick;
-        const defSpec  = nickToSpecies[defNick] || defNick;
-        lastHit[defSpec] = atkSpec;
+      // |move|pXy: Nick|Move|pZy: TargetNick
+      const parts = line.split('|')
+      const atkNick = parts[2].split(':')[1].trim()
+      const defNick = parts[4]?.split(':')[1]?.trim()
+      if (atkNick && defNick) {
+        const atkSpec = nickToSpecies[atkNick] || atkNick
+        const defSpec = nickToSpecies[defNick] || defNick
+        lastHit[defSpec] = { attacker: atkSpec, turn: currentTurn }
       }
     }
 
-    /* D) faint line: record KO from lastHit map */
-    if (line.startsWith('|faint|')) {
-      // |faint|p1a: Klefki
-      const victimNick = line.split('|')[2].split(':')[1].trim();
-      const victimSpec = nickToSpecies[victimNick] || victimNick;
-      const attackerSpec = lastHit[victimSpec];
-      if (attackerSpec) kos.push({ attacker: attackerSpec, victim: victimSpec });
+    /* ---------------- hazard placement ----------- */
+    if (line.startsWith('|-sidestart|')) {
+      // look one line up (should be the move that set the hazard)
+      const prev = lines[idx - 1] || ''
+      const atkNick = prev.split('|')[2]?.split(':')[1]?.trim()
+      const atkSpec = nickToSpecies[atkNick] || atkNick
+
+      const parts = line.split('|')
+      const sidePart = parts[2] // "p1: Agent LeFlame"
+      const raw = parts[3]      // "Spikes"
+      const side = sidePart.split(':')[0] as 'p1' | 'p2'
+
+      if (/Spikes/i.test(raw))        hazardSetter[side].spikes  = atkSpec
+      if (/Stealth Rock/i.test(raw))  hazardSetter[side].rocks   = atkSpec
+      if (/Toxic Spikes/i.test(raw))  hazardSetter[side].tspikes = atkSpec
     }
-  });
+
+    /* ---------------- hazard removal ------------- */
+    if (line.startsWith('|-sideend|')) {
+      const [, sidePart, raw] = line.split('|')
+      const side = sidePart.split(':')[0] as 'p1' | 'p2'
+
+      if (/Spikes/i.test(raw))        delete hazardSetter[side].spikes
+      if (/Stealth Rock/i.test(raw))  delete hazardSetter[side].rocks
+      if (/Toxic Spikes/i.test(raw))  delete hazardSetter[side].tspikes
+    }
+
+    /* ---------------- hazard damage -------------- */
+    if (line.startsWith('|-damage|') && line.includes('0 fnt') && /\[from\]/.test(line)) {
+      const parts = line.split('|')
+      const victimField = parts[2]                 // "p1a: Qwilfish"
+      const fromTag = parts[parts.length - 1]  // "[from] Spikes"
+      const side = sideOfNick(victimField)
+      const victimNick = victimField.split(':')[1].trim()
+      const victimSpec = nickToSpecies[victimNick] || victimNick
+      let attacker: string | undefined
+      let hazardType: string | undefined
+
+      if (/\[from\] Stealth Rock/i.test(fromTag)) {
+        attacker = hazardSetter[side].rocks
+        hazardType = 'Stealth Rock'
+      }
+      if (/\[from\] Spikes/i.test(fromTag)) {
+        attacker = hazardSetter[side].spikes
+        hazardType = 'Spikes'
+      }
+      if (/\[from\] Toxic Spikes/i.test(fromTag)) {
+        attacker = hazardSetter[side].tspikes
+        hazardType = 'Toxic Spikes'
+      }
+
+      if (attacker) kos.push({ attacker, victim: victimSpec, hazard: hazardType })
+    }
+
+    /* ---------------- direct KO (no recoil/hazard) */
+    if (line.startsWith('|faint|')) {
+      const victimNick = line.split('|')[2].split(':')[1].trim()
+      const victimSpec = nickToSpecies[victimNick] || victimNick
+
+      const prev = lines[idx - 1] || ''
+      const indirect =
+        /\[from\] (Recoil|Life Orb|Spikes|Stealth Rock|Toxic Spikes|status)/i.test(prev)
+
+      const hit = lastHit[victimSpec]
+      if (hit && hit.turn === currentTurn && !indirect && hit.attacker !== victimSpec) {
+        kos.push({ attacker: hit.attacker, victim: victimSpec })
+      }
+    }
+  })
 
   return {
     p1: { name: p1Name, team: p1Team },
     p2: { name: p2Name, team: p2Team },
     kos,
-  };
+  }
 }
