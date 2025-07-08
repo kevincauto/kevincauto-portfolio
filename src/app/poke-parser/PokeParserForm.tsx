@@ -116,7 +116,7 @@ export default function PokeParserForm() {
                       <th>KOs</th>
                       <th>Fainted</th>
                       <th>Won</th>
-                      <th>Damage Dealt</th>
+                      <th>Direct Damage Dealt</th>
                     </tr>
                   </thead>
                   <tbody>

@@ -78,9 +78,29 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const [, , player, raw] = line.split('|')
       const species = raw.split(',')[0].trim()
       ;(player === 'p1' ? p1Team : p2Team).push(species)
+      
+      // Map the species name to itself (in case it's used as a nickname)
+      nickToSpecies[species] = species
     }
 
-    /* ---------------- nickname map --------------- */
+    /* ---------------- nickname map from drag events --------------- */
+    if (line.startsWith('|drag|')) {
+      // |drag|p2a: Hell's Messenger|Talonflame, M|100/100
+      const parts = line.split('|')
+      const nick = parts[2].split(':')[1].trim()
+      const species = parts[3].split(',')[0].trim()
+      nickToSpecies[nick] = species
+      
+      // Initialize HP tracking for this Pokémon
+      const hpMatch = parts[3].match(/\|(\d+)\/(\d+)/)
+      if (hpMatch) {
+        const [, currentHPStr, maxHPStr] = hpMatch
+        currentHP[species] = parseInt(currentHPStr)
+        maxHP[species] = parseInt(maxHPStr)
+      }
+    }
+
+    /* ---------------- nickname map from switch events --------------- */
     if (line.startsWith('|switch|')) {
       // |switch|p2a: Nick|Species, F|HP
       const parts = line.split('|')
