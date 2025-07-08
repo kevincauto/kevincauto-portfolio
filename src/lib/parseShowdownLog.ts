@@ -9,10 +9,20 @@ export interface KO {
   hazard?: string; // 'Spikes', 'Stealth Rock', or 'Toxic Spikes'
 }
 
+export interface PokemonStats {
+  name: string;
+  kos: number;    // Number of KOs this Pokémon got
+  fainted: number; // 1 if fainted, 0 if survived
+  won: number;    // 1 if team won, 0 if team lost
+}
+
 export interface DraftResult {
   p1: { name: string; team: string[] }
   p2: { name: string; team: string[] }
   kos: KO[]
+  winner?: string // player name of the winner
+  score?: string // format like "1-0" or "2-1"
+  pokemonStats?: PokemonStats[] // Individual Pokémon statistics
 }
 
 type LastHit = { attacker: string; turn: number }
@@ -22,6 +32,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
   /* --- player names --------------------------------------------------- */
   const p1Name = log.match(/\|player\|p1\|([^\|\n]+)/)?.[1]?.trim()
   const p2Name = log.match(/\|player\|p2\|([^\|\n]+)/)?.[1]?.trim()
+  
   if (!p1Name || !p2Name) return null
 
   /* --- accumulators --------------------------------------------------- */
@@ -33,9 +44,19 @@ export function parseShowdownLog(log: string): DraftResult | null {
   const lastHit: Record<string, LastHit> = {}
   const hazardSetter: Record<'p1' | 'p2', Hazards> = { p1: {}, p2: {} }
 
+  // Track fainted Pokémon for score calculation
+  const faintedPokemon: Record<string, boolean> = {}
+  let winner: string | undefined
+  let p1Remaining = 6
+  let p2Remaining = 6
+
+  // Track individual Pokémon statistics
+  const pokemonKOCounts: Record<string, number> = {}
+  const pokemonFainted: Record<string, boolean> = {}
+
   let currentTurn = 0
   const lines = log.split('\n')
-
+  
   /* helper: given "p2a: Hop on Minecraft" → "p2" */
   const sideOfNick = (nickField: string): 'p1' | 'p2' =>
     (nickField.split(':')[0] as 'p1a' | 'p2a').slice(0, 2) as 'p1' | 'p2'
@@ -126,7 +147,11 @@ export function parseShowdownLog(log: string): DraftResult | null {
         hazardType = 'Toxic Spikes'
       }
 
-      if (attacker) kos.push({ attacker, victim: victimSpec, hazard: hazardType })
+      if (attacker) {
+        kos.push({ attacker, victim: victimSpec, hazard: hazardType })
+        // Track KO for the attacker
+        pokemonKOCounts[attacker] = (pokemonKOCounts[attacker] || 0) + 1
+      }
     }
 
     /* ---------------- direct KO (no recoil/hazard) */
@@ -141,13 +166,53 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const hit = lastHit[victimSpec]
       if (hit && hit.turn === currentTurn && !indirect && hit.attacker !== victimSpec) {
         kos.push({ attacker: hit.attacker, victim: victimSpec })
+        // Track KO for the attacker
+        pokemonKOCounts[hit.attacker] = (pokemonKOCounts[hit.attacker] || 0) + 1
+      }
+
+      // Track fainted Pokémon for score calculation
+      faintedPokemon[victimSpec] = true
+      pokemonFainted[victimSpec] = true
+      const side = sideOfNick(line.split('|')[2])
+      if (side === 'p1') {
+        p1Remaining--
+      } else {
+        p2Remaining--
       }
     }
+
+    /* ---------------- winner declaration ---------- */
+    if (line.startsWith('|win|')) {
+      const winnerName = line.split('|')[2]
+      winner = winnerName
+    }
+  })
+
+  // Build pokemonStats array
+  const pokemonStats: PokemonStats[] = []
+  
+  // Add all Pokémon from both teams
+  const allPokemon = [...p1Team, ...p2Team]
+  
+  // Determine which team won
+  const p1Won = winner === p1Name
+  const p2Won = winner === p2Name
+  
+  allPokemon.forEach(pokemon => {
+    pokemonStats.push({
+      name: pokemon,
+      kos: pokemonKOCounts[pokemon] || 0,
+      fainted: pokemonFainted[pokemon] ? 1 : 0,
+      won: (p1Team.includes(pokemon) && p1Won) || (p2Team.includes(pokemon) && p2Won) ? 1 : 0
+    })
   })
 
   return {
     p1: { name: p1Name, team: p1Team },
     p2: { name: p2Name, team: p2Team },
     kos,
+    winner,
+    score: `${p1Remaining}-${p2Remaining}`,
+    pokemonStats
   }
 }

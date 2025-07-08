@@ -41,8 +41,47 @@
   margin-bottom: 0.25rem;
 }
 
+.results__summary {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+.results__summary h3 {
+  margin-bottom: 0.5rem;
+}
+.results__summary p {
+  margin: 0.25rem 0;
+}
+
+.results__stats {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+.results__stats th,
+.results__stats td {
+  padding: 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+.results__stats th {
+  font-weight: bold;
+}
+.results__stats tr:hover {
+  background-color: blue;
+}
+
 /* error */
 .error {
   color: red;
   margin-top: 0.5rem;
+}
+
+/* help */
+.help {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
 }

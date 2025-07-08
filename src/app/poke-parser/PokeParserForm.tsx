@@ -7,6 +7,9 @@ type Parsed = {
   p1: { name: string; team: string[] };
   p2: { name: string; team: string[] };
   kos: { attacker: string; victim: string; hazard?: string }[];
+  winner?: string;
+  score?: string;
+  pokemonStats?: { name: string; kos: number; fainted: number; won: number }[];
 };
 
 export default function PokeParserForm() {
@@ -28,16 +31,16 @@ export default function PokeParserForm() {
         body: JSON.stringify({ url }),
       });
 
+      const responseData = await res.json();
+      
       if (!res.ok) {
-        const { message } = await res.json();
-        throw new Error(message ?? 'Unknown server error');
+        throw new Error(responseData.message ?? 'Unknown server error');
       }
 
-      const { parsed } = await res.json();
-      setData(parsed);
-        } catch (err: unknown) {
-        if (err instanceof Error) setError(err.message);
-        else setError('Unknown error'); 
+      setData(responseData.parsed);
+    } catch (err: unknown) {
+      if (err instanceof Error) setError(err.message);
+      else setError('Unknown error'); 
     } finally {
       setLoading(false);
     }
@@ -58,6 +61,10 @@ export default function PokeParserForm() {
           {loading ? 'Parsing…' : 'Parse'}
         </button>
       </form>
+      
+      <p className={styles.help}>
+        Paste a Pokémon Showdown replay URL (e.g., https://replay.pokemonshowdown.com/gen9draft-1234567890)
+      </p>
 
       {/* Results ----------------------------------------------------------- */}
       {error && <p className={styles.error}>{error}</p>}
@@ -83,6 +90,46 @@ export default function PokeParserForm() {
                   </li>
                 ))}
               </ul>
+            )}
+            
+            {/* Winner and Score */}
+            {(data.winner || data.score) && (
+              <div className={styles.results__summary}>
+                <h3>Result</h3>
+                {data.winner && (
+                  <p><strong>Winner:</strong> {data.winner}</p>
+                )}
+                {data.score && (
+                  <p><strong>Score:</strong> {data.score}</p>
+                )}
+              </div>
+            )}
+
+            {/* Pokémon Statistics */}
+            {data.pokemonStats && data.pokemonStats.length > 0 && (
+              <div className={styles.results__summary}>
+                <h3>Pokémon Statistics</h3>
+                <table className={styles.results__stats}>
+                  <thead>
+                    <tr>
+                      <th>Pokémon</th>
+                      <th>KOs</th>
+                      <th>Fainted</th>
+                      <th>Won</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.pokemonStats.map((pokemon, i) => (
+                      <tr key={i}>
+                        <td>{pokemon.name}</td>
+                        <td>{pokemon.kos}</td>
+                        <td>{pokemon.fainted ? 'Yes' : 'No'}</td>
+                        <td>{pokemon.won ? 'Yes' : 'No'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         </div>
