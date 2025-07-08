@@ -9,11 +9,11 @@ type Parsed = {
   kos: { attacker: string; victim: string; hazard?: string }[];
   winner?: string;
   score?: string;
-  pokemonStats?: { name: string; kos: number; fainted: number; won: number }[];
+  pokemonStats?: { name: string; kos: number; fainted: number; won: number; damageDealt: number }[];
 };
 
 export default function PokeParserForm() {
-  const [url, setUrl] = useState('');
+  const [url, setUrl] = useState('https://replay.pokemonshowdown.com/gen6draft-2335637717-nwegnp5dgbuu4768334bxodu0lmvnnopw');
   const [data, setData] = useState<Parsed | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -116,6 +116,7 @@ export default function PokeParserForm() {
                       <th>KOs</th>
                       <th>Fainted</th>
                       <th>Won</th>
+                      <th>Damage Dealt</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -125,6 +126,7 @@ export default function PokeParserForm() {
                         <td>{pokemon.kos}</td>
                         <td>{pokemon.fainted ? 'Yes' : 'No'}</td>
                         <td>{pokemon.won ? 'Yes' : 'No'}</td>
+                        <td>{pokemon.damageDealt.toFixed(1)}%</td>
                       </tr>
                     ))}
                   </tbody>
