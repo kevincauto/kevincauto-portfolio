@@ -9,10 +9,20 @@ type Parsed = {
   kos: { attacker: string; victim: string; hazard?: string }[];
   winner?: string;
   score?: string;
-  pokemonStats?: { name: string; kos: number; fainted: number; won: number; damageDealt: number; damageTaken: number; hpLost: number }[];
+  pokemonStats?: { 
+    name: string; 
+    kos: number; 
+    fainted: number; 
+    won: number; 
+    directDamageDealt: number; 
+    indirectDamageDealt: number; 
+    directDamageTaken: number; 
+    indirectDamageTaken: number; 
+    hpLost: number 
+  }[];
 };
 
-type SortField = 'name' | 'kos' | 'fainted' | 'won' | 'damageDealt' | 'damageTaken' | 'hpLost';
+type SortField = 'name' | 'kos' | 'fainted' | 'won' | 'directDamageDealt' | 'indirectDamageDealt' | 'directDamageTaken' | 'indirectDamageTaken' | 'hpLost';
 type SortDirection = 'asc' | 'desc';
 
 export default function PokeParserForm() {
@@ -162,11 +172,17 @@ export default function PokeParserForm() {
                       <th onClick={() => handleSort('won')}>
                         Won {getSortIcon('won')}
                       </th>
-                      <th onClick={() => handleSort('damageDealt')}>
-                        Direct Damage Dealt {getSortIcon('damageDealt')}
+                      <th onClick={() => handleSort('directDamageDealt')}>
+                        Direct Damage Dealt {getSortIcon('directDamageDealt')}
                       </th>
-                      <th onClick={() => handleSort('damageTaken')}>
-                        Damage Taken {getSortIcon('damageTaken')}
+                      <th onClick={() => handleSort('indirectDamageDealt')}>
+                        Indirect Damage Dealt {getSortIcon('indirectDamageDealt')}
+                      </th>
+                      <th onClick={() => handleSort('directDamageTaken')}>
+                        Direct Damage Taken {getSortIcon('directDamageTaken')}
+                      </th>
+                      <th onClick={() => handleSort('indirectDamageTaken')}>
+                        Indirect Damage Taken {getSortIcon('indirectDamageTaken')}
                       </th>
                       <th onClick={() => handleSort('hpLost')}>
                         HP Lost {getSortIcon('hpLost')}
@@ -180,9 +196,11 @@ export default function PokeParserForm() {
                         <td>{pokemon.kos}</td>
                         <td>{pokemon.fainted ? 'Yes' : 'No'}</td>
                         <td>{pokemon.won ? 'Yes' : 'No'}</td>
-                        <td>{pokemon.damageDealt.toFixed(1)}%</td>
-                        <td>{pokemon.damageTaken.toFixed(1)}%</td>
-                        <td>{pokemon.hpLost.toFixed(1)}%</td>
+                        <td>{pokemon.directDamageDealt.toFixed(0)}%</td>
+                        <td>{pokemon.indirectDamageDealt.toFixed(0)}%</td>
+                        <td>{pokemon.directDamageTaken.toFixed(0)}%</td>
+                        <td>{pokemon.indirectDamageTaken.toFixed(0)}%</td>
+                        <td>{pokemon.hpLost.toFixed(0)}%</td>
                       </tr>
                     ))}
                   </tbody>

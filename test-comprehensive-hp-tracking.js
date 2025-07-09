@@ -1,6 +1,6 @@
 const { parseShowdownLog } = require('./src/lib/parseShowdownLog.ts');
 
-// Test log with healing and multiple switch-ins to verify HP tracking
+// Test log with healing, Substitute damage, and multiple switch-ins to verify HP tracking
 const testLog = `|player|p1|Player1
 |player|p2|Player2
 |poke|p1|Suicune
@@ -25,7 +25,7 @@ const testLog = `|player|p1|Player1
 |-damage|p2a: The Swim Reaper|88/100 → 77/100
 |win|Player1`;
 
-console.log('Testing comprehensive HP tracking...\n');
+console.log('Testing comprehensive HP tracking with Substitute damage...\n');
 
 const result = parseShowdownLog(testLog);
 
@@ -36,8 +36,10 @@ if (result && result.pokemonStats) {
     console.log(`  KOs: ${pokemon.kos}`);
     console.log(`  Fainted: ${pokemon.fainted ? 'Yes' : 'No'}`);
     console.log(`  Won: ${pokemon.won ? 'Yes' : 'No'}`);
-    console.log(`  Damage Dealt: ${pokemon.damageDealt.toFixed(1)}%`);
-    console.log(`  Damage Taken: ${pokemon.damageTaken.toFixed(1)}%`);
+    console.log(`  Direct Damage Dealt: ${pokemon.directDamageDealt.toFixed(1)}%`);
+    console.log(`  Indirect Damage Dealt: ${pokemon.indirectDamageDealt.toFixed(1)}%`);
+    console.log(`  Direct Damage Taken: ${pokemon.directDamageTaken.toFixed(1)}%`);
+    console.log(`  Indirect Damage Taken: ${pokemon.indirectDamageTaken.toFixed(1)}%`);
     console.log(`  HP Lost: ${pokemon.hpLost.toFixed(1)}%`);
     console.log('');
   });

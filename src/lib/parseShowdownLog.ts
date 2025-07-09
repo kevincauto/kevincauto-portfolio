@@ -14,9 +14,11 @@ export interface PokemonStats {
   kos: number;    // Number of KOs this Pokémon got
   fainted: number; // 1 if fainted, 0 if survived
   won: number;    // 1 if team won, 0 if team lost
-  damageDealt: number; // Total damage dealt as percentage of health (e.g., 150 = 150% of a full health bar)
-  damageTaken: number; // Total damage taken as percentage of health (can exceed 100% due to healing)
-  hpLost: number; // Total HP lost including defensive move costs (can exceed 100% due to healing)
+  directDamageDealt: number; // Direct damage dealt to opponents
+  indirectDamageDealt: number; // Indirect damage dealt to opponents
+  directDamageTaken: number; // Direct damage taken from opponents
+  indirectDamageTaken: number; // Indirect damage taken (including self-inflicted)
+  hpLost: number; // Total HP lost including all damage (can exceed 100% due to healing)
 }
 
 export interface DraftResult {
@@ -44,14 +46,17 @@ export interface PokemonState {
   status?: 'brn' | 'psn' | 'tox' | 'par' | 'slp' | 'frz';
 
   /* cumulative tallies */
-  damageGiven:  number;  // total % dealt
-  damageTaken:  number;  // total % suffered
-  healingDone:  number;  // total % self-heal, Wish, etc.
-  kos:          number;  // confirmed KOs
+  directDamageDealt: number;   // Direct damage dealt to opponents
+  indirectDamageDealt: number; // Indirect damage dealt to opponents
+  directDamageTaken: number;   // Direct damage taken from opponents
+  indirectDamageTaken: number; // Indirect damage taken (including self-inflicted)
+  hpLost: number;              // Total HP lost including all damage
+  healingDone: number;         // total % self-heal, Wish, etc.
+  kos: number;                 // confirmed KOs
 
   /* attribution helpers */
-  lastAttacker?:     string; // most recent damaging mon
-  statusInflictor?:  string; // who caused current status
+  lastAttacker?: string;       // most recent damaging mon
+  statusBy?: string;           // who inflicted current status
 }
 
 /* ────── entry hazards on *one* side (two exist: hazards.p1 & hazards.p2) ────── */
@@ -129,8 +134,11 @@ export function parseShowdownLog(log: string): DraftResult | null {
         species: species || nickname,
         nickname,
         hp: 100,
-        damageGiven: 0,
-        damageTaken: 0,
+        directDamageDealt: 0,
+        indirectDamageDealt: 0,
+        directDamageTaken: 0,
+        indirectDamageTaken: 0,
+        hpLost: 0,
         healingDone: 0,
         kos: 0
       }
@@ -139,28 +147,50 @@ export function parseShowdownLog(log: string): DraftResult | null {
   }
 
   /* helper: update Pokémon HP and track damage */
-  const updatePokemonHP = (nickname: string, newHP: number, isHealing: boolean = false, attacker?: string) => {
+  const updatePokemonHP = (nickname: string, newHP: number, isHealing: boolean = false, attacker?: string, isDirectDamage: boolean = true, isSelfDamage: boolean = false) => {
     const pokemon = getPokemon(nickname)
     const prevHP = pokemon.hp
     
     if (nickname === 'The Swim Reaper') {
-      console.log(`[DEBUG] updatePokemonHP: ${nickname}, prevHP: ${prevHP}, newHP: ${newHP}, isHealing: ${isHealing}`)
+      console.log(`[DEBUG] updatePokemonHP: ${nickname}, prevHP: ${prevHP}, newHP: ${newHP}, isHealing: ${isHealing}, isDirect: ${isDirectDamage}, isSelf: ${isSelfDamage}`)
     }
     
     // Update HP
     pokemon.hp = newHP
     
     if (!isHealing && newHP < prevHP) {
-      // Damage taken
+      // HP Lost - track all damage
       const damage = prevHP - newHP
-      pokemon.damageTaken += damage
+      pokemon.hpLost += damage
+      
+      // Track damage taken
+      if (isDirectDamage) {
+        pokemon.directDamageTaken += damage
+      } else {
+        pokemon.indirectDamageTaken += damage
+      }
+      
+      // Track damage dealt (only if not self-damage)
+      if (attacker && !isSelfDamage) {
+        const attackerState = getPokemon(attacker)
+        if (isDirectDamage) {
+          attackerState.directDamageDealt += damage
+        } else {
+          attackerState.indirectDamageDealt += damage
+        }
+      }
       
       if (attacker) {
         pokemon.lastAttacker = attacker
       }
       
       if (nickname === 'The Swim Reaper') {
-        console.log(`[DEBUG] Damage tracked: ${damage}%, total damageTaken: ${pokemon.damageTaken}`)
+        console.log(`[DEBUG] HP Lost tracked: ${damage}%, total hpLost: ${pokemon.hpLost}`)
+        if (isDirectDamage) {
+          console.log(`[DEBUG] Direct damage taken: ${damage}%, total directDamageTaken: ${pokemon.directDamageTaken}`)
+        } else {
+          console.log(`[DEBUG] Indirect damage taken: ${damage}%, total indirectDamageTaken: ${pokemon.indirectDamageTaken}`)
+        }
       }
     } else if (isHealing && newHP > prevHP) {
       // Healing done
@@ -170,16 +200,6 @@ export function parseShowdownLog(log: string): DraftResult | null {
       if (nickname === 'The Swim Reaper') {
         console.log(`[DEBUG] Healing tracked: ${healing}%, total healingDone: ${pokemon.healingDone}`)
       }
-    }
-  }
-
-  /* helper: track damage dealt by attacker */
-  const trackDamageDealt = (attackerNick: string, victimNick: string, damage: number) => {
-    const attacker = getPokemon(attackerNick)
-    attacker.damageGiven += damage
-    
-    if (attackerNick === 'The Swim Reaper') {
-      console.log(`[DEBUG] Damage dealt: ${damage}%, total damageGiven: ${attacker.damageGiven}`)
     }
   }
 
@@ -259,89 +279,6 @@ export function parseShowdownLog(log: string): DraftResult | null {
       }
     }
 
-    /* ---------------- damage tracking ---------- */
-    if (line.startsWith('|-damage|')) {
-      const parts = line.split('|')
-      const victimField = parts[2]
-      const hpInfo = parts[3]
-      const victimNick = victimField.split(':')[1].trim()
-      
-      // Parse HP change
-      const hpChangeMatch = hpInfo.match(/(\d+)\/(\d+)\s*→\s*(\d+)\/(\d+)/)
-      const koChangeMatch = hpInfo.match(/(\d+)\/(\d+)\s*→\s*0 fnt/)
-      const currentHPMatch = hpInfo.match(/(\d+)\/(\d+)/)
-      const koMatch = hpInfo.match(/0 fnt/)
-      
-      let newHP = 0
-      
-      if (hpChangeMatch) {
-        // "A/B → C/D"
-        const [, , , newHPStr] = hpChangeMatch
-        newHP = parseInt(newHPStr)
-      } else if (koChangeMatch) {
-        // "A/B → 0 fnt"
-        newHP = 0
-      } else if (koMatch) {
-        // "0 fnt"
-        newHP = 0
-      } else if (currentHPMatch) {
-        // "E/F"
-        const [, newHPStr] = currentHPMatch
-        newHP = parseInt(newHPStr)
-      }
-      
-      // Find the attacker from the previous move line
-      let attackerNick: string | undefined
-      for (let i = idx - 1; i >= Math.max(0, idx - 5); i--) {
-        const prevLine = lines[i]
-        if (prevLine.startsWith('|move|')) {
-          const moveParts = prevLine.split('|')
-          const atkNick = moveParts[2].split(':')[1].trim()
-          const defNick = moveParts[4]?.split(':')[1]?.trim()
-          const moveName = moveParts[3]
-          
-          if (atkNick === victimNick) break // Self-damage
-          
-          const defensiveMoves = ['Substitute', 'Belly Drum', 'Clangorous Soul', 'Dragon Energy', 'Steel Beam', 'Mind Blown', 'Bolt Beak', 'Fishious Rend']
-          if (defensiveMoves.includes(moveName)) break
-          
-          if (defNick === victimNick) {
-            attackerNick = atkNick
-            break
-          }
-        }
-      }
-      
-      // Update Pokémon state
-      const victim = getPokemon(victimNick)
-      const prevHP = victim.hp
-      updatePokemonHP(victimNick, newHP, false, attackerNick)
-      
-      // Track damage dealt by attacker
-      if (attackerNick && newHP < prevHP) {
-        const damage = prevHP - newHP
-        trackDamageDealt(attackerNick, victimNick, damage)
-      }
-    }
-
-    /* ---------------- healing tracking ---------- */
-    if (line.startsWith('|-heal|')) {
-      const parts = line.split('|')
-      const targetField = parts[2]
-      const hpInfo = parts[3]
-      const targetNick = targetField.split(':')[1].trim()
-      
-      // Parse HP change: "A/B" or "A/B slp" etc.
-      const hpMatch = hpInfo.match(/(\d+)\/(\d+)/)
-      if (hpMatch) {
-        const [, newHPStr] = hpMatch
-        const newHP = parseInt(newHPStr)
-        
-        // Update Pokémon state (mark as healing)
-        updatePokemonHP(targetNick, newHP, true)
-      }
-    }
-
     /* ---------------- status tracking ---------- */
     if (line.startsWith('|-status|')) {
       const parts = line.split('|')
@@ -361,7 +298,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
           const defNick = moveParts[4]?.split(':')[1]?.trim()
           
           if (defNick === targetNick) {
-            pokemon.statusInflictor = atkNick
+            pokemon.statusBy = atkNick
             break
           }
         }
@@ -373,7 +310,6 @@ export function parseShowdownLog(log: string): DraftResult | null {
       // look one line up (should be the move that set the hazard)
       const prev = lines[idx - 1] || ''
       const atkNick = prev.split('|')[2]?.split(':')[1]?.trim()
-      const atkSpec = nickToSpecies[atkNick] || atkNick
 
       const parts = line.split('|')
       const sidePart = parts[2] // "p1: Agent LeFlame"
@@ -382,14 +318,14 @@ export function parseShowdownLog(log: string): DraftResult | null {
 
       if (/Spikes/i.test(raw)) {
         battle.hazards[side].spikesLayers++
-        battle.hazards[side].spikesSetter = atkSpec
+        battle.hazards[side].spikesSetter = atkNick // Store nickname, not species
       }
       if (/Stealth Rock/i.test(raw)) {
-        battle.hazards[side].stealthRockSetter = atkSpec
+        battle.hazards[side].stealthRockSetter = atkNick // Store nickname, not species
       }
       if (/Toxic Spikes/i.test(raw)) {
         battle.hazards[side].toxicSpikesLayers++
-        battle.hazards[side].toxicSpikesSetter = atkSpec
+        battle.hazards[side].toxicSpikesSetter = atkNick // Store nickname, not species
       }
     }
 
@@ -440,10 +376,140 @@ export function parseShowdownLog(log: string): DraftResult | null {
         // Track KO for the attacker
         const attackerState = getPokemon(attacker, attacker)
         attackerState.kos++
-        // Track damage taken by victim (KO = 100% damage)
+        // Track indirect damage taken by victim (KO = 100% damage)
         const victimState = getPokemon(victimSpec, victimNick)
-        victimState.damageTaken += 100
+        victimState.indirectDamageTaken += 100
+        victimState.hpLost += 100
         victimState.hp = 0
+        // Track indirect damage dealt by hazard setter
+        attackerState.indirectDamageDealt += 100
+      }
+    }
+
+    /* ---------------- damage tracking ---------- */
+    if (line.startsWith('|-damage|')) {
+      const parts = line.split('|')
+      const victimField = parts[2]
+      const hpInfo = parts[3]
+      const victimNick = victimField.split(':')[1].trim()
+      
+      // Parse HP change
+      const hpChangeMatch = hpInfo.match(/(\d+)\/(\d+)\s*→\s*(\d+)\/(\d+)/)
+      const koChangeMatch = hpInfo.match(/(\d+)\/(\d+)\s*→\s*0 fnt/)
+      const currentHPMatch = hpInfo.match(/(\d+)\/(\d+)/)
+      const koMatch = hpInfo.match(/0 fnt/)
+      
+      let newHP = 0
+      
+      if (hpChangeMatch) {
+        // "A/B → C/D"
+        const [, , , newHPStr] = hpChangeMatch
+        newHP = parseInt(newHPStr)
+      } else if (koChangeMatch) {
+        // "A/B → 0 fnt"
+        newHP = 0
+      } else if (koMatch) {
+        // "0 fnt"
+        newHP = 0
+      } else if (currentHPMatch) {
+        // "E/F"
+        const [, newHPStr] = currentHPMatch
+        newHP = parseInt(newHPStr)
+      }
+      
+      // Find the attacker and determine damage type from the previous move line
+      let attackerNick: string | undefined
+      let isDirectDamage = true
+      let isSelfDamage = false
+      
+      for (let i = idx - 1; i >= Math.max(0, idx - 5); i--) {
+        const prevLine = lines[i]
+        if (prevLine.startsWith('|move|')) {
+          const moveParts = prevLine.split('|')
+          const atkNick = moveParts[2].split(':')[1].trim()
+          const defNick = moveParts[4]?.split(':')[1]?.trim()
+          const moveName = moveParts[3]
+          
+          // Check if this is self-damage
+          if (atkNick === victimNick) {
+            attackerNick = atkNick
+            isSelfDamage = true
+            isDirectDamage = false // Self-damage is always indirect
+            break
+          }
+          
+          // Check if this is a defensive move causing self-damage
+          const defensiveMoves = ['Substitute', 'Belly Drum', 'Clangorous Soul', 'Dragon Energy', 'Steel Beam', 'Mind Blown']
+          if (defensiveMoves.includes(moveName) && atkNick === victimNick) {
+            attackerNick = atkNick
+            isSelfDamage = true
+            isDirectDamage = false
+            break
+          }
+          
+          // Check if this is recoil damage
+          if (prevLine.includes('[from] Recoil') || prevLine.includes('[from] Life Orb')) {
+            attackerNick = atkNick
+            isSelfDamage = true
+            isDirectDamage = false
+            break
+          }
+          
+          // Regular attack
+          if (defNick === victimNick) {
+            attackerNick = atkNick
+            isDirectDamage = true
+            isSelfDamage = false
+            break
+          }
+        }
+      }
+      
+      // Check for status damage
+      if (line.includes('[from] psn') || line.includes('[from] brn') || line.includes('[from] tox')) {
+        isDirectDamage = false
+        // Find who inflicted the status
+        const victimState = getPokemon(victimNick)
+        if (victimState.statusBy) {
+          attackerNick = victimState.statusBy
+        }
+      }
+      
+      // Check for hazard damage
+      if (line.includes('[from] Stealth Rock') || line.includes('[from] Spikes') || line.includes('[from] Toxic Spikes')) {
+        isDirectDamage = false
+        // Attribute to hazard setter
+        const side = sideOfNick(victimField)
+        if (line.includes('[from] Stealth Rock') && battle.hazards[side].stealthRockSetter) {
+          attackerNick = battle.hazards[side].stealthRockSetter
+        }
+        if (line.includes('[from] Spikes') && battle.hazards[side].spikesSetter) {
+          attackerNick = battle.hazards[side].spikesSetter
+        }
+        if (line.includes('[from] Toxic Spikes') && battle.hazards[side].toxicSpikesSetter) {
+          attackerNick = battle.hazards[side].toxicSpikesSetter
+        }
+      }
+      
+      // Update Pokémon state
+      updatePokemonHP(victimNick, newHP, false, attackerNick, isDirectDamage, isSelfDamage)
+    }
+
+    /* ---------------- healing tracking ---------- */
+    if (line.startsWith('|-heal|')) {
+      const parts = line.split('|')
+      const targetField = parts[2]
+      const hpInfo = parts[3]
+      const targetNick = targetField.split(':')[1].trim()
+      
+      // Parse HP change: "A/B" or "A/B slp" etc.
+      const hpMatch = hpInfo.match(/(\d+)\/(\d+)/)
+      if (hpMatch) {
+        const [, newHPStr] = hpMatch
+        const newHP = parseInt(newHPStr)
+        
+        // Update Pokémon state (mark as healing)
+        updatePokemonHP(targetNick, newHP, true)
       }
     }
 
@@ -500,17 +566,21 @@ export function parseShowdownLog(log: string): DraftResult | null {
     // Sum stats across all nicknames for this species
     const totalKOs = allStates.reduce((sum, p) => sum + p.kos, 0)
     const fainted = allStates.some(p => p.hp === 0) ? 1 : 0
-    const damageDealt = allStates.reduce((sum, p) => sum + p.damageGiven, 0)
-    const damageTaken = allStates.reduce((sum, p) => sum + p.damageTaken, 0)
-    const hpLost = damageTaken // For now, same as damageTaken
+    const directDamageDealt = allStates.reduce((sum, p) => sum + p.directDamageDealt, 0)
+    const indirectDamageDealt = allStates.reduce((sum, p) => sum + p.indirectDamageDealt, 0)
+    const directDamageTaken = allStates.reduce((sum, p) => sum + p.directDamageTaken, 0)
+    const indirectDamageTaken = allStates.reduce((sum, p) => sum + p.indirectDamageTaken, 0)
+    const hpLost = allStates.reduce((sum, p) => sum + p.hpLost, 0)
 
     pokemonStats.push({
       name: pokemonSpecies,
       kos: totalKOs,
       fainted,
       won: (p1Team.includes(pokemonSpecies) && p1Won) || (p2Team.includes(pokemonSpecies) && p2Won) ? 1 : 0,
-      damageDealt,
-      damageTaken,
+      directDamageDealt,
+      indirectDamageDealt,
+      directDamageTaken,
+      indirectDamageTaken,
       hpLost
     })
   })
