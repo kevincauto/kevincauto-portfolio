@@ -40,6 +40,7 @@ type Parsed = {
     damageTakenByContactAbility: number;
     damageTakenByLifeOrb: number;
     damageTakenByMoveRecoil: number;
+    damageTakenBySubstitute: number;
   }[];
 };
 
@@ -71,7 +72,8 @@ type SortField =
   | 'damageTakenByRockyHelmet'
   | 'damageTakenByContactAbility'
   | 'damageTakenByLifeOrb'
-  | 'damageTakenByMoveRecoil';
+  | 'damageTakenByMoveRecoil'
+  | 'damageTakenBySubstitute';
 type SortDirection = 'asc' | 'desc';
 
 export default function PokeParserForm() {
@@ -294,6 +296,9 @@ export default function PokeParserForm() {
                       <th onClick={() => handleSort('damageTakenByMoveRecoil')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenByMoveRecoil' ? styles.activeSort : ''}`}>
                         Move Recoil Taken {getSortIcon('damageTakenByMoveRecoil')}
                       </th>
+                      <th onClick={() => handleSort('damageTakenBySubstitute')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenBySubstitute' ? styles.activeSort : ''}`}>
+                        Substitute Taken {getSortIcon('damageTakenBySubstitute')}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -327,6 +332,7 @@ export default function PokeParserForm() {
                         <td className={sortField === 'damageTakenByContactAbility' ? styles.activeSort : ''}>{Math.round(pokemon.damageTakenByContactAbility)}%</td>
                         <td className={sortField === 'damageTakenByLifeOrb' ? styles.activeSort : ''}>{Math.round(pokemon.damageTakenByLifeOrb)}%</td>
                         <td className={sortField === 'damageTakenByMoveRecoil' ? styles.activeSort : ''}>{Math.round(pokemon.damageTakenByMoveRecoil)}%</td>
+                        <td className={sortField === 'damageTakenBySubstitute' ? styles.activeSort : ''}>{Math.round(pokemon.damageTakenBySubstitute)}%</td>
                       </tr>
                     ))}
                   </tbody>

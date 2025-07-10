@@ -41,6 +41,7 @@ export interface PokemonStats {
   damageTakenByContactAbility: number; // Rough Skin, Iron Barbs, etc.
   damageTakenByLifeOrb: number;
   damageTakenByMoveRecoil: number;
+  damageTakenBySubstitute: number;
 }
 
 export interface DraftResult {
@@ -75,6 +76,7 @@ export interface PokemonState {
   totalDamageTaken: number;              // Total damage taken including all damage
   healingDone: number;         // total % self-heal, Wish, etc.
   kos: number;                 // confirmed KOs
+  substituteUses: number;      // number of times Substitute was used
 
   /* attribution helpers */
   lastAttacker?: string;       // most recent damaging mon
@@ -100,6 +102,7 @@ export interface PokemonState {
   damageTakenByContactAbility: number; // Rough Skin, Iron Barbs, etc.
   damageTakenByLifeOrb: number;
   damageTakenByMoveRecoil: number;
+  damageTakenBySubstitute: number;
 }
 
 /* ────── entry hazards on *one* side (two exist: hazards.p1 & hazards.p2) ────── */
@@ -186,6 +189,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
         totalDamageTaken: 0,
         healingDone: 0,
         kos: 0,
+        substituteUses: 0,
         damageDealtBySpikes: 0,
         damageDealtByStealthRock: 0,
         damageDealtByPoison: 0,
@@ -205,6 +209,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
         damageTakenByContactAbility: 0,
         damageTakenByLifeOrb: 0,
         damageTakenByMoveRecoil: 0,
+        damageTakenBySubstitute: 0,
       }
     }
     return battle.pokemon[nickname]
@@ -261,6 +266,10 @@ export function parseShowdownLog(log: string): DraftResult | null {
               break
             case 'Recoil':
               pokemon.damageTakenByMoveRecoil += damage
+              break
+            case 'Substitute':
+              // Substitute always costs exactly 25% of max HP per use
+              // The damage is calculated as 25% * number of uses, not from HP drops
               break
           }
         }
@@ -793,6 +802,40 @@ export function parseShowdownLog(log: string): DraftResult | null {
         }
       }
       
+      // Check for Substitute damage - damage that occurs right after a Substitute move
+      let isSubstituteDamage = false
+      if (isSelfDamage && attackerNick === victimNick) {
+        // Look back a few lines to see if this is Substitute damage
+        for (let i = idx - 1; i >= Math.max(0, idx - 3); i--) {
+          const prevLine = lines[i]
+          if (prevLine.startsWith('|-start|') && prevLine.includes('Substitute')) {
+            // Check if the Pokemon in the start line matches our victim
+            const startParts = prevLine.split('|')
+            const startNick = startParts[2]?.split(':')[1]?.trim()
+            if (startNick === victimNick) {
+              // Look back one more line to find the Substitute move
+              for (let j = i - 1; j >= Math.max(0, i - 2); j--) {
+                const moveLine = lines[j]
+                if (moveLine.startsWith('|move|')) {
+                  const moveParts = moveLine.split('|')
+                  const moveAtkNick = moveParts[2]?.split(':')[1]?.trim()
+                  const moveName = moveParts[3]
+                  if (moveName === 'Substitute' && moveAtkNick === victimNick) {
+                    isSubstituteDamage = true
+                    damageType = 'Substitute'
+                    // Increment substitute use counter
+                    const pokemon = getPokemon(victimNick)
+                    pokemon.substituteUses++
+                    break
+                  }
+                }
+              }
+              if (isSubstituteDamage) break
+            }
+          }
+        }
+      }
+      
       // Update Pokémon state
       updatePokemonHP(victimNick, newHP, false, attackerNick, isDirectDamage, isSelfDamage, damageType)
     }
@@ -812,6 +855,22 @@ export function parseShowdownLog(log: string): DraftResult | null {
         
         // Update Pokémon state (mark as healing)
         updatePokemonHP(targetNick, newHP, true, undefined, true, false, undefined)
+      }
+    }
+
+    /* ---------------- additional healing sources ---------- */
+    // Check for Leftovers healing that might be in different format
+    if (line.includes('[from] item: Leftovers') && !line.startsWith('|-heal|')) {
+      // This might be healing embedded in other events
+      const healMatch = line.match(/(\d+)\/(\d+)/)
+      if (healMatch) {
+        const [, newHPStr] = healMatch
+        const newHP = parseInt(newHPStr)
+        const targetField = line.split('|')[2]
+        const targetNick = targetField?.split(':')[1]?.trim()
+        if (targetNick) {
+          updatePokemonHP(targetNick, newHP, true, undefined, true, false, undefined)
+        }
       }
     }
 
@@ -906,6 +965,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
       damageTakenByContactAbility: allStates.reduce((sum, p) => sum + p.damageTakenByContactAbility, 0), // Rough Skin, Iron Barbs, etc.
       damageTakenByLifeOrb: allStates.reduce((sum, p) => sum + p.damageTakenByLifeOrb, 0),
       damageTakenByMoveRecoil: allStates.reduce((sum, p) => sum + p.damageTakenByMoveRecoil, 0),
+      damageTakenBySubstitute: allStates.reduce((sum, p) => sum + (p.substituteUses * 25), 0),
     })
   })
 
