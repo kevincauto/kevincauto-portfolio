@@ -131,6 +131,10 @@ interface BattleState {
   hailSetter?:      string;  // nickname that started the current Hail/Snow
   rainSetter?:      string;  // nickname that started the current Rain
   sunSetter?:       string;  // nickname that started the current Sun
+
+  /** delayed damage moves */
+  futureSightAttacker?: string;  // nickname that used Future Sight
+  doomDesireAttacker?: string;   // nickname that used Doom Desire
 }
 
 type LastHit = { attacker: string; turn: number; move: string }
@@ -393,6 +397,8 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const parts = line.split('|')
       const atkNick = parts[2].split(':')[1].trim()
       const defNick = parts[4]?.split(':')[1]?.trim()
+      const moveName = parts[3]
+      
       if (atkNick && defNick) {
         const atkSpec = nickToSpecies[atkNick] || atkNick
         const defSpec = nickToSpecies[defNick] || defNick
@@ -401,6 +407,14 @@ export function parseShowdownLog(log: string): DraftResult | null {
         // Track the attacker for ability/item damage attribution
         const defState = getPokemon(defNick)
         defState.lastAttacker = atkNick
+      }
+      
+      // Track delayed damage moves
+      if (moveName === 'Future Sight') {
+        battle.futureSightAttacker = atkNick
+      }
+      if (moveName === 'Doom Desire') {
+        battle.doomDesireAttacker = atkNick
       }
     }
 
@@ -781,6 +795,28 @@ export function parseShowdownLog(log: string): DraftResult | null {
         // Future Sight damage is attributed to the user of Future Sight
         // We need to track this separately or look back for the Future Sight move
         // For now, we'll mark it as indirect damage without specific attribution
+        if (battle.futureSightAttacker) {
+          attackerNick = battle.futureSightAttacker
+          isDirectDamage = true  // Future Sight is direct damage from the original user
+        }
+      }
+      
+      // Check for Future Sight damage (alternative format - damage after Future Sight end)
+      if (idx > 0 && lines[idx - 1].includes('|-end|') && lines[idx - 1].includes('move: Future Sight')) {
+        if (battle.futureSightAttacker) {
+          attackerNick = battle.futureSightAttacker
+          isDirectDamage = true  // Future Sight is direct damage from the original user
+        }
+      }
+      
+      // Check for Doom Desire damage
+      if (line.includes('[from] Doom Desire')) {
+        isDirectDamage = false
+        isSelfDamage = false
+        if (battle.doomDesireAttacker) {
+          attackerNick = battle.doomDesireAttacker
+          isDirectDamage = true  // Doom Desire is direct damage from the original user
+        }
       }
       
       // Check for Explosion/Self-Destruct damage
