@@ -6,7 +6,7 @@ import styles from './PokeParserForm.module.css';
 type Parsed = {
   p1: { name: string; team: string[] };
   p2: { name: string; team: string[] };
-  kos: { attacker: string; victim: string; hazard?: string }[];
+  kos: { attacker: string; victim: string; hazard?: string; move?: string }[];
   winner?: string;
   score?: string;
   pokemonStats?: { 
@@ -147,13 +147,8 @@ export default function PokeParserForm() {
 
       {data && (
         <div className={styles.results}>
-          {/* left column – raw JSON */}
-          <pre className={styles.results__json}>
-            {JSON.stringify(data, null, 2)}
-          </pre>
-
-          {/* right column – KO list */}
-          <div className={styles.results__kos}>
+          {/* KO list and statistics */}
+          <div className={styles.results__content}>
             <h3>Knock-outs</h3>
             {data.kos.length === 0 ? (
               <p>No KOs recorded.</p>
@@ -162,6 +157,7 @@ export default function PokeParserForm() {
                 {data.kos.map((k, i) => (
                   <li key={i}>
                     <strong>{k.attacker}</strong> KO&apos;s {k.victim}
+                    {k.move && ` with ${k.move}`}
                     {k.hazard && ` (${k.hazard})`}
                   </li>
                 ))}
@@ -271,6 +267,14 @@ export default function PokeParserForm() {
                 </table>
               </div>
             )}
+          </div>
+
+          {/* JSON at the bottom */}
+          <div className={styles.results__json}>
+            <h3>Raw Data</h3>
+            <pre>
+              {JSON.stringify(data, null, 2)}
+            </pre>
           </div>
         </div>
       )}

@@ -7,6 +7,7 @@ export interface KO {
   attacker: string; 
   victim: string; 
   hazard?: string; // 'Spikes', 'Stealth Rock', or 'Toxic Spikes'
+  move?: string; // The move that caused the KO (for direct attacks)
 }
 
 export interface PokemonStats {
@@ -107,7 +108,7 @@ interface BattleState {
   sunSetter?:       string;  // nickname that started the current Sun
 }
 
-type LastHit = { attacker: string; turn: number }
+type LastHit = { attacker: string; turn: number; move: string }
 
 export function parseShowdownLog(log: string): DraftResult | null {
   /* --- player names --------------------------------------------------- */
@@ -317,7 +318,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
       if (atkNick && defNick) {
         const atkSpec = nickToSpecies[atkNick] || atkNick
         const defSpec = nickToSpecies[defNick] || defNick
-        lastHit[defSpec] = { attacker: atkSpec, turn: currentTurn }
+        lastHit[defSpec] = { attacker: atkSpec, turn: currentTurn, move: parts[3] }
         
         // Track the attacker for ability/item damage attribution
         const defState = getPokemon(defNick)
@@ -335,17 +336,24 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const pokemon = getPokemon(targetNick)
       pokemon.status = status
       
-      // Find who inflicted the status
-      for (let i = idx - 1; i >= Math.max(0, idx - 5); i--) {
-        const prevLine = lines[i]
-        if (prevLine.startsWith('|move|')) {
-          const moveParts = prevLine.split('|')
-          const atkNick = moveParts[2].split(':')[1].trim()
-          const defNick = moveParts[4]?.split(':')[1]?.trim()
-          
-          if (defNick === targetNick) {
-            pokemon.statusBy = atkNick
-            break
+      // Check if this is self-inflicted status from an item
+      const fromTag = parts[4] || ''
+      if (fromTag.includes('[from] item:') && (fromTag.includes('Flame Orb') || fromTag.includes('Toxic Orb'))) {
+        // Self-inflicted status from item - don't attribute to anyone
+        pokemon.statusBy = undefined
+      } else {
+        // Find who inflicted the status
+        for (let i = idx - 1; i >= Math.max(0, idx - 5); i--) {
+          const prevLine = lines[i]
+          if (prevLine.startsWith('|move|')) {
+            const moveParts = prevLine.split('|')
+            const atkNick = moveParts[2].split(':')[1].trim()
+            const defNick = moveParts[4]?.split(':')[1]?.trim()
+            
+            if (defNick === targetNick) {
+              pokemon.statusBy = atkNick
+              break
+            }
           }
         }
       }
@@ -728,7 +736,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
 
       const hit = lastHit[victimSpec]
       if (hit && hit.turn === currentTurn && !indirect && hit.attacker !== victimSpec) {
-        kos.push({ attacker: hit.attacker, victim: victimSpec })
+        kos.push({ attacker: hit.attacker, victim: victimSpec, move: hit.move })
         // Track KO for the attacker
         const attackerState = getPokemon(hit.attacker, hit.attacker)
         attackerState.kos++

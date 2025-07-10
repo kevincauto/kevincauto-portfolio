@@ -17,28 +17,37 @@
 /* ––– results layout ––– */
 .results {
   display: flex;
+  flex-direction: column;
   gap: 2rem;
-  align-items: flex-start;
 }
 
-/* left column */
-.results__json {
-  flex: 1;
-  /* background: #f8f8f8; */
-  padding: 1rem;
-  overflow-x: auto;
+/* main content area */
+.results__content {
+  width: 100%;
 }
-
-/* right column */
-.results__kos {
-  flex: 1;
-}
-.results__kos ul {
+.results__content ul {
   padding-left: 1.2rem;
   margin: 0.5rem 0 0;
 }
-.results__kos li {
+.results__content li {
   margin-bottom: 0.25rem;
+}
+
+/* JSON at the bottom */
+.results__json {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+.results__json h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+.results__json pre {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
 }
 
 .results__summary {
