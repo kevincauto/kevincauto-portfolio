@@ -67,12 +67,14 @@
   border-collapse: collapse;
   margin-top: 0.5rem;
   font-size: 0.9rem;
+  table-layout: fixed;
 }
 .results__stats th,
 .results__stats td {
   padding: 0.5rem;
   text-align: left;
   border-bottom: 1px solid #eee;
+  white-space: nowrap;
 }
 .results__stats th {
   font-weight: bold;
@@ -81,14 +83,82 @@
   background-color: blue;
 }
 
+/* Sticky first column (Pokémon name) */
+.results__stats th:first-child,
+.results__stats td:first-child {
+  position: sticky;
+  left: 0;
+  background-color: black;
+  z-index: 1;
+  border-right: 2px solid #ddd;
+  min-width: 260px;   /* even wider Pokémon column */
+  max-width: 340px;   /* adjust as needed */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.results__stats tr:hover th:first-child,
+.results__stats tr:hover td:first-child {
+  /* background-color: #f0f0f0; */
+}
+
+/* Allow header cells to wrap text */
+.results__stats th {
+  white-space: normal !important;
+  word-break: break-word;
+  vertical-align: bottom;
+  line-height: 1.2;
+  font-size: 0.95em;
+  padding-top: 0.7em;
+  padding-bottom: 0.7em;
+}
+
+/* Vertical headers for all except the first column */
+.results__stats th:not(:first-child) {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  min-width: 40px;
+  max-width: 60px;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  font-size: 0.95em;
+  line-height: 1;
+}
+
+/* Table container for horizontal scrolling */
+.results__statsContainer {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
 /* Indirect damage column styling */
 .indirectDamageHeader {
-  background-color: #4a148c !important; /* Dark purple */
+  background-color: #4a148c !important; /* Dark purple for damage dealt */
   color: white !important;
   cursor: pointer;
 }
+.pokemonNameCell {
+  min-width: 560px;   /* even wider Pokémon column */
+   /* adjust as needed */
+}
 .indirectDamageCell {
-  background-color: #6a1b9a !important; /* Light purple background */
+  background-color: #6a1b9a !important; /* Light purple for damage dealt */
+}
+.indirectDamageTakenHeader {
+  background-color: #6d002b !important; /* Dark maroon for damage taken */
+  color: white !important;
+  cursor: pointer;
+}
+.indirectDamageTakenCell {
+  background-color: #8b1c3b !important; /* Lighter maroon for damage taken */
+  color: white !important;
 }
 
 /* error */

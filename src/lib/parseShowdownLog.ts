@@ -30,6 +30,17 @@ export interface PokemonStats {
   damageDealtByHail: number;
   damageDealtByRockyHelmet: number;
   damageDealtByContactAbility: number; // Rough Skin, Iron Barbs, etc.
+  // Granular indirect damage taken categories
+  damageTakenBySpikes: number;
+  damageTakenByStealthRock: number;
+  damageTakenByPoison: number;
+  damageTakenByBurn: number;
+  damageTakenBySandstorm: number;
+  damageTakenByHail: number;
+  damageTakenByRockyHelmet: number;
+  damageTakenByContactAbility: number; // Rough Skin, Iron Barbs, etc.
+  damageTakenByLifeOrb: number;
+  damageTakenByMoveRecoil: number;
 }
 
 export interface DraftResult {
@@ -78,6 +89,17 @@ export interface PokemonState {
   damageDealtByHail: number;
   damageDealtByRockyHelmet: number;
   damageDealtByContactAbility: number; // Rough Skin, Iron Barbs, etc.
+  // Granular indirect damage taken categories
+  damageTakenBySpikes: number;
+  damageTakenByStealthRock: number;
+  damageTakenByPoison: number;
+  damageTakenByBurn: number;
+  damageTakenBySandstorm: number;
+  damageTakenByHail: number;
+  damageTakenByRockyHelmet: number;
+  damageTakenByContactAbility: number; // Rough Skin, Iron Barbs, etc.
+  damageTakenByLifeOrb: number;
+  damageTakenByMoveRecoil: number;
 }
 
 /* ────── entry hazards on *one* side (two exist: hazards.p1 & hazards.p2) ────── */
@@ -172,6 +194,17 @@ export function parseShowdownLog(log: string): DraftResult | null {
         damageDealtByHail: 0,
         damageDealtByRockyHelmet: 0,
         damageDealtByContactAbility: 0,
+        // Granular indirect damage taken categories
+        damageTakenBySpikes: 0,
+        damageTakenByStealthRock: 0,
+        damageTakenByPoison: 0,
+        damageTakenByBurn: 0,
+        damageTakenBySandstorm: 0,
+        damageTakenByHail: 0,
+        damageTakenByRockyHelmet: 0,
+        damageTakenByContactAbility: 0,
+        damageTakenByLifeOrb: 0,
+        damageTakenByMoveRecoil: 0,
       }
     }
     return battle.pokemon[nickname]
@@ -195,6 +228,42 @@ export function parseShowdownLog(log: string): DraftResult | null {
         pokemon.directDamageTaken += damage
       } else {
         pokemon.indirectDamageTaken += damage
+        
+        // Track granular indirect damage taken categories
+        if (damageType) {
+          switch (damageType) {
+            case 'Spikes':
+              pokemon.damageTakenBySpikes += damage
+              break
+            case 'Stealth Rock':
+              pokemon.damageTakenByStealthRock += damage
+              break
+            case 'Poison':
+              pokemon.damageTakenByPoison += damage
+              break
+            case 'Burn':
+              pokemon.damageTakenByBurn += damage
+              break
+            case 'Sandstorm':
+              pokemon.damageTakenBySandstorm += damage
+              break
+            case 'Hail':
+              pokemon.damageTakenByHail += damage
+              break
+            case 'Rocky Helmet':
+              pokemon.damageTakenByRockyHelmet += damage
+              break
+            case 'Contact Ability':
+              pokemon.damageTakenByContactAbility += damage
+              break
+            case 'Life Orb':
+              pokemon.damageTakenByLifeOrb += damage
+              break
+            case 'Recoil':
+              pokemon.damageTakenByMoveRecoil += damage
+              break
+          }
+        }
       }
       
       // Track damage dealt (only if not self-damage)
@@ -592,61 +661,72 @@ export function parseShowdownLog(log: string): DraftResult | null {
         }
       }
       
-      // Check for status damage
-      if (line.includes('[from] psn') || line.includes('[from] brn') || line.includes('[from] tox')) {
+      // Check for hazard damage
+      if (line.includes('[from] Stealth Rock')) {
         isDirectDamage = false
+        damageType = 'Stealth Rock'
+        const side = sideOfNick(victimField)
+        if (battle.hazards[side].stealthRockSetter) {
+          attackerNick = battle.hazards[side].stealthRockSetter
+        }
+      }
+      if (line.includes('[from] Spikes')) {
+        isDirectDamage = false
+        damageType = 'Spikes'
+        const side = sideOfNick(victimField)
+        if (battle.hazards[side].spikesSetter) {
+          attackerNick = battle.hazards[side].spikesSetter
+        }
+      }
+      if (line.includes('[from] Toxic Spikes')) {
+        isDirectDamage = false
+        damageType = 'Poison'
+        const side = sideOfNick(victimField)
+        if (battle.hazards[side].toxicSpikesSetter) {
+          attackerNick = battle.hazards[side].toxicSpikesSetter
+        }
+      }
+
+      // Check for weather damage
+      if (line.includes('[from] Sandstorm')) {
+        isDirectDamage = false
+        damageType = 'Sandstorm'
+        if (battle.sandstormSetter) {
+          attackerNick = battle.sandstormSetter
+        }
+      }
+      if (line.includes('[from] Hail')) {
+        isDirectDamage = false
+        damageType = 'Hail'
+        if (battle.hailSetter) {
+          attackerNick = battle.hailSetter
+        }
+      }
+
+      // Check for status damage
+      if (line.includes('[from] brn')) {
+        isDirectDamage = false
+        damageType = 'Burn'
         // Find who inflicted the status
         const victimState = getPokemon(victimNick)
         if (victimState.statusBy) {
           attackerNick = victimState.statusBy
-          if (line.includes('[from] psn') || line.includes('[from] tox')) {
-            damageType = 'Poison'
-          } else if (line.includes('[from] brn')) {
-            damageType = 'Burn'
-          }
         }
       }
-      
-      // Check for hazard damage
-      if (line.includes('[from] Stealth Rock') || line.includes('[from] Spikes') || line.includes('[from] Toxic Spikes')) {
+      if (line.includes('[from] psn') || line.includes('[from] tox')) {
         isDirectDamage = false
-        // Attribute to hazard setter
-        const side = sideOfNick(victimField)
-        if (line.includes('[from] Stealth Rock') && battle.hazards[side].stealthRockSetter) {
-          attackerNick = battle.hazards[side].stealthRockSetter
-          damageType = 'Stealth Rock'
-        }
-        if (line.includes('[from] Spikes') && battle.hazards[side].spikesSetter) {
-          attackerNick = battle.hazards[side].spikesSetter
-          damageType = 'Spikes'
-        }
-        if (line.includes('[from] Toxic Spikes') && battle.hazards[side].toxicSpikesSetter) {
-          attackerNick = battle.hazards[side].toxicSpikesSetter
-          damageType = 'Poison' // Toxic Spikes causes poison damage
+        damageType = 'Poison'
+        // Find who inflicted the status
+        const victimState = getPokemon(victimNick)
+        if (victimState.statusBy) {
+          attackerNick = victimState.statusBy
         }
       }
-      
-      // Check for weather damage
-      if (line.includes('[from] Sandstorm') || line.includes('[from] Hail')) {
-        isDirectDamage = false
-        isSelfDamage = false // Weather is not self-damage
-        if (line.includes('[from] Sandstorm') && battle.sandstormSetter) {
-          attackerNick = battle.sandstormSetter
-          damageType = 'Sandstorm'
-        } else if (line.includes('[from] Hail') && battle.hailSetter) {
-          attackerNick = battle.hailSetter
-          damageType = 'Hail'
-        }
-      }
-      
+
       // Check for ability/item damage (Rough Skin, Iron Barbs, Rocky Helmet, etc.)
-      // Only attribute if the [from] ... [of] ... pattern is present, and only on |-damage| lines
-      if (line.includes('[from] ability:') || line.includes('[from] item:')) {
+      if (line.includes('[from] ability:')) {
         isDirectDamage = false
-        isSelfDamage = false // Ability/item is not self-damage
-        // Parse the format: [from] ability: AbilityName|[of] pXa: PokemonNick
-        const abilityMatch = line.match(/\[from\] ability: ([^|]+)\|\[of\] (p\d+a: [^|]+)/)
-        const itemMatch = line.match(/\[from\] item: ([^|]+)\|\[of\] (p\d+a: [^|]+)/)
+        const abilityMatch = line.match(/\[from\] ability: ([^|]+)\|\[of\] (p\da: [^|]+)/)
         if (abilityMatch) {
           const abilityName = abilityMatch[1].trim()
           const pokemonField = abilityMatch[2]
@@ -655,7 +735,12 @@ export function parseShowdownLog(log: string): DraftResult | null {
           if (abilityName === 'Rough Skin' || abilityName === 'Iron Barbs') {
             damageType = 'Contact Ability'
           }
-        } else if (itemMatch) {
+        }
+      }
+      if (line.includes('[from] item:')) {
+        isDirectDamage = false
+        const itemMatch = line.match(/\[from\] item: ([^|]+)\|\[of\] (p\da: [^|]+)/)
+        if (itemMatch) {
           const itemName = itemMatch[1].trim()
           const pokemonField = itemMatch[2]
           const pokemonNick = pokemonField.split(': ')[1].trim()
@@ -664,15 +749,20 @@ export function parseShowdownLog(log: string): DraftResult | null {
             damageType = 'Rocky Helmet'
           }
         }
-        // Do NOT fallback to lastAttacker for ability/item damage
       }
-      
+
       // Check for item damage (Life Orb, recoil moves)
-      if (line.includes('[from] Life Orb') || line.includes('[from] Recoil')) {
+      if (line.includes('[from] Life Orb')) {
         isDirectDamage = false
         isSelfDamage = true
-        // The attacker is the same as the victim (self-damage)
         attackerNick = victimNick
+        damageType = 'Life Orb'
+      }
+      if (line.includes('[from] Recoil')) {
+        isDirectDamage = false
+        isSelfDamage = true
+        attackerNick = victimNick
+        damageType = 'Recoil'
       }
       
       // Check for Future Sight damage
@@ -805,6 +895,17 @@ export function parseShowdownLog(log: string): DraftResult | null {
       damageDealtByHail: allStates.reduce((sum, p) => sum + p.damageDealtByHail, 0),
       damageDealtByRockyHelmet: allStates.reduce((sum, p) => sum + p.damageDealtByRockyHelmet, 0),
       damageDealtByContactAbility: allStates.reduce((sum, p) => sum + p.damageDealtByContactAbility, 0), // Rough Skin, Iron Barbs, etc.
+      // Granular indirect damage taken categories
+      damageTakenBySpikes: allStates.reduce((sum, p) => sum + p.damageTakenBySpikes, 0),
+      damageTakenByStealthRock: allStates.reduce((sum, p) => sum + p.damageTakenByStealthRock, 0),
+      damageTakenByPoison: allStates.reduce((sum, p) => sum + p.damageTakenByPoison, 0),
+      damageTakenByBurn: allStates.reduce((sum, p) => sum + p.damageTakenByBurn, 0),
+      damageTakenBySandstorm: allStates.reduce((sum, p) => sum + p.damageTakenBySandstorm, 0),
+      damageTakenByHail: allStates.reduce((sum, p) => sum + p.damageTakenByHail, 0),
+      damageTakenByRockyHelmet: allStates.reduce((sum, p) => sum + p.damageTakenByRockyHelmet, 0),
+      damageTakenByContactAbility: allStates.reduce((sum, p) => sum + p.damageTakenByContactAbility, 0), // Rough Skin, Iron Barbs, etc.
+      damageTakenByLifeOrb: allStates.reduce((sum, p) => sum + p.damageTakenByLifeOrb, 0),
+      damageTakenByMoveRecoil: allStates.reduce((sum, p) => sum + p.damageTakenByMoveRecoil, 0),
     })
   })
 
