@@ -540,6 +540,50 @@ export function parseShowdownLog(log: string): DraftResult | null {
       let isSelfDamage = false
       let damageType: string | undefined
       
+      // Look for the previous move line to determine if this is direct damage
+      for (let i = idx - 1; i >= Math.max(0, idx - 5); i--) {
+        const prevLine = lines[i]
+        if (prevLine.startsWith('|move|')) {
+          const moveParts = prevLine.split('|')
+          const atkNick = moveParts[2].split(':')[1].trim()
+          const defNick = moveParts[4]?.split(':')[1]?.trim()
+          const moveName = moveParts[3]
+          
+          // Check if this is self-damage
+          if (atkNick === victimNick) {
+            attackerNick = atkNick
+            isSelfDamage = true
+            isDirectDamage = false // Self-damage is always indirect
+            break
+          }
+          
+          // Check if this is a defensive move causing self-damage
+          const defensiveMoves = ['Substitute', 'Belly Drum', 'Clangorous Soul', 'Dragon Energy', 'Steel Beam', 'Mind Blown']
+          if (defensiveMoves.includes(moveName) && atkNick === victimNick) {
+            attackerNick = atkNick
+            isSelfDamage = true
+            isDirectDamage = false
+            break
+          }
+          
+          // Check if this is recoil damage
+          if (prevLine.includes('[from] Recoil') || prevLine.includes('[from] Life Orb')) {
+            attackerNick = atkNick
+            isSelfDamage = true
+            isDirectDamage = false
+            break
+          }
+          
+          // Regular attack
+          if (defNick === victimNick) {
+            attackerNick = atkNick
+            isDirectDamage = true
+            isSelfDamage = false
+            break
+          }
+        }
+      }
+      
       // Check for status damage
       if (line.includes('[from] psn') || line.includes('[from] brn') || line.includes('[from] tox')) {
         isDirectDamage = false
