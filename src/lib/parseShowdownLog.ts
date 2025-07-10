@@ -540,49 +540,6 @@ export function parseShowdownLog(log: string): DraftResult | null {
       let isSelfDamage = false
       let damageType: string | undefined
       
-      for (let i = idx - 1; i >= Math.max(0, idx - 5); i--) {
-        const prevLine = lines[i]
-        if (prevLine.startsWith('|move|')) {
-          const moveParts = prevLine.split('|')
-          const atkNick = moveParts[2].split(':')[1].trim()
-          const defNick = moveParts[4]?.split(':')[1]?.trim()
-          const moveName = moveParts[3]
-          
-          // Check if this is self-damage
-          if (atkNick === victimNick) {
-            attackerNick = atkNick
-            isSelfDamage = true
-            isDirectDamage = false // Self-damage is always indirect
-            break
-          }
-          
-          // Check if this is a defensive move causing self-damage
-          const defensiveMoves = ['Substitute', 'Belly Drum', 'Clangorous Soul', 'Dragon Energy', 'Steel Beam', 'Mind Blown']
-          if (defensiveMoves.includes(moveName) && atkNick === victimNick) {
-            attackerNick = atkNick
-            isSelfDamage = true
-            isDirectDamage = false
-            break
-          }
-          
-          // Check if this is recoil damage
-          if (prevLine.includes('[from] Recoil') || prevLine.includes('[from] Life Orb')) {
-            attackerNick = atkNick
-            isSelfDamage = true
-            isDirectDamage = false
-            break
-          }
-          
-          // Regular attack
-          if (defNick === victimNick) {
-            attackerNick = atkNick
-            isDirectDamage = true
-            isSelfDamage = false
-            break
-          }
-        }
-      }
-      
       // Check for status damage
       if (line.includes('[from] psn') || line.includes('[from] brn') || line.includes('[from] tox')) {
         isDirectDamage = false
@@ -630,21 +587,32 @@ export function parseShowdownLog(log: string): DraftResult | null {
         }
       }
       
-      // Check for ability damage (Rough Skin, Iron Barbs, etc.)
-      if (line.includes('[from] Rough Skin') || line.includes('[from] Iron Barbs') || line.includes('[from] Rocky Helmet')) {
+      // Check for ability/item damage (Rough Skin, Iron Barbs, Rocky Helmet, etc.)
+      // Only attribute if the [from] ... [of] ... pattern is present, and only on |-damage| lines
+      if (line.includes('[from] ability:') || line.includes('[from] item:')) {
         isDirectDamage = false
-        isSelfDamage = false // Ability is not self-damage
-        // Find the Pokémon with the ability (usually the victim of the attack)
-        // This is tricky - we need to look back to find who attacked this Pokémon
-        const victimState = getPokemon(victimNick)
-        if (victimState.lastAttacker) {
-          attackerNick = victimState.lastAttacker
-          if (line.includes('[from] Rocky Helmet')) {
+        isSelfDamage = false // Ability/item is not self-damage
+        // Parse the format: [from] ability: AbilityName|[of] pXa: PokemonNick
+        const abilityMatch = line.match(/\[from\] ability: ([^|]+)\|\[of\] (p\d+a: [^|]+)/)
+        const itemMatch = line.match(/\[from\] item: ([^|]+)\|\[of\] (p\d+a: [^|]+)/)
+        if (abilityMatch) {
+          const abilityName = abilityMatch[1].trim()
+          const pokemonField = abilityMatch[2]
+          const pokemonNick = pokemonField.split(': ')[1].trim()
+          attackerNick = pokemonNick
+          if (abilityName === 'Rough Skin' || abilityName === 'Iron Barbs') {
+            damageType = 'Contact Ability'
+          }
+        } else if (itemMatch) {
+          const itemName = itemMatch[1].trim()
+          const pokemonField = itemMatch[2]
+          const pokemonNick = pokemonField.split(': ')[1].trim()
+          attackerNick = pokemonNick
+          if (itemName === 'Rocky Helmet') {
             damageType = 'Rocky Helmet'
-          } else {
-            damageType = 'Contact Ability' // Rough Skin, Iron Barbs, etc.
           }
         }
+        // Do NOT fallback to lastAttacker for ability/item damage
       }
       
       // Check for item damage (Life Orb, recoil moves)
