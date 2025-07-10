@@ -65,7 +65,6 @@
 .results__stats {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 0.5rem;
   font-size: 0.9rem;
   table-layout: auto;  /* Change from fixed to auto to allow column sizing */
 }
@@ -76,11 +75,21 @@
   border-bottom: 1px solid #eee;
   white-space: nowrap;
 }
+
+/* Add borders only to header cells */
 .results__stats th {
   font-weight: bold;
+  cursor: pointer; /* Ensure all headers have pointer cursor */
+  border-left: 1px solid #eee !important;
+  border-right: 1px solid #eee !important;
 }
-.results__stats tr:hover {
-  background-color: blue;
+
+/* Zebra striping for table rows */
+.results__stats tbody tr:nth-child(even) {
+  background-color: #303030; /* Near-black for even rows */
+}
+.results__stats tbody tr:nth-child(odd) {
+  background-color: #000000; /* Black for odd rows */
 }
 
 /* Sticky first column (Pokémon name) */
@@ -89,16 +98,43 @@
   position: sticky;
   left: 0;
   background-color: black;
-  z-index: 1;
-  border-right: 2px solid #ddd;
+  z-index: 3; /* Higher z-index to stay above scrollable content */
+  border-right: 2px solid #eee !important; /* Right border for entire Pokemon column */
   min-width: 100px;   /* Increase minimum width for Pokémon names */
   max-width: none;    /* Remove max-width to allow full content */
   white-space: nowrap;
+  box-shadow: 2px 0 0 0 #eee; /* Additional shadow border for visibility during scroll */
   /* Remove overflow and text-overflow to prevent truncation */
 }
-.results__stats tr:hover th:first-child,
-.results__stats tr:hover td:first-child {
-  /* background-color: #f0f0f0; */
+
+/* Sticky first column header gets the border */
+.results__stats th:first-child {
+  border-right: 2px solid #eee !important; /* Slightly thicker right border for separation */
+  border-left: 1px solid #eee !important;
+  z-index: 4; /* Highest z-index for header */
+  box-shadow: 2px 0 0 0 #eee; /* Additional shadow border for visibility during scroll */
+}
+
+/* Zebra striping for sticky first column */
+.results__stats tbody tr:nth-child(even) td:first-child {
+  background-color: #303030; /* Near-black for even rows */
+  border-right: 2px solid #eee !important; /* Maintain right border */
+}
+.results__stats tbody tr:nth-child(odd) td:first-child {
+  background-color: #000000; /* Black for odd rows */
+  border-right: 2px solid #eee !important; /* Maintain right border */
+}
+
+/* Maintain orange color for active sort even with zebra striping */
+.results__stats tbody tr:nth-child(even) td:first-child.activeSort {
+  background-color: #303030; /* Keep zebra stripe background */
+  color: #ffb400 !important; /* Orange text */
+  border-right: 2px solid #eee !important; /* Maintain right border */
+}
+.results__stats tbody tr:nth-child(odd) td:first-child.activeSort {
+  background-color: #000000; /* Keep zebra stripe background */
+  color: #ffb400 !important; /* Orange text */
+  border-right: 2px solid #eee !important; /* Maintain right border */
 }
 
 /* Allow header cells to wrap text */
@@ -116,17 +152,20 @@
 .results__stats th:not(:first-child) {
   writing-mode: vertical-rl;
   transform: rotate(180deg);
-  text-align: center;
+  text-align: left;
   vertical-align: middle;
   white-space: nowrap;
   min-width: 40px;
   max-width: 60px;
+  min-height: 180px; /* Ensure enough height for text + sort icon */
+  height: 180px; /* Fixed height to prevent expansion */
   padding-left: 0.2em;
   padding-right: 0.2em;
   padding-top: 0.5em;
   padding-bottom: 0.5em;
   font-size: 0.95em;
   line-height: 1;
+  position: relative; /* For positioning sort icons */
 }
 
 /* Table container for horizontal scrolling */
@@ -142,6 +181,8 @@
   background-color: #4a148c !important; /* Dark purple for damage dealt */
   color: white !important;
   cursor: pointer;
+  border-left: 1px solid #888 !important; /* Darker border for visibility against purple */
+  border-right: 1px solid #888 !important;
 }
 .pokemonNameCell {
   min-width: 560px;   /* even wider Pokémon column */
@@ -154,6 +195,8 @@
   background-color: #6d002b !important; /* Dark maroon for damage taken */
   color: white !important;
   cursor: pointer;
+  border-left: 1px solid #888 !important; /* Darker border for visibility against maroon */
+  border-right: 1px solid #888 !important;
 }
 .indirectDamageTakenCell {
   background-color: #8b1c3b !important; /* Lighter maroon for damage taken */
@@ -188,6 +231,25 @@
   font-size: 1em;
   margin-left: 0.2em;
   vertical-align: middle;
+}
+
+/* Sort icon styling for vertical headers */
+.sortIcon {
+  font-size: 0.9em;
+  margin-left: 0.2em;
+  display: inline-block;
+  transform: rotate(180deg); /* Counter-rotate to appear upright in vertical headers */
+  color: #ffb400;
+}
+
+/* Active sort header styling */
+.results__stats th.activeSort {
+  color: #ffb400 !important;
+}
+
+/* Active sort column styling - make all cells in the sorted column orange */
+.results__stats td.activeSort {
+  color: #ffb400 !important;
 }
 .pokemonNameHeader {
   position: sticky;
