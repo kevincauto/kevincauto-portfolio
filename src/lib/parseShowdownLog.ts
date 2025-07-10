@@ -20,7 +20,7 @@ export interface PokemonStats {
   totalDamageDealt: number; // Total damage dealt (direct + indirect)
   directDamageTaken: number; // Direct damage taken from opponents
   indirectDamageTaken: number; // Indirect damage taken (including self-inflicted)
-  hpLost: number; // Total HP lost including all damage (can exceed 100% due to healing)
+  totalDamageTaken: number; // Total damage taken including all damage (can exceed 100% due to healing)
   // Granular indirect damage categories
   damageDealtBySpikes: number;
   damageDealtByStealthRock: number;
@@ -72,7 +72,7 @@ export interface PokemonState {
   indirectDamageDealt: number; // Indirect damage dealt to opponents
   directDamageTaken: number;   // Direct damage taken from opponents
   indirectDamageTaken: number; // Indirect damage taken (including self-inflicted)
-  hpLost: number;              // Total HP lost including all damage
+  totalDamageTaken: number;              // Total damage taken including all damage
   healingDone: number;         // total % self-heal, Wish, etc.
   kos: number;                 // confirmed KOs
 
@@ -183,7 +183,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
         indirectDamageDealt: 0,
         directDamageTaken: 0,
         indirectDamageTaken: 0,
-        hpLost: 0,
+        totalDamageTaken: 0,
         healingDone: 0,
         kos: 0,
         damageDealtBySpikes: 0,
@@ -221,7 +221,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
     if (!isHealing && newHP < prevHP) {
       // HP Lost - track all damage
       const damage = prevHP - newHP
-      pokemon.hpLost += damage
+      pokemon.totalDamageTaken += damage
       
       // Track damage taken
       if (isDirectDamage) {
@@ -573,7 +573,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
         // Track indirect damage taken by victim (KO = 100% damage)
         const victimState = getPokemon(victimSpec, victimNick)
         victimState.indirectDamageTaken += 100
-        victimState.hpLost += 100
+        victimState.totalDamageTaken += 100
         victimState.hp = 0
         // Track indirect damage dealt by hazard setter
         attackerState.indirectDamageDealt += 100
@@ -873,7 +873,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
     const totalDamageDealt = directDamageDealt + indirectDamageDealt
     const directDamageTaken = allStates.reduce((sum, p) => sum + p.directDamageTaken, 0)
     const indirectDamageTaken = allStates.reduce((sum, p) => sum + p.indirectDamageTaken, 0)
-    const hpLost = allStates.reduce((sum, p) => sum + p.hpLost, 0)
+    const totalDamageTaken = allStates.reduce((sum, p) => sum + p.totalDamageTaken, 0)
 
     pokemonStats.push({
       name: pokemonSpecies,
@@ -885,7 +885,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
       totalDamageDealt,
       directDamageTaken,
       indirectDamageTaken,
-      hpLost,
+      totalDamageTaken, // Renamed from hpLost to totalDamageTaken
       // Granular indirect damage categories
       damageDealtBySpikes: allStates.reduce((sum, p) => sum + p.damageDealtBySpikes, 0),
       damageDealtByStealthRock: allStates.reduce((sum, p) => sum + p.damageDealtByStealthRock, 0),

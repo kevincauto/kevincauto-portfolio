@@ -19,7 +19,7 @@ type Parsed = {
     totalDamageDealt: number; 
     directDamageTaken: number; 
     indirectDamageTaken: number; 
-    hpLost: number;
+    totalDamageTaken: number;
     // Granular indirect damage categories
     damageDealtBySpikes: number;
     damageDealtByStealthRock: number;
@@ -53,7 +53,7 @@ type SortField =
   | 'totalDamageDealt' 
   | 'directDamageTaken' 
   | 'indirectDamageTaken' 
-  | 'hpLost'
+  | 'totalDamageTaken'
   | 'damageDealtBySpikes'
   | 'damageDealtByStealthRock'
   | 'damageDealtByPoison'
@@ -139,8 +139,12 @@ export default function PokeParserForm() {
   }
 
   function getSortIcon(field: SortField) {
-    if (sortField !== field) return '';
-    return sortDirection === 'asc' ? '▲' : '▼';
+    if (sortField !== field) return null;
+    return sortDirection === 'asc' ? (
+      <span style={{ fontSize: '0.9em', marginLeft: 2 }}>▲</span>
+    ) : (
+      <span style={{ fontSize: '0.9em', marginLeft: 2 }}>▼</span>
+    );
   }
 
   return (
@@ -206,179 +210,123 @@ export default function PokeParserForm() {
                   <table className={styles.results__stats}>
                   <thead>
                     <tr>
-                      <th
-                        onClick={() => handleSort('name')}
-                        className={`${styles.pokemonNameHeader} ${styles.sortable} ${sortField === 'name' ? styles.sorted : ''}`}
-                        scope="col"
-                      >
-                        <span>Pokémon</span>
-                        {getSortIcon('name') && <span className={styles.caret}>{getSortIcon('name')}</span>}
+                      <th onClick={() => handleSort('name')}>
+                        Pokémon {getSortIcon('name')}
                       </th>
-                      <th
-                        onClick={() => handleSort('kos')}
-                        className={`${styles.sortable} ${sortField === 'kos' ? styles.sorted : ''}`}
-                        scope="col"
-                      >
-                        <span>KOs</span>
-                        {getSortIcon('kos') && <span className={styles.caret}>{getSortIcon('kos')}</span>}
+                      <th onClick={() => handleSort('kos')}>
+                        KOs {getSortIcon('kos')}
                       </th>
-                      <th
-                        onClick={() => handleSort('fainted')}
-                        className={`${styles.sortable} ${sortField === 'fainted' ? styles.sorted : ''}`}
-                        scope="col"
-                      >
-                        <span>Fainted</span>
-                        {getSortIcon('fainted') && <span className={styles.caret}>{getSortIcon('fainted')}</span>}
+                      <th onClick={() => handleSort('fainted')}>
+                        Fainted {getSortIcon('fainted')}
                       </th>
-                      <th
-                        onClick={() => handleSort('won')}
-                        className={`${styles.sortable} ${sortField === 'won' ? styles.sorted : ''}`}
-                        scope="col"
-                      >
-                        <span>Won</span>
-                        {getSortIcon('won') && <span className={styles.caret}>{getSortIcon('won')}</span>}
+                      <th onClick={() => handleSort('won')}>
+                        Won {getSortIcon('won')}
                       </th>
-                      <th
-                        onClick={() => handleSort('totalDamageDealt')}
-                        className={`${styles.sortable} ${sortField === 'totalDamageDealt' ? styles.sorted : ''}`}
-                        scope="col"
-                      >
-                        <span>Total Damage Dealt</span>
-                        {getSortIcon('totalDamageDealt') && <span className={styles.caret}>{getSortIcon('totalDamageDealt')}</span>}
+                      <th onClick={() => handleSort('totalDamageDealt')}>
+                        Total Damage Dealt {getSortIcon('totalDamageDealt')}
                       </th>
-                      <th
-                        onClick={() => handleSort('directDamageDealt')}
-                        className={`${styles.sortable} ${sortField === 'directDamageDealt' ? styles.sorted : ''}`}
-                        scope="col"
-                      >
-                        <span>Direct Damage Dealt</span>
-                        {getSortIcon('directDamageDealt') && <span className={styles.caret}>{getSortIcon('directDamageDealt')}</span>}
+                      <th onClick={() => handleSort('directDamageDealt')}>
+                        Direct Damage Dealt {getSortIcon('directDamageDealt')}
                       </th>
-                      <th
-                        onClick={() => handleSort('indirectDamageDealt')}
-                        className={`${styles.indirectDamageHeader} ${styles.sortable} ${sortField === 'indirectDamageDealt' ? styles.sorted : ''}`}
-                        scope="col"
-                      >
-                        <span>Indirect Damage Dealt</span>
-                        {getSortIcon('indirectDamageDealt') && <span className={styles.caret}>{getSortIcon('indirectDamageDealt')}</span>}
+                      <th onClick={() => handleSort('indirectDamageDealt')} className={styles.indirectDamageHeader}>
+                        Indirect Damage Dealt {getSortIcon('indirectDamageDealt')}
                       </th>
                       <th onClick={() => handleSort('damageDealtBySpikes')} className={styles.indirectDamageHeader}>
-                        <span>Spikes</span>
-                        {getSortIcon('damageDealtBySpikes') && <span className={styles.caret}>{getSortIcon('damageDealtBySpikes')}</span>}
+                        Spikes {getSortIcon('damageDealtBySpikes')}
                       </th>
                       <th onClick={() => handleSort('damageDealtByStealthRock')} className={styles.indirectDamageHeader}>
-                        <span>Stealth Rock</span>
-                        {getSortIcon('damageDealtByStealthRock') && <span className={styles.caret}>{getSortIcon('damageDealtByStealthRock')}</span>}
+                        Stealth Rock {getSortIcon('damageDealtByStealthRock')}
                       </th>
                       <th onClick={() => handleSort('damageDealtByPoison')} className={styles.indirectDamageHeader}>
-                        <span>Poison</span>
-                        {getSortIcon('damageDealtByPoison') && <span className={styles.caret}>{getSortIcon('damageDealtByPoison')}</span>}
+                        Poison {getSortIcon('damageDealtByPoison')}
                       </th>
                       <th onClick={() => handleSort('damageDealtByBurn')} className={styles.indirectDamageHeader}>
-                        <span>Burn</span>
-                        {getSortIcon('damageDealtByBurn') && <span className={styles.caret}>{getSortIcon('damageDealtByBurn')}</span>}
+                        Burn {getSortIcon('damageDealtByBurn')}
                       </th>
                       <th onClick={() => handleSort('damageDealtBySandstorm')} className={styles.indirectDamageHeader}>
-                        <span>Sandstorm</span>
-                        {getSortIcon('damageDealtBySandstorm') && <span className={styles.caret}>{getSortIcon('damageDealtBySandstorm')}</span>}
+                        Sandstorm {getSortIcon('damageDealtBySandstorm')}
                       </th>
                       <th onClick={() => handleSort('damageDealtByHail')} className={styles.indirectDamageHeader}>
-                        <span>Hail</span>
-                        {getSortIcon('damageDealtByHail') && <span className={styles.caret}>{getSortIcon('damageDealtByHail')}</span>}
+                        Hail {getSortIcon('damageDealtByHail')}
                       </th>
                       <th onClick={() => handleSort('damageDealtByRockyHelmet')} className={styles.indirectDamageHeader}>
-                        <span>Rocky Helmet</span>
-                        {getSortIcon('damageDealtByRockyHelmet') && <span className={styles.caret}>{getSortIcon('damageDealtByRockyHelmet')}</span>}
+                        Rocky Helmet {getSortIcon('damageDealtByRockyHelmet')}
                       </th>
                       <th onClick={() => handleSort('damageDealtByContactAbility')} className={styles.indirectDamageHeader}>
-                        <span>Contact Ability</span>
-                        {getSortIcon('damageDealtByContactAbility') && <span className={styles.caret}>{getSortIcon('damageDealtByContactAbility')}</span>}
+                        Contact Ability {getSortIcon('damageDealtByContactAbility')}
                       </th>
-                      <th onClick={() => handleSort('hpLost')}>
-                        <span>HP Lost</span>
-                        {getSortIcon('hpLost') && <span className={styles.caret}>{getSortIcon('hpLost')}</span>}
+                      <th onClick={() => handleSort('totalDamageTaken')}>
+                        Total Damage Taken {getSortIcon('totalDamageTaken')}
                       </th>
                       <th onClick={() => handleSort('directDamageTaken')}>
-                        <span>Direct Damage Taken</span>
-                        {getSortIcon('directDamageTaken') && <span className={styles.caret}>{getSortIcon('directDamageTaken')}</span>}
+                        Direct Damage Taken {getSortIcon('directDamageTaken')}
                       </th>
                       <th onClick={() => handleSort('indirectDamageTaken')} className={styles.indirectDamageTakenHeader}>
-                        <span>Indirect Damage Taken</span>
-                        {getSortIcon('indirectDamageTaken') && <span className={styles.caret}>{getSortIcon('indirectDamageTaken')}</span>}
+                        Indirect Damage Taken {getSortIcon('indirectDamageTaken')}
                       </th>
                       <th onClick={() => handleSort('damageTakenBySpikes')} className={styles.indirectDamageTakenHeader}>
-                        <span>Spikes Taken</span>
-                        {getSortIcon('damageTakenBySpikes') && <span className={styles.caret}>{getSortIcon('damageTakenBySpikes')}</span>}
+                        Spikes Taken {getSortIcon('damageTakenBySpikes')}
                       </th>
                       <th onClick={() => handleSort('damageTakenByStealthRock')} className={styles.indirectDamageTakenHeader}>
-                        <span>Stealth Rock Taken</span>
-                        {getSortIcon('damageTakenByStealthRock') && <span className={styles.caret}>{getSortIcon('damageTakenByStealthRock')}</span>}
+                        Stealth Rock Taken {getSortIcon('damageTakenByStealthRock')}
                       </th>
                       <th onClick={() => handleSort('damageTakenByPoison')} className={styles.indirectDamageTakenHeader}>
-                        <span>Poison Taken</span>
-                        {getSortIcon('damageTakenByPoison') && <span className={styles.caret}>{getSortIcon('damageTakenByPoison')}</span>}
+                        Poison Taken {getSortIcon('damageTakenByPoison')}
                       </th>
                       <th onClick={() => handleSort('damageTakenByBurn')} className={styles.indirectDamageTakenHeader}>
-                        <span>Burn Taken</span>
-                        {getSortIcon('damageTakenByBurn') && <span className={styles.caret}>{getSortIcon('damageTakenByBurn')}</span>}
+                        Burn Taken {getSortIcon('damageTakenByBurn')}
                       </th>
                       <th onClick={() => handleSort('damageTakenBySandstorm')} className={styles.indirectDamageTakenHeader}>
-                        <span>Sandstorm Taken</span>
-                        {getSortIcon('damageTakenBySandstorm') && <span className={styles.caret}>{getSortIcon('damageTakenBySandstorm')}</span>}
+                        Sandstorm Taken {getSortIcon('damageTakenBySandstorm')}
                       </th>
                       <th onClick={() => handleSort('damageTakenByHail')} className={styles.indirectDamageTakenHeader}>
-                        <span>Hail Taken</span>
-                        {getSortIcon('damageTakenByHail') && <span className={styles.caret}>{getSortIcon('damageTakenByHail')}</span>}
+                        Hail Taken {getSortIcon('damageTakenByHail')}
                       </th>
                       <th onClick={() => handleSort('damageTakenByRockyHelmet')} className={styles.indirectDamageTakenHeader}>
-                        <span>Rocky Helmet Taken</span>
-                        {getSortIcon('damageTakenByRockyHelmet') && <span className={styles.caret}>{getSortIcon('damageTakenByRockyHelmet')}</span>}
+                        Rocky Helmet Taken {getSortIcon('damageTakenByRockyHelmet')}
                       </th>
                       <th onClick={() => handleSort('damageTakenByContactAbility')} className={styles.indirectDamageTakenHeader}>
-                        <span>Contact Ability Taken</span>
-                        {getSortIcon('damageTakenByContactAbility') && <span className={styles.caret}>{getSortIcon('damageTakenByContactAbility')}</span>}
+                        Contact Ability Taken {getSortIcon('damageTakenByContactAbility')}
                       </th>
                       <th onClick={() => handleSort('damageTakenByLifeOrb')} className={styles.indirectDamageTakenHeader}>
-                        <span>Life Orb Taken</span>
-                        {getSortIcon('damageTakenByLifeOrb') && <span className={styles.caret}>{getSortIcon('damageTakenByLifeOrb')}</span>}
+                        Life Orb Taken {getSortIcon('damageTakenByLifeOrb')}
                       </th>
                       <th onClick={() => handleSort('damageTakenByMoveRecoil')} className={styles.indirectDamageTakenHeader}>
-                        <span>Move Recoil Taken</span>
-                        {getSortIcon('damageTakenByMoveRecoil') && <span className={styles.caret}>{getSortIcon('damageTakenByMoveRecoil')}</span>}
+                        Move Recoil Taken {getSortIcon('damageTakenByMoveRecoil')}
                       </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {getSortedPokemonStats().map((pokemon, i) => (
-                      <tr key={i}>
-                        <td className={styles.pokemonNameCell}>{pokemon.name}</td>
+                    {getSortedPokemonStats().map((pokemon) => (
+                      <tr key={pokemon.name}>
+                        <td>{pokemon.name}</td>
                         <td>{pokemon.kos}</td>
                         <td>{pokemon.fainted ? 'Yes' : 'No'}</td>
                         <td>{pokemon.won ? 'Yes' : 'No'}</td>
-                        <td>{pokemon.totalDamageDealt.toFixed(0)}%</td>
-                        <td>{pokemon.directDamageDealt.toFixed(0)}%</td>
-                        <td className={styles.indirectDamageCell}>{pokemon.indirectDamageDealt.toFixed(0)}%</td>
-                        <td className={styles.indirectDamageCell}>{pokemon.damageDealtBySpikes.toFixed(0)}%</td>
-                        <td className={styles.indirectDamageCell}>{pokemon.damageDealtByStealthRock.toFixed(0)}%</td>
-                        <td className={styles.indirectDamageCell}>{pokemon.damageDealtByPoison.toFixed(0)}%</td>
-                        <td className={styles.indirectDamageCell}>{pokemon.damageDealtByBurn.toFixed(0)}%</td>
-                        <td className={styles.indirectDamageCell}>{pokemon.damageDealtBySandstorm.toFixed(0)}%</td>
-                        <td className={styles.indirectDamageCell}>{pokemon.damageDealtByHail.toFixed(0)}%</td>
-                        <td className={styles.indirectDamageCell}>{pokemon.damageDealtByRockyHelmet.toFixed(0)}%</td>
-                        <td className={styles.indirectDamageCell}>{pokemon.damageDealtByContactAbility.toFixed(0)}%</td>
-                        <td>{pokemon.hpLost.toFixed(0)}%</td>
-                        <td>{pokemon.directDamageTaken.toFixed(0)}%</td>
-                        <td className={styles.indirectDamageTakenCell}>{pokemon.indirectDamageTaken.toFixed(0)}%</td>
-                        <td className={styles.indirectDamageTakenCell}>{pokemon.damageTakenBySpikes.toFixed(0)}%</td>
-                        <td className={styles.indirectDamageTakenCell}>{pokemon.damageTakenByStealthRock.toFixed(0)}%</td>
-                        <td className={styles.indirectDamageTakenCell}>{pokemon.damageTakenByPoison.toFixed(0)}%</td>
-                        <td className={styles.indirectDamageTakenCell}>{pokemon.damageTakenByBurn.toFixed(0)}%</td>
-                        <td className={styles.indirectDamageTakenCell}>{pokemon.damageTakenBySandstorm.toFixed(0)}%</td>
-                        <td className={styles.indirectDamageTakenCell}>{pokemon.damageTakenByHail.toFixed(0)}%</td>
-                        <td className={styles.indirectDamageTakenCell}>{pokemon.damageTakenByRockyHelmet.toFixed(0)}%</td>
-                        <td className={styles.indirectDamageTakenCell}>{pokemon.damageTakenByContactAbility.toFixed(0)}%</td>
-                        <td className={styles.indirectDamageTakenCell}>{pokemon.damageTakenByLifeOrb.toFixed(0)}%</td>
-                        <td className={styles.indirectDamageTakenCell}>{pokemon.damageTakenByMoveRecoil.toFixed(0)}%</td>
+                        <td>{Math.round(pokemon.totalDamageDealt)}%</td>
+                        <td>{Math.round(pokemon.directDamageDealt)}%</td>
+                        <td>{Math.round(pokemon.indirectDamageDealt)}%</td>
+                        <td>{Math.round(pokemon.damageDealtBySpikes)}%</td>
+                        <td>{Math.round(pokemon.damageDealtByStealthRock)}%</td>
+                        <td>{Math.round(pokemon.damageDealtByPoison)}%</td>
+                        <td>{Math.round(pokemon.damageDealtByBurn)}%</td>
+                        <td>{Math.round(pokemon.damageDealtBySandstorm)}%</td>
+                        <td>{Math.round(pokemon.damageDealtByHail)}%</td>
+                        <td>{Math.round(pokemon.damageDealtByRockyHelmet)}%</td>
+                        <td>{Math.round(pokemon.damageDealtByContactAbility)}%</td>
+                        <td>{Math.round(pokemon.totalDamageTaken)}%</td>
+                        <td>{Math.round(pokemon.directDamageTaken)}%</td>
+                        <td>{Math.round(pokemon.indirectDamageTaken)}%</td>
+                        <td>{Math.round(pokemon.damageTakenBySpikes)}%</td>
+                        <td>{Math.round(pokemon.damageTakenByStealthRock)}%</td>
+                        <td>{Math.round(pokemon.damageTakenByPoison)}%</td>
+                        <td>{Math.round(pokemon.damageTakenByBurn)}%</td>
+                        <td>{Math.round(pokemon.damageTakenBySandstorm)}%</td>
+                        <td>{Math.round(pokemon.damageTakenByHail)}%</td>
+                        <td>{Math.round(pokemon.damageTakenByRockyHelmet)}%</td>
+                        <td>{Math.round(pokemon.damageTakenByContactAbility)}%</td>
+                        <td>{Math.round(pokemon.damageTakenByLifeOrb)}%</td>
+                        <td>{Math.round(pokemon.damageTakenByMoveRecoil)}%</td>
                       </tr>
                     ))}
                   </tbody>
