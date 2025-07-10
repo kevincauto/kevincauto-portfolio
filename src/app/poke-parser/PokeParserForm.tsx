@@ -16,13 +16,41 @@ type Parsed = {
     won: number; 
     directDamageDealt: number; 
     indirectDamageDealt: number; 
+    totalDamageDealt: number; 
     directDamageTaken: number; 
     indirectDamageTaken: number; 
-    hpLost: number 
+    hpLost: number;
+    // Granular indirect damage categories
+    damageDealtBySpikes: number;
+    damageDealtByStealthRock: number;
+    damageDealtByPoison: number;
+    damageDealtByBurn: number;
+    damageDealtBySandstorm: number;
+    damageDealtByHail: number;
+    damageDealtByRockyHelmet: number;
+    damageDealtByContactAbility: number;
   }[];
 };
 
-type SortField = 'name' | 'kos' | 'fainted' | 'won' | 'directDamageDealt' | 'indirectDamageDealt' | 'directDamageTaken' | 'indirectDamageTaken' | 'hpLost';
+type SortField = 
+  | 'name' 
+  | 'kos' 
+  | 'fainted' 
+  | 'won' 
+  | 'directDamageDealt' 
+  | 'indirectDamageDealt' 
+  | 'totalDamageDealt' 
+  | 'directDamageTaken' 
+  | 'indirectDamageTaken' 
+  | 'hpLost'
+  | 'damageDealtBySpikes'
+  | 'damageDealtByStealthRock'
+  | 'damageDealtByPoison'
+  | 'damageDealtByBurn'
+  | 'damageDealtBySandstorm'
+  | 'damageDealtByHail'
+  | 'damageDealtByRockyHelmet'
+  | 'damageDealtByContactAbility';
 type SortDirection = 'asc' | 'desc';
 
 export default function PokeParserForm() {
@@ -172,20 +200,47 @@ export default function PokeParserForm() {
                       <th onClick={() => handleSort('won')}>
                         Won {getSortIcon('won')}
                       </th>
+                      <th onClick={() => handleSort('totalDamageDealt')}>
+                        Total Damage Dealt {getSortIcon('totalDamageDealt')}
+                      </th>
                       <th onClick={() => handleSort('directDamageDealt')}>
                         Direct Damage Dealt {getSortIcon('directDamageDealt')}
                       </th>
-                      <th onClick={() => handleSort('indirectDamageDealt')}>
+                      <th onClick={() => handleSort('indirectDamageDealt')} className={styles.indirectDamageHeader}>
                         Indirect Damage Dealt {getSortIcon('indirectDamageDealt')}
+                      </th>
+                      <th onClick={() => handleSort('damageDealtBySpikes')} className={styles.indirectDamageHeader}>
+                        Spikes {getSortIcon('damageDealtBySpikes')}
+                      </th>
+                      <th onClick={() => handleSort('damageDealtByStealthRock')} className={styles.indirectDamageHeader}>
+                        Stealth Rock {getSortIcon('damageDealtByStealthRock')}
+                      </th>
+                      <th onClick={() => handleSort('damageDealtByPoison')} className={styles.indirectDamageHeader}>
+                        Poison {getSortIcon('damageDealtByPoison')}
+                      </th>
+                      <th onClick={() => handleSort('damageDealtByBurn')} className={styles.indirectDamageHeader}>
+                        Burn {getSortIcon('damageDealtByBurn')}
+                      </th>
+                      <th onClick={() => handleSort('damageDealtBySandstorm')} className={styles.indirectDamageHeader}>
+                        Sandstorm {getSortIcon('damageDealtBySandstorm')}
+                      </th>
+                      <th onClick={() => handleSort('damageDealtByHail')} className={styles.indirectDamageHeader}>
+                        Hail {getSortIcon('damageDealtByHail')}
+                      </th>
+                      <th onClick={() => handleSort('damageDealtByRockyHelmet')} className={styles.indirectDamageHeader}>
+                        Rocky Helmet {getSortIcon('damageDealtByRockyHelmet')}
+                      </th>
+                      <th onClick={() => handleSort('damageDealtByContactAbility')} className={styles.indirectDamageHeader}>
+                        Contact Ability {getSortIcon('damageDealtByContactAbility')}
+                      </th>
+                      <th onClick={() => handleSort('hpLost')}>
+                        HP Lost {getSortIcon('hpLost')}
                       </th>
                       <th onClick={() => handleSort('directDamageTaken')}>
                         Direct Damage Taken {getSortIcon('directDamageTaken')}
                       </th>
                       <th onClick={() => handleSort('indirectDamageTaken')}>
                         Indirect Damage Taken {getSortIcon('indirectDamageTaken')}
-                      </th>
-                      <th onClick={() => handleSort('hpLost')}>
-                        HP Lost {getSortIcon('hpLost')}
                       </th>
                     </tr>
                   </thead>
@@ -196,11 +251,20 @@ export default function PokeParserForm() {
                         <td>{pokemon.kos}</td>
                         <td>{pokemon.fainted ? 'Yes' : 'No'}</td>
                         <td>{pokemon.won ? 'Yes' : 'No'}</td>
+                        <td>{pokemon.totalDamageDealt.toFixed(0)}%</td>
                         <td>{pokemon.directDamageDealt.toFixed(0)}%</td>
-                        <td>{pokemon.indirectDamageDealt.toFixed(0)}%</td>
+                        <td className={styles.indirectDamageCell}>{pokemon.indirectDamageDealt.toFixed(0)}%</td>
+                        <td className={styles.indirectDamageCell}>{pokemon.damageDealtBySpikes.toFixed(0)}%</td>
+                        <td className={styles.indirectDamageCell}>{pokemon.damageDealtByStealthRock.toFixed(0)}%</td>
+                        <td className={styles.indirectDamageCell}>{pokemon.damageDealtByPoison.toFixed(0)}%</td>
+                        <td className={styles.indirectDamageCell}>{pokemon.damageDealtByBurn.toFixed(0)}%</td>
+                        <td className={styles.indirectDamageCell}>{pokemon.damageDealtBySandstorm.toFixed(0)}%</td>
+                        <td className={styles.indirectDamageCell}>{pokemon.damageDealtByHail.toFixed(0)}%</td>
+                        <td className={styles.indirectDamageCell}>{pokemon.damageDealtByRockyHelmet.toFixed(0)}%</td>
+                        <td className={styles.indirectDamageCell}>{pokemon.damageDealtByContactAbility.toFixed(0)}%</td>
+                        <td>{pokemon.hpLost.toFixed(0)}%</td>
                         <td>{pokemon.directDamageTaken.toFixed(0)}%</td>
                         <td>{pokemon.indirectDamageTaken.toFixed(0)}%</td>
-                        <td>{pokemon.hpLost.toFixed(0)}%</td>
                       </tr>
                     ))}
                   </tbody>

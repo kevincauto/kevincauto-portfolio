@@ -16,9 +16,19 @@ export interface PokemonStats {
   won: number;    // 1 if team won, 0 if team lost
   directDamageDealt: number; // Direct damage dealt to opponents
   indirectDamageDealt: number; // Indirect damage dealt to opponents
+  totalDamageDealt: number; // Total damage dealt (direct + indirect)
   directDamageTaken: number; // Direct damage taken from opponents
   indirectDamageTaken: number; // Indirect damage taken (including self-inflicted)
   hpLost: number; // Total HP lost including all damage (can exceed 100% due to healing)
+  // Granular indirect damage categories
+  damageDealtBySpikes: number;
+  damageDealtByStealthRock: number;
+  damageDealtByPoison: number;
+  damageDealtByBurn: number;
+  damageDealtBySandstorm: number;
+  damageDealtByHail: number;
+  damageDealtByRockyHelmet: number;
+  damageDealtByContactAbility: number; // Rough Skin, Iron Barbs, etc.
 }
 
 export interface DraftResult {
@@ -57,6 +67,16 @@ export interface PokemonState {
   /* attribution helpers */
   lastAttacker?: string;       // most recent damaging mon
   statusBy?: string;           // who inflicted current status
+
+  /* granular indirect damage categories */
+  damageDealtBySpikes: number;
+  damageDealtByStealthRock: number;
+  damageDealtByPoison: number;
+  damageDealtByBurn: number;
+  damageDealtBySandstorm: number;
+  damageDealtByHail: number;
+  damageDealtByRockyHelmet: number;
+  damageDealtByContactAbility: number; // Rough Skin, Iron Barbs, etc.
 }
 
 /* ────── entry hazards on *one* side (two exist: hazards.p1 & hazards.p2) ────── */
@@ -83,6 +103,8 @@ interface BattleState {
   /** weather attribution (global, not side-specific) */
   sandstormSetter?: string;  // nickname that started the current Sand
   hailSetter?:      string;  // nickname that started the current Hail/Snow
+  rainSetter?:      string;  // nickname that started the current Rain
+  sunSetter?:       string;  // nickname that started the current Sun
 }
 
 type LastHit = { attacker: string; turn: number }
@@ -140,20 +162,24 @@ export function parseShowdownLog(log: string): DraftResult | null {
         indirectDamageTaken: 0,
         hpLost: 0,
         healingDone: 0,
-        kos: 0
+        kos: 0,
+        damageDealtBySpikes: 0,
+        damageDealtByStealthRock: 0,
+        damageDealtByPoison: 0,
+        damageDealtByBurn: 0,
+        damageDealtBySandstorm: 0,
+        damageDealtByHail: 0,
+        damageDealtByRockyHelmet: 0,
+        damageDealtByContactAbility: 0,
       }
     }
     return battle.pokemon[nickname]
   }
 
   /* helper: update Pokémon HP and track damage */
-  const updatePokemonHP = (nickname: string, newHP: number, isHealing: boolean = false, attacker?: string, isDirectDamage: boolean = true, isSelfDamage: boolean = false) => {
+  const updatePokemonHP = (nickname: string, newHP: number, isHealing: boolean = false, attacker?: string, isDirectDamage: boolean = true, isSelfDamage: boolean = false, damageType?: string) => {
     const pokemon = getPokemon(nickname)
     const prevHP = pokemon.hp
-    
-    if (nickname === 'The Swim Reaper') {
-      console.log(`[DEBUG] updatePokemonHP: ${nickname}, prevHP: ${prevHP}, newHP: ${newHP}, isHealing: ${isHealing}, isDirect: ${isDirectDamage}, isSelf: ${isSelfDamage}`)
-    }
     
     // Update HP
     pokemon.hp = newHP
@@ -171,35 +197,51 @@ export function parseShowdownLog(log: string): DraftResult | null {
       }
       
       // Track damage dealt (only if not self-damage)
-      if (attacker && !isSelfDamage) {
+      if (attacker && isDirectDamage && !isSelfDamage) {
         const attackerState = getPokemon(attacker)
-        if (isDirectDamage) {
-          attackerState.directDamageDealt += damage
-        } else {
-          attackerState.indirectDamageDealt += damage
+        attackerState.directDamageDealt += damage
+      } else if (attacker && !isDirectDamage && !isSelfDamage) {
+        const attackerState = getPokemon(attacker)
+        attackerState.indirectDamageDealt += damage
+        
+        // Track granular indirect damage categories
+        if (damageType) {
+          switch (damageType) {
+            case 'Spikes':
+              attackerState.damageDealtBySpikes += damage
+              break
+            case 'Stealth Rock':
+              attackerState.damageDealtByStealthRock += damage
+              break
+            case 'Poison':
+              attackerState.damageDealtByPoison += damage
+              break
+            case 'Burn':
+              attackerState.damageDealtByBurn += damage
+              break
+            case 'Sandstorm':
+              attackerState.damageDealtBySandstorm += damage
+              break
+            case 'Hail':
+              attackerState.damageDealtByHail += damage
+              break
+            case 'Rocky Helmet':
+              attackerState.damageDealtByRockyHelmet += damage
+              break
+            case 'Contact Ability':
+              attackerState.damageDealtByContactAbility += damage
+              break
+          }
         }
       }
       
       if (attacker) {
         pokemon.lastAttacker = attacker
       }
-      
-      if (nickname === 'The Swim Reaper') {
-        console.log(`[DEBUG] HP Lost tracked: ${damage}%, total hpLost: ${pokemon.hpLost}`)
-        if (isDirectDamage) {
-          console.log(`[DEBUG] Direct damage taken: ${damage}%, total directDamageTaken: ${pokemon.directDamageTaken}`)
-        } else {
-          console.log(`[DEBUG] Indirect damage taken: ${damage}%, total indirectDamageTaken: ${pokemon.indirectDamageTaken}`)
-        }
-      }
     } else if (isHealing && newHP > prevHP) {
       // Healing done
       const healing = newHP - prevHP
       pokemon.healingDone += healing
-      
-      if (nickname === 'The Swim Reaper') {
-        console.log(`[DEBUG] Healing tracked: ${healing}%, total healingDone: ${pokemon.healingDone}`)
-      }
     }
   }
 
@@ -276,6 +318,10 @@ export function parseShowdownLog(log: string): DraftResult | null {
         const atkSpec = nickToSpecies[atkNick] || atkNick
         const defSpec = nickToSpecies[defNick] || defNick
         lastHit[defSpec] = { attacker: atkSpec, turn: currentTurn }
+        
+        // Track the attacker for ability/item damage attribution
+        const defState = getPokemon(defNick)
+        defState.lastAttacker = atkNick
       }
     }
 
@@ -344,6 +390,77 @@ export function parseShowdownLog(log: string): DraftResult | null {
       if (/Toxic Spikes/i.test(raw)) {
         battle.hazards[side].toxicSpikesLayers = 0
         battle.hazards[side].toxicSpikesSetter = undefined
+      }
+    }
+
+    /* ---------------- weather tracking ----------- */
+    if (line.startsWith('|-weather|')) {
+      const parts = line.split('|')
+      const weatherType = parts[2]
+      
+      // Check for ability-based weather (like Sand Stream)
+      if (line.includes('[from] ability: Sand Stream')) {
+        // Extract the Pokémon that has the ability
+        const abilityMatch = line.match(/\[of\] (p\d+a: [^|]+)/)
+        if (abilityMatch) {
+          const pokemonField = abilityMatch[1]
+          const pokemonNick = pokemonField.split(': ')[1].trim()
+          if (weatherType === 'Sandstorm') {
+            battle.sandstormSetter = pokemonNick
+          }
+        }
+      } else if (line.includes('[from] ability: Snow Warning')) {
+        // Extract the Pokémon that has the ability
+        const abilityMatch = line.match(/\[of\] (p\d+a: [^|]+)/)
+        if (abilityMatch) {
+          const pokemonField = abilityMatch[1]
+          const pokemonNick = pokemonField.split(': ')[1].trim()
+          if (weatherType === 'Hail') {
+            battle.hailSetter = pokemonNick
+          }
+        }
+      } else if (line.includes('[from] ability: Drizzle')) {
+        // Extract the Pokémon that has the ability
+        const abilityMatch = line.match(/\[of\] (p\d+a: [^|]+)/)
+        if (abilityMatch) {
+          const pokemonField = abilityMatch[1]
+          const pokemonNick = pokemonField.split(': ')[1].trim()
+          if (weatherType === 'RainDance') {
+            battle.rainSetter = pokemonNick
+          }
+        }
+      } else if (line.includes('[from] ability: Drought')) {
+        // Extract the Pokémon that has the ability
+        const abilityMatch = line.match(/\[of\] (p\d+a: [^|]+)/)
+        if (abilityMatch) {
+          const pokemonField = abilityMatch[1]
+          const pokemonNick = pokemonField.split(': ')[1].trim()
+          if (weatherType === 'SunnyDay') {
+            battle.sunSetter = pokemonNick
+          }
+        }
+      } else {
+        // Look back for the move that set the weather
+        for (let i = idx - 1; i >= Math.max(0, idx - 5); i--) {
+          const prevLine = lines[i]
+          if (prevLine.startsWith('|move|')) {
+            const moveParts = prevLine.split('|')
+            const atkNick = moveParts[2].split(':')[1].trim()
+            const moveName = moveParts[3]
+            
+            // Map weather types to setter fields
+            if (weatherType === 'Sandstorm' && ['Sandstorm', 'Sand Stream'].includes(moveName)) {
+              battle.sandstormSetter = atkNick
+            } else if (weatherType === 'Hail' && ['Hail', 'Snow Warning'].includes(moveName)) {
+              battle.hailSetter = atkNick
+            } else if (weatherType === 'RainDance' && ['Rain Dance', 'Drizzle'].includes(moveName)) {
+              battle.rainSetter = atkNick
+            } else if (weatherType === 'SunnyDay' && ['Sunny Day', 'Drought'].includes(moveName)) {
+              battle.sunSetter = atkNick
+            }
+            break
+          }
+        }
       }
     }
 
@@ -421,6 +538,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
       let attackerNick: string | undefined
       let isDirectDamage = true
       let isSelfDamage = false
+      let damageType: string | undefined
       
       for (let i = idx - 1; i >= Math.max(0, idx - 5); i--) {
         const prevLine = lines[i]
@@ -472,6 +590,11 @@ export function parseShowdownLog(log: string): DraftResult | null {
         const victimState = getPokemon(victimNick)
         if (victimState.statusBy) {
           attackerNick = victimState.statusBy
+          if (line.includes('[from] psn') || line.includes('[from] tox')) {
+            damageType = 'Poison'
+          } else if (line.includes('[from] brn')) {
+            damageType = 'Burn'
+          }
         }
       }
       
@@ -482,17 +605,86 @@ export function parseShowdownLog(log: string): DraftResult | null {
         const side = sideOfNick(victimField)
         if (line.includes('[from] Stealth Rock') && battle.hazards[side].stealthRockSetter) {
           attackerNick = battle.hazards[side].stealthRockSetter
+          damageType = 'Stealth Rock'
         }
         if (line.includes('[from] Spikes') && battle.hazards[side].spikesSetter) {
           attackerNick = battle.hazards[side].spikesSetter
+          damageType = 'Spikes'
         }
         if (line.includes('[from] Toxic Spikes') && battle.hazards[side].toxicSpikesSetter) {
           attackerNick = battle.hazards[side].toxicSpikesSetter
+          damageType = 'Poison' // Toxic Spikes causes poison damage
+        }
+      }
+      
+      // Check for weather damage
+      if (line.includes('[from] Sandstorm') || line.includes('[from] Hail')) {
+        isDirectDamage = false
+        isSelfDamage = false // Weather is not self-damage
+        if (line.includes('[from] Sandstorm') && battle.sandstormSetter) {
+          attackerNick = battle.sandstormSetter
+          damageType = 'Sandstorm'
+        } else if (line.includes('[from] Hail') && battle.hailSetter) {
+          attackerNick = battle.hailSetter
+          damageType = 'Hail'
+        }
+      }
+      
+      // Check for ability damage (Rough Skin, Iron Barbs, etc.)
+      if (line.includes('[from] Rough Skin') || line.includes('[from] Iron Barbs') || line.includes('[from] Rocky Helmet')) {
+        isDirectDamage = false
+        isSelfDamage = false // Ability is not self-damage
+        // Find the Pokémon with the ability (usually the victim of the attack)
+        // This is tricky - we need to look back to find who attacked this Pokémon
+        const victimState = getPokemon(victimNick)
+        if (victimState.lastAttacker) {
+          attackerNick = victimState.lastAttacker
+          if (line.includes('[from] Rocky Helmet')) {
+            damageType = 'Rocky Helmet'
+          } else {
+            damageType = 'Contact Ability' // Rough Skin, Iron Barbs, etc.
+          }
+        }
+      }
+      
+      // Check for item damage (Life Orb, recoil moves)
+      if (line.includes('[from] Life Orb') || line.includes('[from] Recoil')) {
+        isDirectDamage = false
+        isSelfDamage = true
+        // The attacker is the same as the victim (self-damage)
+        attackerNick = victimNick
+      }
+      
+      // Check for Future Sight damage
+      if (line.includes('[from] Future Sight')) {
+        isDirectDamage = false
+        isSelfDamage = false
+        // Future Sight damage is attributed to the user of Future Sight
+        // We need to track this separately or look back for the Future Sight move
+        // For now, we'll mark it as indirect damage without specific attribution
+      }
+      
+      // Check for Explosion/Self-Destruct damage
+      if (line.includes('[from] Explosion') || line.includes('[from] Self-Destruct')) {
+        isDirectDamage = false
+        isSelfDamage = true
+        attackerNick = victimNick
+      }
+      
+      // Check for drain healing (Giga Drain, etc.)
+      if (line.includes('[from] drain')) {
+        // This is healing, not damage - handled in healing section
+        // But we need to track the drain amount for the attacker
+        const drainMatch = line.match(/\[from\] drain: (\d+)/)
+        if (drainMatch && attackerNick) {
+          const drainAmount = parseInt(drainMatch[1])
+          const attackerState = getPokemon(attackerNick)
+          attackerState.healingDone += drainAmount
         }
       }
       
       // Update Pokémon state
-      updatePokemonHP(victimNick, newHP, false, attackerNick, isDirectDamage, isSelfDamage)
+      updatePokemonHP(victimNick, newHP, false, attackerNick, isDirectDamage, isSelfDamage, damageType)
     }
 
     /* ---------------- healing tracking ---------- */
@@ -509,7 +701,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
         const newHP = parseInt(newHPStr)
         
         // Update Pokémon state (mark as healing)
-        updatePokemonHP(targetNick, newHP, true)
+        updatePokemonHP(targetNick, newHP, true, undefined, true, false, undefined)
       }
     }
 
@@ -568,6 +760,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
     const fainted = allStates.some(p => p.hp === 0) ? 1 : 0
     const directDamageDealt = allStates.reduce((sum, p) => sum + p.directDamageDealt, 0)
     const indirectDamageDealt = allStates.reduce((sum, p) => sum + p.indirectDamageDealt, 0)
+    const totalDamageDealt = directDamageDealt + indirectDamageDealt
     const directDamageTaken = allStates.reduce((sum, p) => sum + p.directDamageTaken, 0)
     const indirectDamageTaken = allStates.reduce((sum, p) => sum + p.indirectDamageTaken, 0)
     const hpLost = allStates.reduce((sum, p) => sum + p.hpLost, 0)
@@ -579,9 +772,19 @@ export function parseShowdownLog(log: string): DraftResult | null {
       won: (p1Team.includes(pokemonSpecies) && p1Won) || (p2Team.includes(pokemonSpecies) && p2Won) ? 1 : 0,
       directDamageDealt,
       indirectDamageDealt,
+      totalDamageDealt,
       directDamageTaken,
       indirectDamageTaken,
-      hpLost
+      hpLost,
+      // Granular indirect damage categories
+      damageDealtBySpikes: allStates.reduce((sum, p) => sum + p.damageDealtBySpikes, 0),
+      damageDealtByStealthRock: allStates.reduce((sum, p) => sum + p.damageDealtByStealthRock, 0),
+      damageDealtByPoison: allStates.reduce((sum, p) => sum + p.damageDealtByPoison, 0),
+      damageDealtByBurn: allStates.reduce((sum, p) => sum + p.damageDealtByBurn, 0),
+      damageDealtBySandstorm: allStates.reduce((sum, p) => sum + p.damageDealtBySandstorm, 0),
+      damageDealtByHail: allStates.reduce((sum, p) => sum + p.damageDealtByHail, 0),
+      damageDealtByRockyHelmet: allStates.reduce((sum, p) => sum + p.damageDealtByRockyHelmet, 0),
+      damageDealtByContactAbility: allStates.reduce((sum, p) => sum + p.damageDealtByContactAbility, 0), // Rough Skin, Iron Barbs, etc.
     })
   })
 

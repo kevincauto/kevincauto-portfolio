@@ -72,6 +72,16 @@
   background-color: blue;
 }
 
+/* Indirect damage column styling */
+.indirectDamageHeader {
+  background-color: #4a148c !important; /* Dark purple */
+  color: white !important;
+  cursor: pointer;
+}
+.indirectDamageCell {
+  background-color: #6a1b9a !important; /* Light purple background */
+}
+
 /* error */
 .error {
   color: red;
