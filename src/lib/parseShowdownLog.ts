@@ -577,6 +577,25 @@ export function parseShowdownLog(log: string): DraftResult | null {
         else p2Remaining--
         faintedPokemon[key] = true
         getPokemon(nickname, side).hp = 0
+
+        // Check for a direct KO
+        const lastHitData = lastHit[key];
+        const prevLine = lines[idx - 1] || '';
+        const isIndirectKO = /\[from\]/.test(prevLine);
+
+        if (lastHitData && lastHitData.turn === currentTurn && !isIndirectKO) {
+          const attackerState = battle.pokemon[lastHitData.attackerKey];
+          const victimState = getPokemon(nickname, side);
+          
+          if (attackerState && victimState) {
+            kos.push({ 
+              attacker: attackerState.species, 
+              victim: victimState.species, 
+              move: lastHitData.move 
+            });
+            attackerState.kos++;
+          }
+        }
       }
     }
 
