@@ -238,7 +238,7 @@
   font-size: 0.9em;
   margin-left: 0.2em;
   display: inline-block;
-  transform: rotate(180deg); /* Counter-rotate to appear upright in vertical headers */
+  transform: rotate(180deg); /* Counter-rotate to appear upright in vertical headers on desktop */
   color: #ffb400;
 }
 
@@ -261,7 +261,7 @@
   white-space: nowrap;
   /* Remove overflow and text-overflow to prevent truncation */
 }
-.results__stats th {
+.results__stats th:first-child {
   white-space: nowrap !important;
   word-break: normal;
   writing-mode: initial;
@@ -276,9 +276,23 @@
   color: #fff;
   position: sticky;
   top: 0;
-  z-index: 1;
-}
-.results__stats th:first-child {
   z-index: 3;
   background: #111;
+}
+
+/* ------------------------------------------------------------------ */
+/* Mobile override: remove 180deg rotation so text isn’t upside-down   */
+/* ------------------------------------------------------------------ */
+@media (max-width: 768px) {
+  .results__stats th:not(:first-child) {
+    writing-mode: initial;
+    transform: none; /* No rotation on small screens */
+    text-align: left;
+    white-space: normal; /* Allow wrapping if needed */
+    min-width: 120px; /* Give more space for horizontal text */
+    height: auto;     /* Let height adjust naturally */
+  }
+  .sortIcon {
+    transform: none; /* Keep icon upright */
+  }
 }
