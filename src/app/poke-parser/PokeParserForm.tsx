@@ -41,6 +41,8 @@ type Parsed = {
     damageTakenByLifeOrb: number;
     damageTakenByMoveRecoil: number;
     damageTakenBySubstitute: number;
+    damageTakenBySacrificialMove: number;
+    damageTakenByRiskRewardMove: number;
   }[];
 };
 
@@ -73,7 +75,9 @@ type SortField =
   | 'damageTakenByContactAbility'
   | 'damageTakenByLifeOrb'
   | 'damageTakenByMoveRecoil'
-  | 'damageTakenBySubstitute';
+  | 'damageTakenBySubstitute'
+  | 'damageTakenBySacrificialMove'
+  | 'damageTakenByRiskRewardMove';
 type SortDirection = 'asc' | 'desc';
 
 export default function PokeParserForm() {
@@ -299,6 +303,12 @@ export default function PokeParserForm() {
                       <th onClick={() => handleSort('damageTakenBySubstitute')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenBySubstitute' ? styles.activeSort : ''}`}>
                         Substitute Taken {getSortIcon('damageTakenBySubstitute')}
                       </th>
+                      <th onClick={() => handleSort('damageTakenBySacrificialMove')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenBySacrificialMove' ? styles.activeSort : ''}`}>
+                        Sacrificial Move Taken {getSortIcon('damageTakenBySacrificialMove')}
+                      </th>
+                      <th onClick={() => handleSort('damageTakenByRiskRewardMove')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenByRiskRewardMove' ? styles.activeSort : ''}`}>
+                        Risk Reward Move Taken {getSortIcon('damageTakenByRiskRewardMove')}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -333,6 +343,8 @@ export default function PokeParserForm() {
                         <td className={sortField === 'damageTakenByLifeOrb' ? styles.activeSort : ''}>{Math.round(pokemon.damageTakenByLifeOrb)}%</td>
                         <td className={sortField === 'damageTakenByMoveRecoil' ? styles.activeSort : ''}>{Math.round(pokemon.damageTakenByMoveRecoil)}%</td>
                         <td className={sortField === 'damageTakenBySubstitute' ? styles.activeSort : ''}>{Math.round(pokemon.damageTakenBySubstitute)}%</td>
+                        <td className={sortField === 'damageTakenBySacrificialMove' ? styles.activeSort : ''}>{Math.round(pokemon.damageTakenBySacrificialMove)}%</td>
+                        <td className={sortField === 'damageTakenByRiskRewardMove' ? styles.activeSort : ''}>{Math.round(pokemon.damageTakenByRiskRewardMove)}%</td>
                       </tr>
                     ))}
                   </tbody>
