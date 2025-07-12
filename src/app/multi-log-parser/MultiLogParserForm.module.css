@@ -90,4 +90,114 @@
 
 .parseButton:hover {
   background-color: #ffca4d;
+}
+
+.error {
+  color: #ff6b6b; /* Light red for visibility */
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.resultsContainer {
+  margin-top: 2rem;
+  width: 100%;
+  padding: 1.5rem;
+  border-radius: 8px;
+  background-color: #1e1e1e;
+  border: 1px solid #333;
+}
+
+.resultsContainer h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.jsonOutput {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  background-color: #111;
+  padding: 1rem;
+  border-radius: 4px;
+  color: #d4d4d4;
+  font-size: 0.9rem;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+/* --- Stats Table Styles --- */
+.results__statsContainer {
+  width: 100%;
+  overflow-x: auto; /* Allows horizontal scrolling on small screens */
+}
+
+.results__stats {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  white-space: nowrap; /* Prevent headers from wrapping */
+}
+
+.results__stats th,
+.results__stats td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #333;
+}
+
+.results__stats th {
+  background-color: #2a2a2a;
+  font-weight: bold;
+  cursor: pointer;
+  position: relative;
+  user-select: none; /* Prevents text selection on click */
+}
+
+.results__stats th:hover {
+  background-color: #383838;
+}
+
+.results__stats tbody tr:nth-child(odd) {
+  background-color: #222;
+}
+
+.results__stats tbody tr:hover {
+  background-color: #3c3c3c;
+}
+
+.activeSort {
+  background-color: #004d80 !important; /* Dark blue to show active sort */
+  color: #fff;
+}
+
+.sortIcon {
+  font-size: 0.7em;
+  margin-left: 0.3em;
+  display: inline-block;
+}
+
+.results__stats th:first-child,
+.results__stats td:first-child {
+  position: -webkit-sticky; /* For Safari */
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
+.results__stats th:first-child {
+  z-index: 2; /* Keep header on top of body cells */
+}
+
+/* Sticky cells need a solid background, or the scrolling content shows through. */
+.results__stats tbody tr td:first-child {
+  background-color: #1e1e1e; /* Default/even row background */
+}
+
+.results__stats tbody tr:nth-child(odd) td:first-child {
+  background-color: #222; /* Odd row background */
+}
+
+.results__stats tbody tr:hover td:first-child {
+  background-color: #3c3c3c; /* Hovered row background */
 } 
