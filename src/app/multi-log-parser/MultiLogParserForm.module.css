@@ -128,7 +128,8 @@
 /* --- Stats Table Styles --- */
 .results__statsContainer {
   width: 100%;
-  overflow-x: auto; /* Allows horizontal scrolling on small screens */
+  overflow: auto; /* Allows horizontal and vertical scrolling */
+  max-height: 70vh; /* Adjust as needed */
 }
 
 .results__stats {
@@ -150,8 +151,11 @@
   background-color: #2a2a2a;
   font-weight: bold;
   cursor: pointer;
-  position: relative;
+  position: -webkit-sticky; /* For Safari */
+  position: sticky;
+  top: 0;
   user-select: none; /* Prevents text selection on click */
+  z-index: 2;
 }
 
 .results__stats th:hover {
@@ -186,7 +190,7 @@
 }
 
 .results__stats th:first-child {
-  z-index: 2; /* Keep header on top of body cells */
+  z-index: 3; /* Keep header on top of other headers and body cells */
 }
 
 /* Sticky cells need a solid background, or the scrolling content shows through. */

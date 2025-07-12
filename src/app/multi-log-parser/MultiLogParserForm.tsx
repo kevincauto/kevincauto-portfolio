@@ -69,8 +69,7 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
               {renderHeader('kos', 'KOs')}
               {renderHeader('kosPerGame', 'KOs/Game')}
               {renderHeader('fainted', 'Faints')}
-              {renderHeader('faintedPerGame', 'Faints/Game')}
-              {renderHeader('kosPerFaint', 'K/F Ratio')}
+              {renderHeader('kosPerFaint', 'K/D Ratio')}
               
               {/* Damage Dealt Section */}
               {renderHeader('totalDamageDealt', 'Total Dmg Dealt')}
@@ -84,7 +83,7 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
               {renderHeader('damageDealtBySandstorm', 'Sand Dmg')}
               {renderHeader('damageDealtByHail', 'Hail Dmg')}
               {renderHeader('damageDealtByRockyHelmet', 'Helmet Dmg')}
-              {renderHeader('damageDealtByContactAbility', 'Ability Dmg')}
+              {renderHeader('damageDealtByContactAbility', 'Contact Ability Dmg')}
               
               {/* Damage Taken Section */}
               {renderHeader('totalDamageTaken', 'Total Dmg Taken')}
@@ -98,12 +97,12 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
               {renderHeader('damageTakenBySandstorm', 'Sand Taken')}
               {renderHeader('damageTakenByHail', 'Hail Taken')}
               {renderHeader('damageTakenByRockyHelmet', 'Helmet Taken')}
-              {renderHeader('damageTakenByContactAbility', 'Ability Taken')}
+              {renderHeader('damageTakenByContactAbility', 'Contact Ability Taken')}
               {renderHeader('damageTakenByLifeOrb', 'Life Orb Taken')}
               {renderHeader('damageTakenByMoveRecoil', 'Recoil Taken')}
               {renderHeader('damageTakenBySubstitute', 'Sub Taken')}
               {renderHeader('damageTakenBySacrificialMove', 'Sacrifice Taken')}
-              {renderHeader('damageTakenByRiskRewardMove', 'Risk/Reward Taken')}
+              {renderHeader('damageTakenByRiskRewardMove', 'Belly Drum Taken')}
             </tr>
           </thead>
           <tbody>
@@ -115,7 +114,6 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
                 <td className={sortField === 'kos' ? styles.activeSort : ''}>{pokemon.kos}</td>
                 <td className={sortField === 'kosPerGame' ? styles.activeSort : ''}>{pokemon.kosPerGame.toFixed(2)}</td>
                 <td className={sortField === 'fainted' ? styles.activeSort : ''}>{pokemon.fainted}</td>
-                <td className={sortField === 'faintedPerGame' ? styles.activeSort : ''}>{pokemon.faintedPerGame.toFixed(2)}</td>
                 <td className={sortField === 'kosPerFaint' ? styles.activeSort : ''}>{pokemon.kosPerFaint.toFixed(2)}</td>
                 
                 {/* Damage Dealt Data */}

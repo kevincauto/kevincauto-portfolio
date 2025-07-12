@@ -5,7 +5,6 @@ import { parseShowdownLog, PokemonStats } from '@/lib/parseShowdownLog';
 export interface AggregatedPokemonStats extends PokemonStats {
   gamesPlayed: number;
   kosPerGame: number;
-  faintedPerGame: number;
   totalDamageDealtPerGame: number;
   totalDamageTakenPerGame: number;
   kosPerFaint: number;
@@ -63,7 +62,7 @@ export async function POST(req: NextRequest) {
             damageTakenByRockyHelmet: 0, damageTakenByContactAbility: 0,
             damageTakenByLifeOrb: 0, damageTakenByMoveRecoil: 0, damageTakenBySubstitute: 0,
             damageTakenBySacrificialMove: 0, damageTakenByRiskRewardMove: 0,
-            kosPerGame: 0, faintedPerGame: 0, totalDamageDealtPerGame: 0, totalDamageTakenPerGame: 0,
+            kosPerGame: 0, totalDamageDealtPerGame: 0, totalDamageTakenPerGame: 0,
             kosPerFaint: 0
           };
         }
@@ -116,7 +115,6 @@ export async function POST(req: NextRequest) {
         ...stats,
         name,
         kosPerGame: gamesPlayed > 0 ? kos / gamesPlayed : 0,
-        faintedPerGame: gamesPlayed > 0 ? fainted / gamesPlayed : 0,
         totalDamageDealtPerGame: gamesPlayed > 0 ? stats.totalDamageDealt / gamesPlayed : 0,
         totalDamageTakenPerGame: gamesPlayed > 0 ? stats.totalDamageTaken / gamesPlayed : 0,
         kosPerFaint: fainted > 0 ? kos / fainted : kos, // Handle division by zero
