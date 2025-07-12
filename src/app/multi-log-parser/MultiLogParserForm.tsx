@@ -4,9 +4,11 @@ import { useState } from 'react';
 import styles from './MultiLogParserForm.module.css';
 import { FaPlus, FaTrash } from 'react-icons/fa';
 import { AggregatedPokemonStats } from '../api/multi-poke-parser/route'; // Import the new type
+import PokemonIcon from '../../components/PokemonIcon';
 
 type SortField = keyof AggregatedPokemonStats;
 type SortDirection = 'asc' | 'desc';
+type RankedPokemonStats = AggregatedPokemonStats & { rank: number };
 
 // A new component for displaying the results
 function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
@@ -22,21 +24,67 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
     }
   };
 
-  const getSortedData = () => {
-    return [...data].sort((a, b) => {
+  const getRankedData = (): RankedPokemonStats[] => {
+    const sorted = [...data].sort((a, b) => {
       const aValue = a[sortField];
       const bValue = b[sortField];
 
+      // Handle numeric comparison for descending order on most stats
+      if (typeof aValue === 'number' && typeof bValue === 'number' && sortField !== 'name') {
+        return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+      }
+
+      // Handle string comparison for name
       if (typeof aValue === 'string' && typeof bValue === 'string') {
-        return sortDirection === 'asc' 
-          ? aValue.localeCompare(bValue) 
+        return sortDirection === 'asc'
+          ? aValue.localeCompare(bValue)
           : bValue.localeCompare(aValue);
       }
-      
+
+      // Fallback for mixed types, though shouldn't happen with current data
       if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
       if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
+
+    if (sorted.length === 0) {
+      return [];
+    }
+
+    // Add rank property with tie handling
+    const rankedData: RankedPokemonStats[] = [];
+    const totalItems = sorted.length;
+    for (let i = 0; i < totalItems; i++) {
+      const current = sorted[i];
+      let rank: number;
+
+      if (i === 0) {
+        // Top item rank depends on sort order for numeric fields
+        if (sortDirection === 'asc' && sortField !== 'name') {
+          rank = totalItems;
+        } else {
+          rank = 1;
+        }
+      } else {
+        const previous = sorted[i - 1];
+        const previousRanked = rankedData[i - 1];
+        const currentValue = current[sortField];
+        const previousValue = previous[sortField];
+
+        if (currentValue === previousValue) {
+          rank = previousRanked.rank;
+        } else {
+          // Rank depends on sort order for numeric fields
+          if (sortDirection === 'asc' && sortField !== 'name') {
+            rank = totalItems - i;
+          } else {
+            rank = i + 1;
+          }
+        }
+      }
+      rankedData.push({ ...current, rank });
+    }
+    return rankedData;
   };
 
   const getSortIcon = (field: SortField) => {
@@ -54,7 +102,7 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
     </th>
   );
   
-  const sortedData = getSortedData();
+  const sortedData = getRankedData();
 
   return (
     <div className={styles.resultsContainer}>
@@ -63,6 +111,7 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
         <table className={styles.results__stats}>
           <thead>
             <tr>
+              <th className={styles.rankHeader}>Rank</th>
               {renderHeader('name', 'Pokémon')}
               {renderHeader('gamesPlayed', 'GP')}
               {renderHeader('won', 'Wins')}
@@ -108,7 +157,11 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
           <tbody>
             {sortedData.map((pokemon) => (
               <tr key={pokemon.name}>
-                <td className={sortField === 'name' ? styles.activeSort : ''}>{pokemon.name}</td>
+                <td className={styles.rankCell}>{pokemon.rank}</td>
+                <td className={sortField === 'name' ? styles.activeSort : ''}>
+                  <PokemonIcon species={pokemon.name} />
+                  {pokemon.name}
+                </td>
                 <td className={sortField === 'gamesPlayed' ? styles.activeSort : ''}>{pokemon.gamesPlayed}</td>
                 <td className={sortField === 'won' ? styles.activeSort : ''}>{pokemon.won}</td>
                 <td className={sortField === 'kos' ? styles.activeSort : ''}>{pokemon.kos}</td>

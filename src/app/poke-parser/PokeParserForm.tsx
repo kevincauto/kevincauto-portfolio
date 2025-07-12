@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from 'react';
 import styles from './PokeParserForm.module.css';
+import PokemonIcon from '../../components/PokemonIcon';
 
 type Parsed = {
   p1: { name: string; team: string[] };
@@ -314,7 +315,10 @@ export default function PokeParserForm() {
                   <tbody>
                     {getSortedPokemonStats().map((pokemon) => (
                       <tr key={pokemon.name}>
-                        <td className={sortField === 'name' ? styles.activeSort : ''}>{pokemon.name}</td>
+                        <td className={sortField === 'name' ? styles.activeSort : ''}>
+                          <PokemonIcon species={pokemon.name} />
+                          {pokemon.name}
+                        </td>
                         <td className={sortField === 'kos' ? styles.activeSort : ''}>{pokemon.kos}</td>
                         <td className={sortField === 'fainted' ? styles.activeSort : ''}>{pokemon.fainted ? 'Yes' : 'No'}</td>
                         <td className={sortField === 'won' ? styles.activeSort : ''}>{pokemon.won ? 'Yes' : 'No'}</td>

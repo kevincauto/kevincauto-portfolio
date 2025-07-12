@@ -181,27 +181,52 @@
   display: inline-block;
 }
 
+.rankHeader,
+.rankCell {
+  text-align: center;
+}
+
 .results__stats th:first-child,
-.results__stats td:first-child {
+.results__stats td:first-child,
+.results__stats th:nth-child(2),
+.results__stats td:nth-child(2) {
   position: -webkit-sticky; /* For Safari */
   position: sticky;
-  left: 0;
   z-index: 1;
 }
 
+.results__stats th:first-child,
+.results__stats td:first-child {
+  left: 0;
+}
+
+.results__stats th:nth-child(2),
+.results__stats td:nth-child(2) {
+  left: 60px; /* Adjust based on rank column width */
+}
+
+.results__stats th:first-child,
+.results__stats th:nth-child(2) {
+  z-index: 3;
+}
+
+/* Ensure the very top-left corner is on top of everything */
 .results__stats th:first-child {
-  z-index: 3; /* Keep header on top of other headers and body cells */
+  z-index: 3;
 }
 
 /* Sticky cells need a solid background, or the scrolling content shows through. */
-.results__stats tbody tr td:first-child {
+.results__stats tbody tr td:first-child,
+.results__stats tbody tr td:nth-child(2) {
   background-color: #1e1e1e; /* Default/even row background */
 }
 
-.results__stats tbody tr:nth-child(odd) td:first-child {
+.results__stats tbody tr:nth-child(odd) td:first-child,
+.results__stats tbody tr:nth-child(odd) td:nth-child(2) {
   background-color: #222; /* Odd row background */
 }
 
-.results__stats tbody tr:hover td:first-child {
+.results__stats tbody tr:hover td:first-child,
+.results__stats tbody tr:hover td:nth-child(2) {
   background-color: #3c3c3c; /* Hovered row background */
 } 
