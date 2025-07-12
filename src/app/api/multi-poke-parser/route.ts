@@ -12,6 +12,20 @@ export interface AggregatedPokemonStats extends PokemonStats {
 
 const PREFIX = 'https://replay.pokemonshowdown.com/';
 
+/**
+ * Normalizes a Pokémon species name to its base form for aggregation.
+ * e.g., "Florges-Blue" -> "Florges"
+ */
+function getBaseSpeciesName(name: string): string {
+  if (name.startsWith('Florges')) {
+    return 'Florges';
+  }
+  if (name.startsWith('Gastrodon')) {
+    return 'Gastrodon';
+  }
+  return name;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { urls } = await req.json();
@@ -47,7 +61,8 @@ export async function POST(req: NextRequest) {
     for (const log of validLogs) {
       if (!log?.pokemonStats) continue;
       for (const pokemon of log.pokemonStats) {
-        let existing = aggregatedStats.get(pokemon.name);
+        const baseName = getBaseSpeciesName(pokemon.name);
+        let existing = aggregatedStats.get(baseName);
 
         if (!existing) {
           existing = {
@@ -103,7 +118,7 @@ export async function POST(req: NextRequest) {
         updatedStats.damageTakenBySacrificialMove += pokemon.damageTakenBySacrificialMove;
         updatedStats.damageTakenByRiskRewardMove += pokemon.damageTakenByRiskRewardMove;
         
-        aggregatedStats.set(pokemon.name, updatedStats);
+        aggregatedStats.set(baseName, updatedStats);
       }
     }
 
