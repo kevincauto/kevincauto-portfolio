@@ -30,6 +30,7 @@ export interface PokemonStats {
   damageDealtByHail: number;
   damageDealtByRockyHelmet: number;
   damageDealtByContactAbility: number; // Rough Skin, Iron Barbs, etc.
+  damageDealtByLeechSeed: number;
   // Granular indirect damage taken categories
   damageTakenBySpikes: number;
   damageTakenByStealthRock: number;
@@ -44,6 +45,7 @@ export interface PokemonStats {
   damageTakenBySubstitute: number;
   damageTakenBySacrificialMove: number;
   damageTakenByRiskRewardMove: number;
+  damageTakenByLeechSeed: number;
 }
 
 export interface DraftResult {
@@ -93,6 +95,7 @@ export interface PokemonState {
   damageDealtByHail: number;
   damageDealtByRockyHelmet: number;
   damageDealtByContactAbility: number; // Rough Skin, Iron Barbs, etc.
+  damageDealtByLeechSeed: number;
   // Granular indirect damage taken categories
   damageTakenBySpikes: number;
   damageTakenByStealthRock: number;
@@ -107,6 +110,7 @@ export interface PokemonState {
   damageTakenBySubstitute: number;
   damageTakenBySacrificialMove: number;
   damageTakenByRiskRewardMove: number;
+  damageTakenByLeechSeed: number;
 }
 
 /* ────── entry hazards on *one* side (two exist: hazards.p1 & hazards.p2) ────── */
@@ -129,6 +133,9 @@ interface BattleState {
 
   /** exactly two HazardStates: hazards.p1 & hazards.p2 */
   hazards: Record<SideID, HazardState>;
+
+  /** A set of pokemonKeys for all pokemon that have used Leech Seed */
+  leechSeedUsers: Set<string>;
 
   /** weather attribution (global, not side-specific) */
   sandstormSetter?: string;  // uses unique pokemonKey
@@ -181,7 +188,8 @@ export function parseShowdownLog(log: string): DraftResult | null {
     hazards: {
       p1: { spikesLayers: 0, toxicSpikesLayers: 0 },
       p2: { spikesLayers: 0, toxicSpikesLayers: 0 }
-    }
+    },
+    leechSeedUsers: new Set(),
   }
 
   let currentTurn = 0
@@ -220,6 +228,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
         damageDealtByHail: 0,
         damageDealtByRockyHelmet: 0,
         damageDealtByContactAbility: 0,
+        damageDealtByLeechSeed: 0,
         damageTakenBySpikes: 0,
         damageTakenByStealthRock: 0,
         damageTakenByPoison: 0,
@@ -233,6 +242,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
         damageTakenBySubstitute: 0,
         damageTakenBySacrificialMove: 0,
         damageTakenByRiskRewardMove: 0,
+        damageTakenByLeechSeed: 0,
       }
     } else if (species && battle.pokemon[key].species === battle.pokemon[key].nickname) {
       // If we learn the true species of a Pokémon we only knew by nickname, update it.
@@ -279,6 +289,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
             case 'Recoil': pokemon.damageTakenByMoveRecoil += damage; break
             case 'Sacrificial Move': pokemon.damageTakenBySacrificialMove += damage; break
             case 'Risk Reward Move': pokemon.damageTakenByRiskRewardMove += damage; break
+            case 'Leech Seed': pokemon.damageTakenByLeechSeed += damage; break
             case 'Substitute': break;
           }
         }
@@ -300,6 +311,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
               case 'Hail': attackerState.damageDealtByHail += damage; break
               case 'Rocky Helmet': attackerState.damageDealtByRockyHelmet += damage; break
               case 'Contact Ability': attackerState.damageDealtByContactAbility += damage; break
+              case 'Leech Seed': attackerState.damageDealtByLeechSeed += damage; break
             }
           }
         }
@@ -352,6 +364,10 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const atkKey = getPokemonKey(atkSide, atkNick)
       
       lastMoveUsed[atkKey] = { move: moveName, turn: currentTurn }
+
+      if (moveName === 'Leech Seed') {
+        battle.leechSeedUsers.add(atkKey);
+      }
 
       if (parts[4]) {
         const defField = parts[4]
@@ -504,6 +520,14 @@ export function parseShowdownLog(log: string): DraftResult | null {
           isSelfDamage = true;
           attackerKey = getPokemonKey(victimSide, victimNick);
           damageType = fromContent;
+        } else if (fromContent === 'Leech Seed') {
+          damageType = 'Leech Seed';
+          if (ofNick && ofSide) {
+            const potentialAttackerKey = getPokemonKey(ofSide, ofNick);
+            if (battle.leechSeedUsers.has(potentialAttackerKey)) {
+              attackerKey = potentialAttackerKey;
+            }
+          }
         } else if (['Stealth Rock', 'Spikes'].includes(fromContent)) {
           attackerKey = battle.hazards[victimSide][fromContent === 'Spikes' ? 'spikesSetter' : 'stealthRockSetter'];
           damageType = fromContent;
@@ -643,6 +667,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
       damageDealtByHail: allStates.reduce((sum, p) => sum + p.damageDealtByHail, 0),
       damageDealtByRockyHelmet: allStates.reduce((sum, p) => sum + p.damageDealtByRockyHelmet, 0),
       damageDealtByContactAbility: allStates.reduce((sum, p) => sum + p.damageDealtByContactAbility, 0),
+      damageDealtByLeechSeed: allStates.reduce((sum, p) => sum + p.damageDealtByLeechSeed, 0),
       damageTakenBySpikes: allStates.reduce((sum, p) => sum + p.damageTakenBySpikes, 0),
       damageTakenByStealthRock: allStates.reduce((sum, p) => sum + p.damageTakenByStealthRock, 0),
       damageTakenByPoison: allStates.reduce((sum, p) => sum + p.damageTakenByPoison, 0),
@@ -656,6 +681,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
       damageTakenBySubstitute: allStates.reduce((sum, p) => sum + (p.substituteUses * 25), 0),
       damageTakenBySacrificialMove: allStates.reduce((sum, p) => sum + p.damageTakenBySacrificialMove, 0),
       damageTakenByRiskRewardMove: allStates.reduce((sum, p) => sum + p.damageTakenByRiskRewardMove, 0),
+      damageTakenByLeechSeed: allStates.reduce((sum, p) => sum + p.damageTakenByLeechSeed, 0),
     })
   })
 

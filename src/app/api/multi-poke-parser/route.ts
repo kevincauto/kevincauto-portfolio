@@ -78,7 +78,9 @@ export async function POST(req: NextRequest) {
             damageTakenByLifeOrb: 0, damageTakenByMoveRecoil: 0, damageTakenBySubstitute: 0,
             damageTakenBySacrificialMove: 0, damageTakenByRiskRewardMove: 0,
             kosPerGame: 0, totalDamageDealtPerGame: 0, totalDamageTakenPerGame: 0,
-            kosPerFaint: 0
+            kosPerFaint: 0,
+            damageDealtByLeechSeed: 0,
+            damageTakenByLeechSeed: 0
           };
         }
         
@@ -117,6 +119,8 @@ export async function POST(req: NextRequest) {
         updatedStats.damageTakenBySubstitute += pokemon.damageTakenBySubstitute;
         updatedStats.damageTakenBySacrificialMove += pokemon.damageTakenBySacrificialMove;
         updatedStats.damageTakenByRiskRewardMove += pokemon.damageTakenByRiskRewardMove;
+        updatedStats.damageDealtByLeechSeed += pokemon.damageDealtByLeechSeed;
+        updatedStats.damageTakenByLeechSeed += pokemon.damageTakenByLeechSeed;
         
         aggregatedStats.set(baseName, updatedStats);
       }
