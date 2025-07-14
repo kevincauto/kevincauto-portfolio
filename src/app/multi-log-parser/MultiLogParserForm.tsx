@@ -510,12 +510,14 @@ export default function MultiLogParserForm() {
       {results && (
         <>
           <ResultsTable data={results} />
+          {/*
           <div className={styles.resultsContainer}>
             <h2 style={{ marginTop: '1rem' }}>Raw JSON Output</h2>
             <pre className={styles.jsonOutput}>
               {JSON.stringify(results, null, 2)}
             </pre>
           </div>
+          */}
         </>
       )}
     </>

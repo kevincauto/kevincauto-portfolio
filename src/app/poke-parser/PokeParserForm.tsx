@@ -1,8 +1,58 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import styles from './PokeParserForm.module.css';
 import PokemonIcon from '../../components/PokemonIcon';
+import Image from 'next/image';
+
+const awardExplanations: { [key: string]: string } = {
+  "Shadow Realm Administrator": "Most KOs",
+  "Conductor of the Pain Train": "Most Damage Dealt",
+  "Frank the Tank": "Most Damage Taken",
+  "The Passive Aggressor": "Most Indirect Damage Dealt",
+  "I'm Trying My Best": "Least Impactful",
+};
+
+type PokemonStat = { 
+  name: string; 
+  kos: number; 
+  fainted: number; 
+  won: number; 
+  directDamageDealt: number; 
+  indirectDamageDealt: number; 
+  totalDamageDealt: number; 
+  directDamageTaken: number; 
+  indirectDamageTaken: number; 
+  totalDamageTaken: number;
+  // Granular indirect damage categories
+  damageDealtBySpikes: number;
+  damageDealtByStealthRock: number;
+  damageDealtByPoison: number;
+  damageDealtByBurn: number;
+  damageDealtBySandstorm: number;
+  damageDealtByHail: number;
+  damageDealtByRockyHelmet: number;
+  damageDealtByContactAbility: number;
+  damageDealtByLeechSeed: number;
+  damageDealtByCurse: number;
+  // Granular indirect damage taken categories
+  damageTakenBySpikes: number;
+  damageTakenByStealthRock: number;
+  damageTakenByPoison: number;
+  damageTakenByBurn: number;
+  damageTakenBySandstorm: number;
+  damageTakenByHail: number;
+  damageTakenByRockyHelmet: number;
+  damageTakenByContactAbility: number;
+  damageTakenByLifeOrb: number;
+  damageTakenByMoveRecoil: number;
+  damageTakenBySubstitute: number;
+  damageTakenBySacrificialMove: number;
+  damageTakenByRiskRewardMove: number;
+  damageTakenByLeechSeed: number;
+  damageTakenByCurse: number;
+  damageTakenByCurseSelf: number;
+};
 
 type Parsed = {
   p1: { name: string; team: string[] };
@@ -10,87 +60,45 @@ type Parsed = {
   kos: { attacker: string; victim: string; hazard?: string; move?: string }[];
   winner?: string;
   score?: string;
-  pokemonStats?: { 
-    name: string; 
-    kos: number; 
-    fainted: number; 
-    won: number; 
-    directDamageDealt: number; 
-    indirectDamageDealt: number; 
-    totalDamageDealt: number; 
-    directDamageTaken: number; 
-    indirectDamageTaken: number; 
-    totalDamageTaken: number;
-    // Granular indirect damage categories
-    damageDealtBySpikes: number;
-    damageDealtByStealthRock: number;
-    damageDealtByPoison: number;
-    damageDealtByBurn: number;
-    damageDealtBySandstorm: number;
-    damageDealtByHail: number;
-    damageDealtByRockyHelmet: number;
-    damageDealtByContactAbility: number;
-    damageDealtByLeechSeed: number;
-    damageDealtByCurse: number;
-    // Granular indirect damage taken categories
-    damageTakenBySpikes: number;
-    damageTakenByStealthRock: number;
-    damageTakenByPoison: number;
-    damageTakenByBurn: number;
-    damageTakenBySandstorm: number;
-    damageTakenByHail: number;
-    damageTakenByRockyHelmet: number;
-    damageTakenByContactAbility: number;
-    damageTakenByLifeOrb: number;
-    damageTakenByMoveRecoil: number;
-    damageTakenBySubstitute: number;
-    damageTakenBySacrificialMove: number;
-    damageTakenByRiskRewardMove: number;
-    damageTakenByLeechSeed: number;
-    damageTakenByCurse: number;
-    damageTakenByCurseSelf: number;
-  }[];
+  pokemonStats?: PokemonStat[];
 };
 
-type SortField = 
-  | 'name' 
-  | 'kos' 
-  | 'fainted' 
-  | 'won' 
-  | 'directDamageDealt' 
-  | 'indirectDamageDealt' 
-  | 'totalDamageDealt' 
-  | 'directDamageTaken' 
-  | 'indirectDamageTaken' 
-  | 'totalDamageTaken'
-  | 'damageDealtBySpikes'
-  | 'damageDealtByStealthRock'
-  | 'damageDealtByPoison'
-  | 'damageDealtByBurn'
-  | 'damageDealtBySandstorm'
-  | 'damageDealtByHail'
-  | 'damageDealtByRockyHelmet'
-  | 'damageDealtByContactAbility'
-  | 'damageDealtByLeechSeed'
-  | 'damageTakenBySpikes'
-  | 'damageTakenByStealthRock'
-  | 'damageTakenByPoison'
-  | 'damageTakenByBurn'
-  | 'damageTakenBySandstorm'
-  | 'damageTakenByHail'
-  | 'damageTakenByRockyHelmet'
-  | 'damageTakenByContactAbility'
-  | 'damageTakenByLifeOrb'
-  | 'damageTakenByMoveRecoil'
-  | 'damageTakenBySubstitute'
-  | 'damageTakenBySacrificialMove'
-  | 'damageTakenByRiskRewardMove'
-  | 'damageDealtByLeechSeed'
-  | 'damageTakenByLeechSeed'
-  | 'damageDealtByCurse'
-  | 'damageTakenByCurse'
-  | 'damageTakenByCurseSelf';
+type SortField = keyof PokemonStat | 'name';
+
 type SortDirection = 'asc' | 'desc';
+
+function AwardCard({ pokemon, award }: { pokemon: PokemonStat; award: string }) {
+  const formattedSpecies = pokemon.name.toLowerCase().replace(/ /g, '-').replace(/\./g, '');
+  const primaryUrl = `https://img.pokemondb.net/artwork/large/${formattedSpecies}.jpg`;
+  const fallbackUrl = `https://img.pokemondb.net/artwork/${formattedSpecies}.jpg`;
+  
+  const [imgSrc, setImgSrc] = useState(primaryUrl);
+  const explanation = awardExplanations[award];
+
+  useEffect(() => {
+    setImgSrc(primaryUrl);
+  }, [primaryUrl]);
+
+  return (
+    <div className={styles.awardCard}>
+      <h3>{award}</h3>
+      {explanation && <p className={styles.awardExplanation}>({explanation})</p>}
+      <Image
+        src={imgSrc}
+        alt={pokemon.name}
+        width={200}
+        height={200}
+        className={styles.awardPokemonImage}
+        onError={() => {
+          if (imgSrc === primaryUrl) {
+            setImgSrc(fallbackUrl);
+          }
+        }}
+      />
+      <p>{pokemon.name}</p>
+    </div>
+  );
+}
 
 export default function PokeParserForm() {
   const [url, setUrl] = useState('https://replay.pokemonshowdown.com/gen6draft-2335637717-nwegnp5dgbuu4768334bxodu0lmvnnopw');
@@ -169,6 +177,49 @@ export default function PokeParserForm() {
     );
   }
 
+  let shadowRealmAdmin: PokemonStat | undefined;
+  let conductorOfThePainTrain: PokemonStat | undefined;
+  let frankTheTank: PokemonStat | undefined;
+  let passiveAggressor: PokemonStat | undefined;
+  let tryingMyBest: PokemonStat | undefined;
+
+  if (data?.pokemonStats && data.pokemonStats.length > 0) {
+    const stats = data.pokemonStats;
+
+    shadowRealmAdmin = [...stats].sort((a, b) => {
+      if (a.kos > b.kos) return -1;
+      if (a.kos < b.kos) return 1;
+      if (a.totalDamageDealt > b.totalDamageDealt) return -1;
+      if (a.totalDamageDealt < b.totalDamageDealt) return 1;
+      return 0;
+    })[0];
+    
+    conductorOfThePainTrain = stats.reduce((best, current) => 
+      current.totalDamageDealt > best.totalDamageDealt ? current : best
+    );
+
+    frankTheTank = stats.reduce((best, current) => 
+      current.totalDamageTaken > best.totalDamageTaken ? current : best
+    );
+
+    passiveAggressor = stats.reduce((best, current) => 
+      current.indirectDamageDealt > best.indirectDamageDealt ? current : best
+    );
+
+    tryingMyBest = [...stats].sort((a, b) => {
+      // 1. Least KOs
+      if (a.kos < b.kos) return -1;
+      if (a.kos > b.kos) return 1;
+      // 2. Least total damage dealt
+      if (a.totalDamageDealt < b.totalDamageDealt) return -1;
+      if (a.totalDamageDealt > b.totalDamageDealt) return 1;
+      // 3. Least total damage taken
+      if (a.totalDamageTaken < b.totalDamageTaken) return -1;
+      if (a.totalDamageTaken > b.totalDamageTaken) return 1;
+      return 0;
+    })[0];
+  }
+
   return (
     <>
       <form onSubmit={handleSubmit} className={styles.parser}>
@@ -200,6 +251,21 @@ export default function PokeParserForm() {
       {data && (
         <div className={styles.results}>
           <div className={styles.results__content}>
+
+            {/* Awards Section */}
+            {(shadowRealmAdmin || conductorOfThePainTrain || frankTheTank || passiveAggressor || tryingMyBest) && (
+              <div className={styles.awardsSection}>
+                <h3>Award Winners</h3>
+                <div className={styles.awardCardsContainer}>
+                  {shadowRealmAdmin && <AwardCard pokemon={shadowRealmAdmin} award="Shadow Realm Administrator" />}
+                  {conductorOfThePainTrain && <AwardCard pokemon={conductorOfThePainTrain} award="Conductor of the Pain Train" />}
+                  {frankTheTank && <AwardCard pokemon={frankTheTank} award="Frank the Tank" />}
+                  {passiveAggressor && <AwardCard pokemon={passiveAggressor} award="The Passive Aggressor" />}
+                  {tryingMyBest && <AwardCard pokemon={tryingMyBest} award="I'm Trying My Best" />}
+                </div>
+              </div>
+            )}
+
             {/* Pokémon Statistics */}
             {data.pokemonStats && data.pokemonStats.length > 0 && (
               <div className={styles.results__summary}>
@@ -398,12 +464,14 @@ export default function PokeParserForm() {
           </div>
 
           {/* JSON at the bottom */}
+          {/*
           <div className={styles.results__json}>
             <h3>Raw Data</h3>
             <pre>
               {JSON.stringify(data, null, 2)}
             </pre>
           </div>
+          */}
         </div>
       )}
     </>
