@@ -80,7 +80,10 @@ export async function POST(req: NextRequest) {
             kosPerGame: 0, totalDamageDealtPerGame: 0, totalDamageTakenPerGame: 0,
             kosPerFaint: 0,
             damageDealtByLeechSeed: 0,
-            damageTakenByLeechSeed: 0
+            damageTakenByLeechSeed: 0,
+            damageDealtByCurse: 0,
+            damageTakenByCurse: 0,
+            damageTakenByCurseSelf: 0
           };
         }
         
@@ -121,6 +124,9 @@ export async function POST(req: NextRequest) {
         updatedStats.damageTakenByRiskRewardMove += pokemon.damageTakenByRiskRewardMove;
         updatedStats.damageDealtByLeechSeed += pokemon.damageDealtByLeechSeed;
         updatedStats.damageTakenByLeechSeed += pokemon.damageTakenByLeechSeed;
+        updatedStats.damageDealtByCurse += pokemon.damageDealtByCurse;
+        updatedStats.damageTakenByCurse += pokemon.damageTakenByCurse;
+        updatedStats.damageTakenByCurseSelf += pokemon.damageTakenByCurseSelf;
         
         aggregatedStats.set(baseName, updatedStats);
       }

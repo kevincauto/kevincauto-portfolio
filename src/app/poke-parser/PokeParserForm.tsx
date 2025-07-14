@@ -31,6 +31,7 @@ type Parsed = {
     damageDealtByRockyHelmet: number;
     damageDealtByContactAbility: number;
     damageDealtByLeechSeed: number;
+    damageDealtByCurse: number;
     // Granular indirect damage taken categories
     damageTakenBySpikes: number;
     damageTakenByStealthRock: number;
@@ -46,6 +47,8 @@ type Parsed = {
     damageTakenBySacrificialMove: number;
     damageTakenByRiskRewardMove: number;
     damageTakenByLeechSeed: number;
+    damageTakenByCurse: number;
+    damageTakenByCurseSelf: number;
   }[];
 };
 
@@ -68,6 +71,7 @@ type SortField =
   | 'damageDealtByHail'
   | 'damageDealtByRockyHelmet'
   | 'damageDealtByContactAbility'
+  | 'damageDealtByLeechSeed'
   | 'damageTakenBySpikes'
   | 'damageTakenByStealthRock'
   | 'damageTakenByPoison'
@@ -82,7 +86,10 @@ type SortField =
   | 'damageTakenBySacrificialMove'
   | 'damageTakenByRiskRewardMove'
   | 'damageDealtByLeechSeed'
-  | 'damageTakenByLeechSeed';
+  | 'damageTakenByLeechSeed'
+  | 'damageDealtByCurse'
+  | 'damageTakenByCurse'
+  | 'damageTakenByCurseSelf';
 type SortDirection = 'asc' | 'desc';
 
 export default function PokeParserForm() {
@@ -269,6 +276,9 @@ export default function PokeParserForm() {
                       <th onClick={() => handleSort('damageDealtByLeechSeed')} className={`${styles.indirectDamageHeader} ${sortField === 'damageDealtByLeechSeed' ? styles.activeSort : ''}`}>
                         Leech Seed Dealt {getSortIcon('damageDealtByLeechSeed')}
                       </th>
+                      <th onClick={() => handleSort('damageDealtByCurse')} className={`${styles.indirectDamageHeader} ${sortField === 'damageDealtByCurse' ? styles.activeSort : ''}`}>
+                        Curse Dealt {getSortIcon('damageDealtByCurse')}
+                      </th>
                       <th onClick={() => handleSort('totalDamageTaken')} className={sortField === 'totalDamageTaken' ? styles.activeSort : ''}>
                         Total Damage Taken {getSortIcon('totalDamageTaken')}
                       </th>
@@ -320,6 +330,12 @@ export default function PokeParserForm() {
                       <th onClick={() => handleSort('damageTakenByLeechSeed')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenByLeechSeed' ? styles.activeSort : ''}`}>
                         Leech Seed Taken {getSortIcon('damageTakenByLeechSeed')}
                       </th>
+                      <th onClick={() => handleSort('damageTakenByCurse')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenByCurse' ? styles.activeSort : ''}`}>
+                        Curse Taken {getSortIcon('damageTakenByCurse')}
+                      </th>
+                      <th onClick={() => handleSort('damageTakenByCurseSelf')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenByCurseSelf' ? styles.activeSort : ''}`}>
+                        Curse Self {getSortIcon('damageTakenByCurseSelf')}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -344,6 +360,7 @@ export default function PokeParserForm() {
                         <td className={sortField === 'damageDealtByRockyHelmet' ? styles.activeSort : ''}>{Math.round(pokemon.damageDealtByRockyHelmet)}%</td>
                         <td className={sortField === 'damageDealtByContactAbility' ? styles.activeSort : ''}>{Math.round(pokemon.damageDealtByContactAbility)}%</td>
                         <td className={sortField === 'damageDealtByLeechSeed' ? styles.activeSort : ''}>{Math.round(pokemon.damageDealtByLeechSeed)}%</td>
+                        <td className={sortField === 'damageDealtByCurse' ? styles.activeSort : ''}>{Math.round(pokemon.damageDealtByCurse)}%</td>
                         <td className={sortField === 'totalDamageTaken' ? styles.activeSort : ''}>{Math.round(pokemon.totalDamageTaken)}%</td>
                         <td className={sortField === 'directDamageTaken' ? styles.activeSort : ''}>{Math.round(pokemon.directDamageTaken)}%</td>
                         <td className={sortField === 'indirectDamageTaken' ? styles.activeSort : ''}>{Math.round(pokemon.indirectDamageTaken)}%</td>
@@ -361,6 +378,8 @@ export default function PokeParserForm() {
                         <td className={sortField === 'damageTakenBySacrificialMove' ? styles.activeSort : ''}>{Math.round(pokemon.damageTakenBySacrificialMove)}%</td>
                         <td className={sortField === 'damageTakenByRiskRewardMove' ? styles.activeSort : ''}>{Math.round(pokemon.damageTakenByRiskRewardMove)}%</td>
                         <td className={sortField === 'damageTakenByLeechSeed' ? styles.activeSort : ''}>{Math.round(pokemon.damageTakenByLeechSeed)}%</td>
+                        <td className={sortField === 'damageTakenByCurse' ? styles.activeSort : ''}>{Math.round(pokemon.damageTakenByCurse)}%</td>
+                        <td className={sortField === 'damageTakenByCurseSelf' ? styles.activeSort : ''}>{Math.round(pokemon.damageTakenByCurseSelf)}%</td>
                       </tr>
                     ))}
                   </tbody>

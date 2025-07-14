@@ -31,6 +31,7 @@ export interface PokemonStats {
   damageDealtByRockyHelmet: number;
   damageDealtByContactAbility: number; // Rough Skin, Iron Barbs, etc.
   damageDealtByLeechSeed: number;
+  damageDealtByCurse: number;
   // Granular indirect damage taken categories
   damageTakenBySpikes: number;
   damageTakenByStealthRock: number;
@@ -46,6 +47,8 @@ export interface PokemonStats {
   damageTakenBySacrificialMove: number;
   damageTakenByRiskRewardMove: number;
   damageTakenByLeechSeed: number;
+  damageTakenByCurse: number;
+  damageTakenByCurseSelf: number;
 }
 
 export interface DraftResult {
@@ -96,6 +99,7 @@ export interface PokemonState {
   damageDealtByRockyHelmet: number;
   damageDealtByContactAbility: number; // Rough Skin, Iron Barbs, etc.
   damageDealtByLeechSeed: number;
+  damageDealtByCurse: number;
   // Granular indirect damage taken categories
   damageTakenBySpikes: number;
   damageTakenByStealthRock: number;
@@ -111,6 +115,8 @@ export interface PokemonState {
   damageTakenBySacrificialMove: number;
   damageTakenByRiskRewardMove: number;
   damageTakenByLeechSeed: number;
+  damageTakenByCurse: number;
+  damageTakenByCurseSelf: number;
 }
 
 /* ────── entry hazards on *one* side (two exist: hazards.p1 & hazards.p2) ────── */
@@ -229,6 +235,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
         damageDealtByRockyHelmet: 0,
         damageDealtByContactAbility: 0,
         damageDealtByLeechSeed: 0,
+        damageDealtByCurse: 0,
         damageTakenBySpikes: 0,
         damageTakenByStealthRock: 0,
         damageTakenByPoison: 0,
@@ -243,6 +250,8 @@ export function parseShowdownLog(log: string): DraftResult | null {
         damageTakenBySacrificialMove: 0,
         damageTakenByRiskRewardMove: 0,
         damageTakenByLeechSeed: 0,
+        damageTakenByCurse: 0,
+        damageTakenByCurseSelf: 0,
       }
     } else if (species && battle.pokemon[key].species === battle.pokemon[key].nickname) {
       // If we learn the true species of a Pokémon we only knew by nickname, update it.
@@ -290,6 +299,8 @@ export function parseShowdownLog(log: string): DraftResult | null {
             case 'Sacrificial Move': pokemon.damageTakenBySacrificialMove += damage; break
             case 'Risk Reward Move': pokemon.damageTakenByRiskRewardMove += damage; break
             case 'Leech Seed': pokemon.damageTakenByLeechSeed += damage; break
+            case 'Curse': pokemon.damageTakenByCurse += damage; break;
+            case 'CurseSelf': pokemon.damageTakenByCurseSelf += damage; break;
             case 'Substitute': break;
           }
         }
@@ -312,6 +323,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
               case 'Rocky Helmet': attackerState.damageDealtByRockyHelmet += damage; break
               case 'Contact Ability': attackerState.damageDealtByContactAbility += damage; break
               case 'Leech Seed': attackerState.damageDealtByLeechSeed += damage; break
+              case 'Curse': attackerState.damageDealtByCurse += damage; break;
             }
           }
         }
@@ -528,6 +540,9 @@ export function parseShowdownLog(log: string): DraftResult | null {
               attackerKey = potentialAttackerKey;
             }
           }
+        } else if (fromContent === 'Curse') {
+          damageType = 'Curse';
+          if (ofNick && ofSide) attackerKey = getPokemonKey(ofSide, ofNick);
         } else if (['Stealth Rock', 'Spikes'].includes(fromContent)) {
           attackerKey = battle.hazards[victimSide][fromContent === 'Spikes' ? 'spikesSetter' : 'stealthRockSetter'];
           damageType = fromContent;
@@ -554,6 +569,8 @@ export function parseShowdownLog(log: string): DraftResult | null {
           attackerKey = lastAction.attackerKey;
           if (riskRewardMoves.has(lastAction.move)) {
             damageType = 'Risk Reward Move';
+          } else if (lastAction.move === 'Curse') {
+            damageType = 'CurseSelf';
           }
         } else {
           isDirectDamage = true;
@@ -668,6 +685,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
       damageDealtByRockyHelmet: allStates.reduce((sum, p) => sum + p.damageDealtByRockyHelmet, 0),
       damageDealtByContactAbility: allStates.reduce((sum, p) => sum + p.damageDealtByContactAbility, 0),
       damageDealtByLeechSeed: allStates.reduce((sum, p) => sum + p.damageDealtByLeechSeed, 0),
+      damageDealtByCurse: allStates.reduce((sum, p) => sum + p.damageDealtByCurse, 0),
       damageTakenBySpikes: allStates.reduce((sum, p) => sum + p.damageTakenBySpikes, 0),
       damageTakenByStealthRock: allStates.reduce((sum, p) => sum + p.damageTakenByStealthRock, 0),
       damageTakenByPoison: allStates.reduce((sum, p) => sum + p.damageTakenByPoison, 0),
@@ -682,6 +700,8 @@ export function parseShowdownLog(log: string): DraftResult | null {
       damageTakenBySacrificialMove: allStates.reduce((sum, p) => sum + p.damageTakenBySacrificialMove, 0),
       damageTakenByRiskRewardMove: allStates.reduce((sum, p) => sum + p.damageTakenByRiskRewardMove, 0),
       damageTakenByLeechSeed: allStates.reduce((sum, p) => sum + p.damageTakenByLeechSeed, 0),
+      damageTakenByCurse: allStates.reduce((sum, p) => sum + p.damageTakenByCurse, 0),
+      damageTakenByCurseSelf: allStates.reduce((sum, p) => sum + p.damageTakenByCurseSelf, 0),
     })
   })
 

@@ -134,6 +134,7 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
               {renderHeader('damageDealtByRockyHelmet', 'Helmet Dmg')}
               {renderHeader('damageDealtByContactAbility', 'Contact Ability Dmg')}
               {renderHeader('damageDealtByLeechSeed', 'Leech Seed Dmg')}
+              {renderHeader('damageDealtByCurse', 'Curse Dmg')}
               
               {/* Damage Taken Section */}
               {renderHeader('totalDamageTaken', 'Total Dmg Taken')}
@@ -154,6 +155,8 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
               {renderHeader('damageTakenBySacrificialMove', 'Sacrifice Taken')}
               {renderHeader('damageTakenByRiskRewardMove', 'Belly Drum Taken')}
               {renderHeader('damageTakenByLeechSeed', 'Leech Seed Taken')}
+              {renderHeader('damageTakenByCurse', 'Curse Taken')}
+              {renderHeader('damageTakenByCurseSelf', 'Curse Self Dmg')}
             </tr>
           </thead>
           <tbody>
@@ -185,6 +188,7 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
                 <td className={sortField === 'damageDealtByRockyHelmet' ? styles.activeSort : ''}>{Math.round(pokemon.damageDealtByRockyHelmet)}%</td>
                 <td className={sortField === 'damageDealtByContactAbility' ? styles.activeSort : ''}>{Math.round(pokemon.damageDealtByContactAbility)}%</td>
                 <td className={sortField === 'damageDealtByLeechSeed' ? styles.activeSort : ''}>{Math.round(pokemon.damageDealtByLeechSeed)}%</td>
+                <td className={sortField === 'damageDealtByCurse' ? styles.activeSort : ''}>{Math.round(pokemon.damageDealtByCurse)}%</td>
 
                 {/* Damage Taken Data */}
                 <td className={sortField === 'totalDamageTaken' ? styles.activeSort : ''}>{Math.round(pokemon.totalDamageTaken)}%</td>
@@ -205,6 +209,8 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
                 <td className={sortField === 'damageTakenBySacrificialMove' ? styles.activeSort : ''}>{Math.round(pokemon.damageTakenBySacrificialMove)}%</td>
                 <td className={sortField === 'damageTakenByRiskRewardMove' ? styles.activeSort : ''}>{Math.round(pokemon.damageTakenByRiskRewardMove)}%</td>
                 <td className={sortField === 'damageTakenByLeechSeed' ? styles.activeSort : ''}>{Math.round(pokemon.damageTakenByLeechSeed)}%</td>
+                <td className={sortField === 'damageTakenByCurse' ? styles.activeSort : ''}>{Math.round(pokemon.damageTakenByCurse)}%</td>
+                <td className={sortField === 'damageTakenByCurseSelf' ? styles.activeSort : ''}>{Math.round(pokemon.damageTakenByCurseSelf)}%</td>
               </tr>
             ))}
           </tbody>
