@@ -128,6 +128,10 @@ export default function PokeParserForm() {
     }
   }
 
+  function handleClear() {
+    setUrl('');
+  }
+
   function handleSort(field: SortField) {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -176,13 +180,18 @@ export default function PokeParserForm() {
           required
           className={styles.parser__input}
         />
-        <button className={styles.parser__button} disabled={loading}>
-          {loading ? 'Parsing…' : 'Parse'}
-        </button>
+        <div className={styles.formActions}>
+          <button type="button" onClick={handleClear} className={styles.clearButton}>
+            Clear
+          </button>
+          <button className={styles.parser__button} disabled={loading}>
+            {loading ? 'Parsing…' : 'Parse'}
+          </button>
+        </div>
       </form>
       
       <p className={styles.help}>
-        Paste a Pokémon Showdown replay URL (e.g., https://replay.pokemonshowdown.com/gen9draft-1234567890)
+        Paste a Pokémon Showdown replay URL (e.g., https://replay.pokemonshowdown.com/gen6draft-2343718562-vejctxvc2repvwcffvmfb9mi2wxanknpw)
       </p>
 
       {/* Results ----------------------------------------------------------- */}
@@ -190,36 +199,7 @@ export default function PokeParserForm() {
 
       {data && (
         <div className={styles.results}>
-          {/* KO list and statistics */}
           <div className={styles.results__content}>
-            <h3>Knock-outs</h3>
-            {data.kos.length === 0 ? (
-              <p>No KOs recorded.</p>
-            ) : (
-              <ul>
-                {data.kos.map((k, i) => (
-                  <li key={i}>
-                    <strong>{k.attacker}</strong> KO&apos;s {k.victim}
-                    {k.move && ` with ${k.move}`}
-                    {k.hazard && ` (${k.hazard})`}
-                  </li>
-                ))}
-              </ul>
-            )}
-            
-            {/* Winner and Score */}
-            {(data.winner || data.score) && (
-              <div className={styles.results__summary}>
-                <h3>Result</h3>
-                {data.winner && (
-                  <p><strong>Winner:</strong> {data.winner}</p>
-                )}
-                {data.score && (
-                  <p><strong>Score:</strong> {data.score}</p>
-                )}
-              </div>
-            )}
-
             {/* Pokémon Statistics */}
             {data.pokemonStats && data.pokemonStats.length > 0 && (
               <div className={styles.results__summary}>
@@ -246,37 +226,37 @@ export default function PokeParserForm() {
                       <th onClick={() => handleSort('directDamageDealt')} className={sortField === 'directDamageDealt' ? styles.activeSort : ''}>
                         Direct Damage Dealt {getSortIcon('directDamageDealt')}
                       </th>
-                      <th onClick={() => handleSort('indirectDamageDealt')} className={`${styles.indirectDamageHeader} ${sortField === 'indirectDamageDealt' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('indirectDamageDealt')} className={sortField === 'indirectDamageDealt' ? styles.activeSort : ''}>
                         Indirect Damage Dealt {getSortIcon('indirectDamageDealt')}
                       </th>
-                      <th onClick={() => handleSort('damageDealtBySpikes')} className={`${styles.indirectDamageHeader} ${sortField === 'damageDealtBySpikes' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageDealtBySpikes')} className={sortField === 'damageDealtBySpikes' ? styles.activeSort : ''}>
                         Spikes {getSortIcon('damageDealtBySpikes')}
                       </th>
-                      <th onClick={() => handleSort('damageDealtByStealthRock')} className={`${styles.indirectDamageHeader} ${sortField === 'damageDealtByStealthRock' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageDealtByStealthRock')} className={sortField === 'damageDealtByStealthRock' ? styles.activeSort : ''}>
                         Stealth Rock {getSortIcon('damageDealtByStealthRock')}
                       </th>
-                      <th onClick={() => handleSort('damageDealtByPoison')} className={`${styles.indirectDamageHeader} ${sortField === 'damageDealtByPoison' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageDealtByPoison')} className={sortField === 'damageDealtByPoison' ? styles.activeSort : ''}>
                         Poison {getSortIcon('damageDealtByPoison')}
                       </th>
-                      <th onClick={() => handleSort('damageDealtByBurn')} className={`${styles.indirectDamageHeader} ${sortField === 'damageDealtByBurn' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageDealtByBurn')} className={sortField === 'damageDealtByBurn' ? styles.activeSort : ''}>
                         Burn {getSortIcon('damageDealtByBurn')}
                       </th>
-                      <th onClick={() => handleSort('damageDealtBySandstorm')} className={`${styles.indirectDamageHeader} ${sortField === 'damageDealtBySandstorm' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageDealtBySandstorm')} className={sortField === 'damageDealtBySandstorm' ? styles.activeSort : ''}>
                         Sandstorm {getSortIcon('damageDealtBySandstorm')}
                       </th>
-                      <th onClick={() => handleSort('damageDealtByHail')} className={`${styles.indirectDamageHeader} ${sortField === 'damageDealtByHail' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageDealtByHail')} className={sortField === 'damageDealtByHail' ? styles.activeSort : ''}>
                         Hail {getSortIcon('damageDealtByHail')}
                       </th>
-                      <th onClick={() => handleSort('damageDealtByRockyHelmet')} className={`${styles.indirectDamageHeader} ${sortField === 'damageDealtByRockyHelmet' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageDealtByRockyHelmet')} className={sortField === 'damageDealtByRockyHelmet' ? styles.activeSort : ''}>
                         Rocky Helmet {getSortIcon('damageDealtByRockyHelmet')}
                       </th>
-                      <th onClick={() => handleSort('damageDealtByContactAbility')} className={`${styles.indirectDamageHeader} ${sortField === 'damageDealtByContactAbility' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageDealtByContactAbility')} className={sortField === 'damageDealtByContactAbility' ? styles.activeSort : ''}>
                         Contact Ability {getSortIcon('damageDealtByContactAbility')}
                       </th>
-                      <th onClick={() => handleSort('damageDealtByLeechSeed')} className={`${styles.indirectDamageHeader} ${sortField === 'damageDealtByLeechSeed' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageDealtByLeechSeed')} className={sortField === 'damageDealtByLeechSeed' ? styles.activeSort : ''}>
                         Leech Seed Dealt {getSortIcon('damageDealtByLeechSeed')}
                       </th>
-                      <th onClick={() => handleSort('damageDealtByCurse')} className={`${styles.indirectDamageHeader} ${sortField === 'damageDealtByCurse' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageDealtByCurse')} className={sortField === 'damageDealtByCurse' ? styles.activeSort : ''}>
                         Curse Dealt {getSortIcon('damageDealtByCurse')}
                       </th>
                       <th onClick={() => handleSort('totalDamageTaken')} className={sortField === 'totalDamageTaken' ? styles.activeSort : ''}>
@@ -285,55 +265,55 @@ export default function PokeParserForm() {
                       <th onClick={() => handleSort('directDamageTaken')} className={sortField === 'directDamageTaken' ? styles.activeSort : ''}>
                         Direct Damage Taken {getSortIcon('directDamageTaken')}
                       </th>
-                      <th onClick={() => handleSort('indirectDamageTaken')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'indirectDamageTaken' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('indirectDamageTaken')} className={sortField === 'indirectDamageTaken' ? styles.activeSort : ''}>
                         Indirect Damage Taken {getSortIcon('indirectDamageTaken')}
                       </th>
-                      <th onClick={() => handleSort('damageTakenBySpikes')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenBySpikes' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageTakenBySpikes')} className={sortField === 'damageTakenBySpikes' ? styles.activeSort : ''}>
                         Spikes Taken {getSortIcon('damageTakenBySpikes')}
                       </th>
-                      <th onClick={() => handleSort('damageTakenByStealthRock')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenByStealthRock' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageTakenByStealthRock')} className={sortField === 'damageTakenByStealthRock' ? styles.activeSort : ''}>
                         Stealth Rock Taken {getSortIcon('damageTakenByStealthRock')}
                       </th>
-                      <th onClick={() => handleSort('damageTakenByPoison')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenByPoison' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageTakenByPoison')} className={sortField === 'damageTakenByPoison' ? styles.activeSort : ''}>
                         Poison Taken {getSortIcon('damageTakenByPoison')}
                       </th>
-                      <th onClick={() => handleSort('damageTakenByBurn')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenByBurn' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageTakenByBurn')} className={sortField === 'damageTakenByBurn' ? styles.activeSort : ''}>
                         Burn Taken {getSortIcon('damageTakenByBurn')}
                       </th>
-                      <th onClick={() => handleSort('damageTakenBySandstorm')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenBySandstorm' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageTakenBySandstorm')} className={sortField === 'damageTakenBySandstorm' ? styles.activeSort : ''}>
                         Sandstorm Taken {getSortIcon('damageTakenBySandstorm')}
                       </th>
-                      <th onClick={() => handleSort('damageTakenByHail')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenByHail' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageTakenByHail')} className={sortField === 'damageTakenByHail' ? styles.activeSort : ''}>
                         Hail Taken {getSortIcon('damageTakenByHail')}
                       </th>
-                      <th onClick={() => handleSort('damageTakenByRockyHelmet')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenByRockyHelmet' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageTakenByRockyHelmet')} className={sortField === 'damageTakenByRockyHelmet' ? styles.activeSort : ''}>
                         Rocky Helmet Taken {getSortIcon('damageTakenByRockyHelmet')}
                       </th>
-                      <th onClick={() => handleSort('damageTakenByContactAbility')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenByContactAbility' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageTakenByContactAbility')} className={sortField === 'damageTakenByContactAbility' ? styles.activeSort : ''}>
                         Contact Ability Taken {getSortIcon('damageTakenByContactAbility')}
                       </th>
-                      <th onClick={() => handleSort('damageTakenByLifeOrb')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenByLifeOrb' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageTakenByLifeOrb')} className={sortField === 'damageTakenByLifeOrb' ? styles.activeSort : ''}>
                         Life Orb Taken {getSortIcon('damageTakenByLifeOrb')}
                       </th>
-                      <th onClick={() => handleSort('damageTakenByMoveRecoil')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenByMoveRecoil' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageTakenByMoveRecoil')} className={sortField === 'damageTakenByMoveRecoil' ? styles.activeSort : ''}>
                         Move Recoil Taken {getSortIcon('damageTakenByMoveRecoil')}
                       </th>
-                      <th onClick={() => handleSort('damageTakenBySubstitute')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenBySubstitute' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageTakenBySubstitute')} className={sortField === 'damageTakenBySubstitute' ? styles.activeSort : ''}>
                         Substitute Taken {getSortIcon('damageTakenBySubstitute')}
                       </th>
-                      <th onClick={() => handleSort('damageTakenBySacrificialMove')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenBySacrificialMove' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageTakenBySacrificialMove')} className={sortField === 'damageTakenBySacrificialMove' ? styles.activeSort : ''}>
                         Sacrificial Move Taken {getSortIcon('damageTakenBySacrificialMove')}
                       </th>
-                      <th onClick={() => handleSort('damageTakenByRiskRewardMove')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenByRiskRewardMove' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageTakenByRiskRewardMove')} className={sortField === 'damageTakenByRiskRewardMove' ? styles.activeSort : ''}>
                         Risk Reward Move Taken {getSortIcon('damageTakenByRiskRewardMove')}
                       </th>
-                      <th onClick={() => handleSort('damageTakenByLeechSeed')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenByLeechSeed' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageTakenByLeechSeed')} className={sortField === 'damageTakenByLeechSeed' ? styles.activeSort : ''}>
                         Leech Seed Taken {getSortIcon('damageTakenByLeechSeed')}
                       </th>
-                      <th onClick={() => handleSort('damageTakenByCurse')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenByCurse' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageTakenByCurse')} className={sortField === 'damageTakenByCurse' ? styles.activeSort : ''}>
                         Curse Taken {getSortIcon('damageTakenByCurse')}
                       </th>
-                      <th onClick={() => handleSort('damageTakenByCurseSelf')} className={`${styles.indirectDamageTakenHeader} ${sortField === 'damageTakenByCurseSelf' ? styles.activeSort : ''}`}>
+                      <th onClick={() => handleSort('damageTakenByCurseSelf')} className={sortField === 'damageTakenByCurseSelf' ? styles.activeSort : ''}>
                         Curse Self {getSortIcon('damageTakenByCurseSelf')}
                       </th>
                     </tr>
@@ -386,6 +366,34 @@ export default function PokeParserForm() {
                 </table>
                 </div>
               </div>
+            )}
+            
+            {/* Winner and Score */}
+            {(data.winner || data.score) && (
+              <div className={styles.results__summary}>
+                <h3>Result</h3>
+                {data.winner && (
+                  <p><strong>Winner:</strong> {data.winner}</p>
+                )}
+                {data.score && (
+                  <p><strong>Score:</strong> {data.score}</p>
+                )}
+              </div>
+            )}
+
+            <h3>Knock-outs</h3>
+            {data.kos.length === 0 ? (
+              <p>No KOs recorded.</p>
+            ) : (
+              <ul>
+                {data.kos.map((k, i) => (
+                  <li key={i}>
+                    <strong>{k.attacker}</strong> KO&apos;s {k.victim}
+                    {k.move && ` with ${k.move}`}
+                    {k.hazard && ` (${k.hazard})`}
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
 

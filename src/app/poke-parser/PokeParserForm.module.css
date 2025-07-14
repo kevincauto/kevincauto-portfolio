@@ -29,294 +29,183 @@
   cursor: pointer;
   font-size: 1rem;
   transition: background-color 0.2s;
-  width: 80%;
-  max-width: 800px;
+  width: 100%;
 }
 
 .parser__button:hover {
   background-color: #ffca4d;
 }
 
-/* ––– results layout ––– */
-.results {
+.formActions {
   display: flex;
-  flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
+  width: 80%;
+  max-width: 800px;
 }
 
-/* main content area */
+.clearButton {
+  padding: 0.85rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #e53935; /* Red */
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+  width: 100%;
+}
+
+.clearButton:hover {
+  background-color: #f44336;
+}
+
+/* ––– results layout ––– */
+.results {
+  margin-top: 2rem;
+  width: 100%;
+  padding: 1.5rem;
+  border-radius: 8px;
+  background-color: #1e1e1e;
+  border: 1px solid #333;
+}
+
 .results__content {
   width: 100%;
 }
+
 .results__content ul {
   padding-left: 1.2rem;
   margin: 0.5rem 0 0;
 }
+
 .results__content li {
   margin-bottom: 0.25rem;
 }
 
-/* JSON at the bottom */
-.results__json {
-  width: 100%;
-  padding: 1rem;
-  border-radius: 4px;
-  overflow-x: auto;
-}
-.results__json h3 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-}
-.results__json pre {
-  margin: 0;
-  font-size: 0.8rem;
-  line-height: 1.4;
-}
-
 .results__summary {
   margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 1px solid #eee;
 }
+
 .results__summary h3 {
-  margin-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
 }
+
 .results__summary p {
   margin: 0.25rem 0;
+}
+
+.jsonOutput {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  background-color: #111;
+  padding: 1rem;
+  border-radius: 4px;
+  color: #d4d4d4;
+  font-size: 0.9rem;
+  max-height: 600px;
+  overflow-y: auto;
+  margin-top: 2rem;
+}
+
+/* --- Stats Table Styles --- */
+.results__statsContainer {
+  width: 100%;
+  overflow: auto;
+  max-height: 70vh;
 }
 
 .results__stats {
   width: 100%;
   border-collapse: collapse;
+  margin-top: 1rem;
   font-size: 0.9rem;
-  table-layout: auto;  /* Change from fixed to auto to allow column sizing */
+  white-space: nowrap;
 }
+
 .results__stats th,
 .results__stats td {
-  padding: 0.5rem;
+  padding: 0.75rem 1rem;
   text-align: left;
-  border-bottom: 1px solid #eee;
-  white-space: nowrap;
+  border-bottom: 1px solid #333;
 }
 
-/* Add borders only to header cells */
+.results__stats td {
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+}
+
 .results__stats th {
+  background-color: #2a2a2a;
   font-weight: bold;
-  cursor: pointer; /* Ensure all headers have pointer cursor */
-  border-left: 1px solid #eee !important;
-  border-right: 1px solid #eee !important;
+  cursor: pointer;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  user-select: none;
+  z-index: 2;
 }
 
-/* Zebra striping for table rows */
-.results__stats tbody tr:nth-child(even) {
-  background-color: #303030; /* Near-black for even rows */
+.results__stats th:hover {
+  background-color: #383838;
 }
+
 .results__stats tbody tr:nth-child(odd) {
-  background-color: #000000; /* Black for odd rows */
+  background-color: #222;
 }
 
-/* Sticky first column (Pokémon name) */
+.results__stats tbody tr:hover {
+  background-color: #3c3c3c;
+}
+
 .results__stats th:first-child,
 .results__stats td:first-child {
+  position: -webkit-sticky;
   position: sticky;
   left: 0;
-  background-color: black;
-  z-index: 3; /* Higher z-index to stay above scrollable content */
-  border-right: 2px solid #eee !important; /* Right border for entire Pokemon column */
-  min-width: 100px;   /* Increase minimum width for Pokémon names */
-  max-width: none;    /* Remove max-width to allow full content */
-  white-space: nowrap;
-  box-shadow: 2px 0 0 0 #eee; /* Additional shadow border for visibility during scroll */
-  /* Remove overflow and text-overflow to prevent truncation */
+  z-index: 1;
 }
 
-/* Sticky first column header gets the border */
+/* Make sticky header always on top */
 .results__stats th:first-child {
-  border-right: 2px solid #eee !important; /* Slightly thicker right border for separation */
-  border-left: 1px solid #eee !important;
-  z-index: 4; /* Highest z-index for header */
-  box-shadow: 2px 0 0 0 #eee; /* Additional shadow border for visibility during scroll */
+  z-index: 3;
 }
 
-/* Zebra striping for sticky first column */
-.results__stats tbody tr:nth-child(even) td:first-child {
-  background-color: #303030; /* Near-black for even rows */
-  border-right: 2px solid #eee !important; /* Maintain right border */
+/* Sticky cells need a solid background */
+.results__stats tbody tr td:first-child {
+  background-color: #1e1e1e;
 }
+
 .results__stats tbody tr:nth-child(odd) td:first-child {
-  background-color: #000000; /* Black for odd rows */
-  border-right: 2px solid #eee !important; /* Maintain right border */
+  background-color: #222;
 }
 
-/* Maintain orange color for active sort even with zebra striping */
-.results__stats tbody tr:nth-child(even) td:first-child.activeSort {
-  background-color: #303030; /* Keep zebra stripe background */
-  color: #ffb400 !important; /* Orange text */
-  border-right: 2px solid #eee !important; /* Maintain right border */
-}
-.results__stats tbody tr:nth-child(odd) td:first-child.activeSort {
-  background-color: #000000; /* Keep zebra stripe background */
-  color: #ffb400 !important; /* Orange text */
-  border-right: 2px solid #eee !important; /* Maintain right border */
+.results__stats tbody tr:hover td:first-child {
+  background-color: #3c3c3c;
 }
 
-/* Allow header cells to wrap text */
-.results__stats th {
-  white-space: normal !important;
-  word-break: break-word;
-  vertical-align: bottom;
-  line-height: 1.2;
-  font-size: 0.95em;
-  padding-top: 0.7em;
-  padding-bottom: 0.7em;
+.activeSort {
+  background-color: #004d80 !important;
+  color: #fff;
 }
 
-/* Vertical headers for all except the first column */
-.results__stats th:not(:first-child) {
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  text-align: left;
-  vertical-align: middle;
-  white-space: nowrap;
-  min-width: 40px;
-  max-width: 60px;
-  min-height: 180px; /* Ensure enough height for text + sort icon */
-  height: 180px; /* Fixed height to prevent expansion */
-  padding-left: 0.2em;
-  padding-right: 0.2em;
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
-  font-size: 0.95em;
-  line-height: 1;
-  position: relative; /* For positioning sort icons */
+.sortIcon {
+  font-size: 0.7em;
+  margin-left: 0.3em;
+  display: inline-block;
 }
 
-/* Table container for horizontal scrolling */
-.results__statsContainer {
-  width: 100%;
-  overflow-x: auto;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-/* Indirect damage column styling */
-.indirectDamageHeader {
-  background-color: #4a148c !important; /* Dark purple for damage dealt */
-  color: white !important;
-  cursor: pointer;
-  border-left: 1px solid #888 !important; /* Darker border for visibility against purple */
-  border-right: 1px solid #888 !important;
-}
-.pokemonNameCell {
-  min-width: 560px;   /* even wider Pokémon column */
-   /* adjust as needed */
-}
-.indirectDamageCell {
-  background-color: #6a1b9a !important; /* Light purple for damage dealt */
-}
-.indirectDamageTakenHeader {
-  background-color: #6d002b !important; /* Dark maroon for damage taken */
-  color: white !important;
-  cursor: pointer;
-  border-left: 1px solid #888 !important; /* Darker border for visibility against maroon */
-  border-right: 1px solid #888 !important;
-}
-.indirectDamageTakenCell {
-  background-color: #8b1c3b !important; /* Lighter maroon for damage taken */
-  color: white !important;
-}
-
-/* error */
 .error {
-  color: red;
-  margin-top: 0.5rem;
+  color: #ff6b6b;
+  margin-top: 1rem;
+  text-align: center;
 }
 
-/* help */
 .help {
   color: #666;
   font-size: 0.9rem;
   margin-top: 0.5rem;
   margin-bottom: 1rem;
   text-align: center;
-}
-
-.sortable {
-  cursor: pointer;
-  border-bottom: 2px solid #bbb;
-  transition: border-color 0.2s;
-}
-.sorted {
-  border-bottom: 3px solid #ffb400 !important; /* ESPN gold */
-  color: #ffb400 !important;
-}
-.caret {
-  color: #ffb400;
-  font-size: 1em;
-  margin-left: 0.2em;
-  vertical-align: middle;
-}
-
-/* Sort icon styling for vertical headers */
-.sortIcon {
-  font-size: 0.9em;
-  margin-left: 0.2em;
-  display: inline-block;
-  transform: rotate(180deg); /* Counter-rotate to appear upright in vertical headers on desktop */
-  color: #ffb400;
-}
-
-/* Active sort header styling */
-.results__stats th.activeSort {
-  color: #ffb400 !important;
-}
-
-/* Active sort column styling - make all cells in the sorted column orange */
-.results__stats td.activeSort {
-  color: #ffb400 !important;
-}
-.pokemonNameHeader {
-  position: sticky;
-  left: 0;
-  background: #111;
-  z-index: 2;
-  min-width: 300px;   /* Increase minimum width for Pokémon names */
-  max-width: none;    /* Remove max-width to allow full content */
-  white-space: nowrap;
-  /* Remove overflow and text-overflow to prevent truncation */
-}
-.results__stats th:first-child {
-  white-space: nowrap !important;
-  word-break: normal;
-  writing-mode: initial;
-  transform: none;
-  text-align: left;
-  vertical-align: bottom;
-  line-height: 1.2;
-  font-size: 0.95em;
-  padding-top: 0.7em;
-  padding-bottom: 0.7em;
-  background: #222;
-  color: #fff;
-  position: sticky;
-  top: 0;
-  z-index: 3;
-  background: #111;
-}
-
-/* ------------------------------------------------------------------ */
-/* Mobile override: remove 180deg rotation so text isn’t upside-down   */
-/* ------------------------------------------------------------------ */
-@media (max-width: 768px) {
-  .results__stats th:not(:first-child) {
-    writing-mode: initial;
-    transform: none; /* No rotation on small screens */
-    text-align: left;
-    white-space: normal; /* Allow wrapping if needed */
-    min-width: 120px; /* Give more space for horizontal text */
-    height: auto;     /* Let height adjust naturally */
-  }
-  .sortIcon {
-    transform: none; /* Keep icon upright */
-  }
 }

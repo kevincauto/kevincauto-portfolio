@@ -31,12 +31,11 @@ const PokemonIcon: React.FC<PokemonIconProps> = ({ species }) => {
     <Image
       src={imageUrl}
       alt={species}
-      width={40}
-      height={40}
+      width={36}
+      height={36}
       style={{
         marginRight: '8px',
         verticalAlign: 'middle',
-        imageRendering: 'pixelated', // Keeps the pixel art sharp
       }}
       onError={() => setError(true)}
     />
