@@ -74,7 +74,9 @@ export interface PokemonState {
   /* live status */
   hp: number;        // 0‥100  (percent)
   status?: 'brn' | 'psn' | 'tox' | 'par' | 'slp' | 'frz';
-
+  faintedByDirectHit?: boolean;
+  faintCause?: string;
+ 
   /* cumulative tallies */
   directDamageDealt: number;   // Direct damage dealt to opponents
   indirectDamageDealt: number; // Indirect damage dealt to opponents
@@ -175,7 +177,10 @@ export function parseShowdownLog(log: string): DraftResult | null {
   let winner: string | undefined
   let p1Remaining = 6
   let p2Remaining = 6
-
+  const activePokemonInSlot: Record<string, string> = {};
+  let lastDamageDealt = 0;
+  let lastDamageWasDirect = true;
+ 
   /* --- battle state --------------------------------------------------- */
 
   // Define the list of sacrificial moves
@@ -273,11 +278,16 @@ export function parseShowdownLog(log: string): DraftResult | null {
   ) => {
     const pokemon = getPokemon(nickname, side)
     const prevHP = pokemon.hp
+    let damage = 0
     
     pokemon.hp = newHP
     
     if (!isHealing && newHP < prevHP) {
-      const damage = prevHP - newHP
+      damage = prevHP - newHP
+      if (newHP === 0) {
+        pokemon.faintedByDirectHit = isDirectDamage;
+        pokemon.faintCause = damageType;
+      }
       pokemon.totalDamageTaken += damage
       
       if (isDirectDamage) {
@@ -336,6 +346,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const healing = newHP - prevHP;
       pokemon.healingDone += healing;
     }
+    return damage;
   }
 
   lines.forEach((line, idx) => {
@@ -360,6 +371,8 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const species = parts[3].split(',')[0].trim()
       const side = sideOfNick(nickField)
       const pokemon = getPokemon(nick, side, species)
+      const slot = nickField.split(':')[0];
+      activePokemonInSlot[slot] = nick;
 
       const hpMatch = parts[4]?.match(/(\d+)\/(\d+)/) || parts[3].match(/(\d+)\/(\d+)/)
       if (hpMatch) {
@@ -587,7 +600,8 @@ export function parseShowdownLog(log: string): DraftResult | null {
         }
       }
 
-      updatePokemonHP(victimNick, victimSide, newHP, false, attackerKey, isDirectDamage, isSelfDamage, damageType)
+      lastDamageDealt = updatePokemonHP(victimNick, victimSide, newHP, false, attackerKey, isDirectDamage, isSelfDamage, damageType)
+      lastDamageWasDirect = isDirectDamage;
     }
 
     if (line.startsWith('|-heal|')) {
@@ -602,11 +616,71 @@ export function parseShowdownLog(log: string): DraftResult | null {
       }
     }
 
+    if (line.startsWith('|replace|')) {
+      const [, , pos, newDetails] = line.split('|');
+      if (!pos || !newDetails) return;
+
+      const slot = pos.split(':')[0]; // e.g. 'p1a'
+      const newNick = pos.split(':')[1].trim();
+      const side = sideOfNick(pos);
+      const newSpecies = newDetails.split(',')[0].trim();
+      const oldNick = activePokemonInSlot[slot];
+      
+      if (oldNick) {
+        const oldKey = getPokemonKey(side, oldNick);
+        const newKey = getPokemonKey(side, newNick);
+        
+        if (lastHit[oldKey]) {
+          lastHit[newKey] = lastHit[oldKey];
+          delete lastHit[oldKey];
+        }
+        
+        const oldMonState = battle.pokemon[oldKey];
+        const newMonState = getPokemon(newNick, side, newSpecies);
+        
+        // Transfer all relevant state from the illusion to the real Pokémon
+        newMonState.hp = oldMonState.hp;
+        newMonState.status = oldMonState.status;
+        newMonState.lastAttacker = oldMonState.lastAttacker;
+        newMonState.faintedByDirectHit = oldMonState.faintedByDirectHit;
+        newMonState.faintCause = oldMonState.faintCause;
+        
+        // Clear the state of the illusioned Pokémon so it doesn't carry over
+        oldMonState.hp = 100;
+        oldMonState.status = undefined;
+        oldMonState.lastAttacker = undefined;
+        oldMonState.faintedByDirectHit = undefined;
+        oldMonState.faintCause = undefined;
+
+        // Re-apply damage if the illusion fainted, to ensure correct final HP.
+        if (newMonState.hp === 0 && lastDamageDealt > 0) {
+            newMonState.totalDamageTaken += lastDamageDealt;
+            if (lastDamageWasDirect) {
+                newMonState.directDamageTaken += lastDamageDealt;
+            } else {
+                newMonState.indirectDamageTaken += lastDamageDealt;
+            }
+
+            const attackerState = battle.pokemon[newMonState.lastAttacker || ''];
+            if (attackerState) {
+                if (lastDamageWasDirect) {
+                    attackerState.directDamageDealt += lastDamageDealt;
+                } else {
+                    attackerState.indirectDamageDealt += lastDamageDealt;
+                }
+            }
+        }
+      }
+      
+      activePokemonInSlot[slot] = newNick;
+    }
+
     if (line.startsWith('|faint|')) {
       const nickField = line.split('|')[2]
       const nickname = nickField.split(': ')[1].trim()
       const side = sideOfNick(nickField)
       const key = getPokemonKey(side, nickname)
+      const victimState = getPokemon(nickname, side);
 
       const lastAction = lastMoveUsed[key];
       if (lastAction && lastAction.turn === currentTurn && sacrificialMoves.has(lastAction.move)) {
@@ -621,12 +695,9 @@ export function parseShowdownLog(log: string): DraftResult | null {
 
         // Check for a direct KO
         const lastHitData = lastHit[key];
-        const prevLine = lines[idx - 1] || '';
-        const isIndirectKO = /\[from\]/.test(prevLine);
-
-        if (lastHitData && lastHitData.turn === currentTurn && !isIndirectKO) {
+        
+        if (lastHitData && lastHitData.turn === currentTurn && victimState.faintedByDirectHit) {
           const attackerState = battle.pokemon[lastHitData.attackerKey];
-          const victimState = getPokemon(nickname, side);
           
           if (attackerState && victimState) {
             kos.push({ 
@@ -636,6 +707,19 @@ export function parseShowdownLog(log: string): DraftResult | null {
             });
             attackerState.kos++;
           }
+        } else if (victimState.faintedByDirectHit === false) {
+         const attackerKey = victimState.lastAttacker;
+         if (attackerKey) {
+           const attackerState = battle.pokemon[attackerKey];
+           if (attackerState) {
+             kos.push({
+               attacker: attackerState.species,
+               victim: victimState.species,
+               hazard: victimState.faintCause,
+             });
+             attackerState.kos++;
+           }
+         }
         }
       }
     }

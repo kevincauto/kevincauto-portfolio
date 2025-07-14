@@ -8,7 +8,7 @@ import PokemonIcon from '../../components/PokemonIcon';
 import Image from 'next/image';
 
 const awardExplanations: { [key: string]: string } = {
-  "Most Valuable Pocket Monster": "Best K/D",
+  "Most Valuable Pocket Monster": "Best K/D, High Usage",
   "Frank the Tank": "Most Damage Taken",
   "The Passive Aggressor": "Most Indirect Damage Dealt",
   "I'm Trying My Best": "Worst K/D",
@@ -323,7 +323,7 @@ export default function MultiLogParserForm() {
     'https://replay.pokemonshowdown.com/gen6draft-2322030433',
     'https://replay.pokemonshowdown.com/gen6draft-2325140350-da9jpgvud1g7l53ljdrrvai3f3ygbpmpw',
     'https://replay.pokemonshowdown.com/gen6draft-2323578264',
-    'https://replay.pokemonshowdown.com/gen6draft-2332417125'
+    'https://replay.pokemonshowdown.com/gen6draft-2332417125',
   ]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
