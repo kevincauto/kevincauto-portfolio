@@ -303,6 +303,12 @@ export default function MultiLogParserForm() {
     setUrls(newUrls);
   };
 
+  const handleDeleteAll = () => {
+    if (window.confirm('Are you sure you want to delete all URLs?')) {
+      setUrls(['']);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsAccordionOpen(false); // Always close accordion on submit
@@ -381,7 +387,14 @@ export default function MultiLogParserForm() {
             </div>
           </div>
         </div>
-        <div className={styles.buttonGroup}>
+        <div className={styles.formActions}>
+          <button
+            type="button"
+            onClick={handleDeleteAll}
+            className={styles.deleteAllButton}
+          >
+            Delete All URLs
+          </button>
           <button type="submit" className={styles.parseButton} disabled={loading}>
             {loading ? 'Parsing...' : 'Parse All'}
           </button>
