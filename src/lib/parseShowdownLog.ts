@@ -90,6 +90,7 @@ export interface PokemonState {
   /* attribution helpers */
   lastAttacker?: string;       // most recent damaging mon (uses unique pokemonKey)
   statusBy?: string;           // who inflicted current status (uses unique pokemonKey)
+  trickedBy?: string;          // who used Trick/Switcheroo on this mon (uses unique pokemonKey)
 
   /* granular indirect damage categories */
   damageDealtBySpikes: number;
@@ -212,6 +213,12 @@ export function parseShowdownLog(log: string): DraftResult | null {
   /* helper: given "p2a: Hop on Minecraft" → "p2" */
   const sideOfNick = (nickField: string): SideID =>
     (nickField.split(':')[0] as 'p1a' | 'p2a').slice(0, 2) as SideID
+
+  /* helper: extracts nickname, handles colons in names */
+  const getNickFromField = (field: string): string => {
+    const idx = field.indexOf(':');
+    return idx === -1 ? field.trim() : field.substring(idx + 1).trim();
+  };
 
   /* helper: get or create Pokémon state */
   const getPokemon = (nickname: string, side: SideID, species?: string, slot?: number): PokemonState => {
@@ -367,7 +374,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
     if (line.startsWith('|drag|') || line.startsWith('|switch|')) {
       const parts = line.split('|')
       const nickField = parts[2]
-      const nick = nickField.split(':')[1].trim()
+      const nick = getNickFromField(nickField)
       const species = parts[3].split(',')[0].trim()
       const side = sideOfNick(nickField)
       const pokemon = getPokemon(nick, side, species)
@@ -383,7 +390,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
     if (line.startsWith('|move|')) {
       const parts = line.split('|')
       const atkField = parts[2]
-      const atkNick = atkField.split(':')[1].trim()
+      const atkNick = getNickFromField(atkField)
       const atkSide = sideOfNick(atkField)
       const moveName = parts[3]
       const atkKey = getPokemonKey(atkSide, atkNick)
@@ -394,9 +401,22 @@ export function parseShowdownLog(log: string): DraftResult | null {
         battle.leechSeedUsers.add(atkKey);
       }
 
+      if (moveName === 'Trick' || moveName === 'Switcheroo') {
+        if(parts[4]) {
+          const defField = parts[4];
+          const defNick = getNickFromField(defField);
+          const defSide = sideOfNick(defField);
+          const defPokemon = getPokemon(defNick, defSide);
+          const atkPokemon = getPokemon(atkNick, atkSide);
+
+          defPokemon.trickedBy = atkKey;
+          atkPokemon.trickedBy = getPokemonKey(defSide, defNick);
+        }
+      }
+
       if (parts[4]) {
         const defField = parts[4]
-        const defNick = defField.split(':')[1].trim()
+        const defNick = getNickFromField(defField)
         const defSide = sideOfNick(defField)
         const defKey = getPokemonKey(defSide, defNick)
         lastHit[defKey] = { attackerKey: atkKey, turn: currentTurn, move: moveName }
@@ -410,21 +430,25 @@ export function parseShowdownLog(log: string): DraftResult | null {
     if (line.startsWith('|-status|')) {
       const parts = line.split('|')
       const targetField = parts[2]
-      const targetNick = targetField.split(':')[1].trim()
+      const targetNick = getNickFromField(targetField)
       const targetSide = sideOfNick(targetField)
       const pokemon = getPokemon(targetNick, targetSide)
       pokemon.status = parts[3] as PokemonState['status']
       
       const fromTag = parts[4] || ''
       if (fromTag.includes('[from] item:') && (fromTag.includes('Flame Orb') || fromTag.includes('Toxic Orb'))) {
-        pokemon.statusBy = undefined
+        if(pokemon.trickedBy) {
+          pokemon.statusBy = pokemon.trickedBy
+        } else {
+          pokemon.statusBy = undefined;
+        }
       } else {
         for (let i = idx - 1; i >= Math.max(0, idx - 5); i--) {
           const prevLine = lines[i]
           if (prevLine.startsWith('|move|')) {
             const [, , atkField, , defField] = prevLine.split('|')
             if (defField === targetField) {
-              const atkNick = atkField.split(':')[1].trim()
+              const atkNick = getNickFromField(atkField)
               const atkSide = sideOfNick(atkField)
               pokemon.statusBy = getPokemonKey(atkSide, atkNick)
               break
@@ -437,7 +461,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
     if (line.startsWith('|-sidestart|')) {
       const prev = lines[idx - 1] || ''
       const atkField = prev.split('|')[2]
-      const atkNick = atkField?.split(':')[1]?.trim()
+      const atkNick = atkField ? getNickFromField(atkField) : undefined
       const atkSide = atkField ? sideOfNick(atkField) : undefined
 
       const parts = line.split('|')
@@ -471,7 +495,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const fromAbilityMatch = line.match(/\[from\] ability: [^|]+\|\[of\] (p\da: [^|]+)/)
       if (fromAbilityMatch) {
         const ofField = fromAbilityMatch[1]
-        const nick = ofField.split(': ')[1].trim()
+        const nick = getNickFromField(ofField)
         const side = sideOfNick(ofField)
         const key = getPokemonKey(side, nick)
         if (line.includes('Sandstorm')) battle.sandstormSetter = key
@@ -485,7 +509,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const victimField = line.split('|')[2]
       const fromTag = line.split('|').pop() || ''
       const side = sideOfNick(victimField)
-      const victimNick = victimField.split(':')[1].trim()
+      const victimNick = getNickFromField(victimField)
       const victim = getPokemon(victimNick, side)
       let attackerKey: string | undefined
       let hazardType: string | undefined
@@ -513,7 +537,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const parts = line.split('|')
       const victimField = parts[2]
       const hpInfo = parts[3]
-      const victimNick = victimField.split(':')[1].trim()
+      const victimNick = getNickFromField(victimField)
       const victimSide = sideOfNick(victimField)
       
       const newHP = parseInt(hpInfo.match(/(\d+)\/(\d+)|0 fnt/)?.[1] || '0')
@@ -530,7 +554,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
 
       if (fromContent) {
         isDirectDamage = false
-        const ofNick = ofField ? ofField.split(': ')[1].trim() : undefined
+        const ofNick = ofField ? getNickFromField(ofField) : undefined
         const ofSide = ofField ? sideOfNick(ofField) : undefined
         
         if (fromContent.startsWith('ability:')) {
@@ -608,7 +632,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const parts = line.split('|')
       const targetField = parts[2]
       const hpInfo = parts[3]
-      const targetNick = targetField.split(':')[1].trim()
+      const targetNick = getNickFromField(targetField)
       const targetSide = sideOfNick(targetField)
       const hpMatch = hpInfo.match(/(\d+)\/(\d+)/)
       if (hpMatch) {
@@ -621,7 +645,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
       if (!pos || !newDetails) return;
 
       const slot = pos.split(':')[0]; // e.g. 'p1a'
-      const newNick = pos.split(':')[1].trim();
+      const newNick = getNickFromField(pos);
       const side = sideOfNick(pos);
       const newSpecies = newDetails.split(',')[0].trim();
       const oldNick = activePokemonInSlot[slot];
@@ -677,7 +701,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
 
     if (line.startsWith('|faint|')) {
       const nickField = line.split('|')[2]
-      const nickname = nickField.split(': ')[1].trim()
+      const nickname = getNickFromField(nickField)
       const side = sideOfNick(nickField)
       const key = getPokemonKey(side, nickname)
       const victimState = getPokemon(nickname, side);
@@ -711,7 +735,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
          const attackerKey = victimState.lastAttacker;
          if (attackerKey) {
            const attackerState = battle.pokemon[attackerKey];
-           if (attackerState) {
+           if (attackerState && attackerKey !== key) {
              kos.push({
                attacker: attackerState.species,
                victim: victimState.species,
