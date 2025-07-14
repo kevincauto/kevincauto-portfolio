@@ -6,10 +6,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'img.pokemondb.net',
         port: '',
-        pathname: '/sprites/**',
+        pathname: '**',
       },
     ],
   },
-};
+}
 
-export default nextConfig;
+module.exports = nextConfig

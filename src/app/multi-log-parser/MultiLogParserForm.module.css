@@ -302,4 +302,58 @@
 .results__stats tbody tr:hover td:first-child,
 .results__stats tbody tr:hover td:nth-child(2) {
   background-color: #3c3c3c; /* Hovered row background */
+}
+
+.awardsSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.awardsSection h2 {
+  text-align: center;
+  width: 100%;
+}
+
+.awardCardsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.awardCard {
+  background-color: #2a2a2a;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+  width: 250px;
+  border: 1px solid #444;
+}
+
+.awardCard h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  color: #ffb400; /* ESPN Gold */
+}
+
+.awardExplanation {
+  margin: -0.75rem 0 1rem 0;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: #ccc;
+}
+
+.awardPokemonImage {
+  object-fit: contain;
+  margin-bottom: 1rem;
+}
+
+.awardCard p {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0;
 } 

@@ -1,10 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './MultiLogParserForm.module.css';
 import { FaPlus, FaTrash } from 'react-icons/fa';
 import { AggregatedPokemonStats } from '../api/multi-poke-parser/route'; // Import the new type
 import PokemonIcon from '../../components/PokemonIcon';
+import Image from 'next/image';
+
+const awardExplanations: { [key: string]: string } = {
+  "Most Valuable Pocket Monster": "Best K/D",
+  "Frank the Tank": "Most Damage Taken",
+  "The Passive Aggressor": "Most Indirect Damage Dealt",
+  "I'm Trying My Best": "Worst K/D",
+  "Conductor of the Pain Train": "Most Damage Dealt",
+  "Shadow Realm Administrator": "Most KOs",
+};
 
 type SortField = keyof AggregatedPokemonStats;
 type SortDirection = 'asc' | 'desc';
@@ -106,7 +116,6 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
 
   return (
     <div className={styles.resultsContainer}>
-      <h2>Aggregated Statistics</h2>
       <div className={styles.results__statsContainer}>
         <table className={styles.results__stats}>
           <thead>
@@ -216,6 +225,39 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
           </tbody>
         </table>
       </div>
+    </div>
+  );
+}
+
+function AwardCard({ pokemon, award }: { pokemon: AggregatedPokemonStats; award: string }) {
+  const formattedSpecies = pokemon.name.toLowerCase().replace(/ /g, '-').replace(/\./g, '');
+  const primaryUrl = `https://img.pokemondb.net/artwork/large/${formattedSpecies}.jpg`;
+  const fallbackUrl = `https://img.pokemondb.net/artwork/${formattedSpecies}.jpg`;
+  
+  const [imgSrc, setImgSrc] = useState(primaryUrl);
+  const explanation = awardExplanations[award];
+
+  useEffect(() => {
+    setImgSrc(primaryUrl);
+  }, [primaryUrl]);
+
+  return (
+    <div className={styles.awardCard}>
+      <h3>{award}</h3>
+      {explanation && <p className={styles.awardExplanation}>({explanation})</p>}
+      <Image
+        src={imgSrc}
+        alt={pokemon.name}
+        width={200}
+        height={200}
+        className={styles.awardPokemonImage}
+        onError={() => {
+          if (imgSrc === primaryUrl) {
+            setImgSrc(fallbackUrl);
+          }
+        }}
+      />
+      <p>{pokemon.name}</p>
     </div>
   );
 }
@@ -338,6 +380,54 @@ export default function MultiLogParserForm() {
     }
   };
 
+  let mvp: AggregatedPokemonStats | undefined;
+  let frankTheTank: AggregatedPokemonStats | undefined;
+  let passiveAggressor: AggregatedPokemonStats | undefined;
+  let tryingMyBest: AggregatedPokemonStats | undefined;
+  let conductorOfThePainTrain: AggregatedPokemonStats | undefined;
+  let shadowRealmAdmin: AggregatedPokemonStats | undefined;
+
+  if (results && results.length > 0) {
+    const avgGamesPlayed = results.reduce((sum, p) => sum + p.gamesPlayed, 0) / results.length;
+    const eligibleForMvp = results.filter(p => p.gamesPlayed > avgGamesPlayed);
+
+    if (eligibleForMvp.length > 0) {
+      mvp = eligibleForMvp.reduce((best, current) => {
+        return current.kosPerFaint > best.kosPerFaint ? current : best;
+      });
+    }
+
+    frankTheTank = results.reduce((best, current) => {
+      return current.totalDamageTaken > best.totalDamageTaken ? current : best;
+    });
+
+    passiveAggressor = results.reduce((best, current) => {
+      return current.indirectDamageDealt > best.indirectDamageDealt ? current : best;
+    });
+
+    tryingMyBest = [...results].sort((a, b) => {
+      if (a.kosPerFaint < b.kosPerFaint) return -1;
+      if (a.kosPerFaint > b.kosPerFaint) return 1;
+      // Tie-breaker: more faints is "worse"
+      if (a.fainted > b.fainted) return -1;
+      if (a.fainted < b.fainted) return 1;
+      return 0;
+    })[0];
+
+    conductorOfThePainTrain = results.reduce((best, current) => {
+      return current.totalDamageDealt > best.totalDamageDealt ? current : best;
+    });
+
+    shadowRealmAdmin = [...results].sort((a, b) => {
+      if (a.kos > b.kos) return -1;
+      if (a.kos < b.kos) return 1;
+      // Tie-breaker: more damage dealt
+      if (a.totalDamageDealt > b.totalDamageDealt) return -1;
+      if (a.totalDamageDealt < b.totalDamageDealt) return 1;
+      return 0;
+    })[0];
+  }
+
   return (
     <>
       <form onSubmit={handleSubmit} className={styles.form}>
@@ -402,6 +492,20 @@ export default function MultiLogParserForm() {
       </form>
 
       {error && <p className={styles.error}>{error}</p>}
+
+      {(mvp || frankTheTank || passiveAggressor || tryingMyBest || conductorOfThePainTrain || shadowRealmAdmin) && (
+        <div className={styles.awardsSection}>
+          <h2>Award Winners</h2>
+          <div className={styles.awardCardsContainer}>
+            {mvp && <AwardCard pokemon={mvp} award="Most Valuable Pocket Monster" />}
+            {shadowRealmAdmin && <AwardCard pokemon={shadowRealmAdmin} award="Shadow Realm Administrator" />}
+            {conductorOfThePainTrain && <AwardCard pokemon={conductorOfThePainTrain} award="Conductor of the Pain Train" />}
+            {frankTheTank && <AwardCard pokemon={frankTheTank} award="Frank the Tank" />}
+            {passiveAggressor && <AwardCard pokemon={passiveAggressor} award="The Passive Aggressor" />}
+            {tryingMyBest && <AwardCard pokemon={tryingMyBest} award="I'm Trying My Best" />}
+          </div>
+        </div>
+      )}
 
       {results && (
         <>
