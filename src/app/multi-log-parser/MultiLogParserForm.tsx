@@ -286,6 +286,7 @@ export default function MultiLogParserForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<AggregatedPokemonStats[] | null>(null);
+  const [isAccordionOpen, setIsAccordionOpen] = useState(false);
 
   const handleAddInput = () => {
     setUrls([...urls, '']);
@@ -304,6 +305,7 @@ export default function MultiLogParserForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsAccordionOpen(false); // Always close accordion on submit
     setLoading(true);
     setError(null);
     setResults(null);
@@ -333,39 +335,53 @@ export default function MultiLogParserForm() {
   return (
     <>
       <form onSubmit={handleSubmit} className={styles.form}>
-        <div className={styles.inputList}>
-          {urls.map((url, index) => (
-            <div key={index} className={styles.inputRow}>
-              <input
-                type="url"
-                placeholder="Paste draft replay URL"
-                value={url}
-                onChange={(e) => handleInputChange(index, e.target.value)}
-                className={styles.input}
-                required
-              />
-              <button
-                type="button"
-                onClick={() => handleRemoveInput(index)}
-                className={`${styles.iconButton} ${styles.deleteButton}`}
-                disabled={urls.length === 1}
-                aria-label="Remove URL"
-              >
-                <FaTrash />
-              </button>
-            </div>
-          ))}
-        </div>
-        <div className={styles.buttonGroup}>
+        <div className={styles.accordion}>
           <button
             type="button"
-            onClick={handleAddInput}
-            className={styles.addButton}
-            aria-label="Add URL"
+            onClick={() => setIsAccordionOpen(!isAccordionOpen)}
+            className={styles.accordionToggle}
           >
-            <FaPlus />
-            <span>Add Another URL</span>
+            <span>{isAccordionOpen ? 'Hide Replay URLs' : 'Show Replay URLs'}</span>
+            <span className={`${styles.accordionIcon} ${isAccordionOpen ? styles.open : ''}`}>▼</span>
           </button>
+          <div className={`${styles.accordionContent} ${isAccordionOpen ? styles.open : ''}`}>
+            <div className={styles.inputList}>
+              {urls.map((url, index) => (
+                <div key={index} className={styles.inputRow}>
+                  <input
+                    type="url"
+                    placeholder="Paste draft replay URL"
+                    value={url}
+                    onChange={(e) => handleInputChange(index, e.target.value)}
+                    className={styles.input}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveInput(index)}
+                    className={`${styles.iconButton} ${styles.deleteButton}`}
+                    disabled={urls.length === 1}
+                    aria-label="Remove URL"
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className={styles.buttonGroup}>
+              <button
+                type="button"
+                onClick={handleAddInput}
+                className={styles.addButton}
+                aria-label="Add URL"
+              >
+                <FaPlus />
+                <span>Add Another URL</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className={styles.buttonGroup}>
           <button type="submit" className={styles.parseButton} disabled={loading}>
             {loading ? 'Parsing...' : 'Parse All'}
           </button>
