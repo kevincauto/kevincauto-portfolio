@@ -549,11 +549,15 @@ export function parseShowdownLog(log: string): DraftResult | null {
           damageType = 'Contact Ability';
           if (ofNick && ofSide) attackerKey = getPokemonKey(ofSide, ofNick);
         } else if (fromContent.startsWith('item:')) {
-          if (ofNick && ofSide) {
+          if (fromContent.includes('Life Orb')) {
+            isSelfDamage = true;
+            attackerKey = getPokemonKey(victimSide, victimNick);
+            damageType = 'Life Orb';
+          } else if (ofNick && ofSide) {
             attackerKey = getPokemonKey(ofSide, ofNick);
             if (fromContent.includes('Rocky Helmet')) damageType = 'Rocky Helmet';
           }
-        } else if (fromContent === 'Life Orb' || fromContent === 'Recoil') {
+        } else if (fromContent === 'Recoil') {
           isSelfDamage = true;
           attackerKey = getPokemonKey(victimSide, victimNick);
           damageType = fromContent;
