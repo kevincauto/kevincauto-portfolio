@@ -180,7 +180,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
   let winner: string | undefined
   let p1Remaining = 6
   let p2Remaining = 6
-  const activePokemonInSlot: Record<string, string> = {};
+  const activePokemonInSlot: Record<string, string> = {}; // Change: value is species, not nickname
   let lastDamageDealt = 0;
   let lastDamageWasDirect = true;
  
@@ -210,7 +210,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
   const lines = log.split('\n')
 
   /* helper: get unique key for a Pokémon instance */
-  const getPokemonKey = (side: SideID, nickname: string) => `${side}:${nickname}`;
+  const getPokemonKey = (side: SideID, species: string) => `${side}:${species}`;
 
   /* helper: given "p2a: Hop on Minecraft" → "p2" */
   const sideOfNick = (nickField: string): SideID =>
@@ -230,14 +230,14 @@ export function parseShowdownLog(log: string): DraftResult | null {
   };
 
   /* helper: get or create Pokémon state */
-  const getPokemon = (nickname: string, side: SideID, species?: string, slot?: number): PokemonState => {
-    const key = getPokemonKey(side, nickname);
+  const getPokemon = (species: string, side: SideID, slot?: number): PokemonState => {
+    const key = getPokemonKey(side, species);
     if (!battle.pokemon[key]) {
       battle.pokemon[key] = {
         side: side,
         slot: slot || 1,
-        species: species || nickname,
-        nickname: nickname,
+        species: species,
+        nickname: species,
         hp: 100,
         directDamageDealt: 0,
         indirectDamageDealt: 0,
@@ -275,16 +275,13 @@ export function parseShowdownLog(log: string): DraftResult | null {
         damageTakenByCurse: 0,
         damageTakenByCurseSelf: 0,
       }
-    } else if (species && battle.pokemon[key].species === battle.pokemon[key].nickname) {
-      // If we learn the true species of a Pokémon we only knew by nickname, update it.
-      battle.pokemon[key].species = species;
     }
     return battle.pokemon[key]
   }
 
   /* helper: update Pokémon HP and track damage */
   const updatePokemonHP = (
-    nickname: string, 
+    species: string,
     side: SideID, 
     newHP: number, 
     isHealing: boolean = false, 
@@ -293,7 +290,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
     isSelfDamage: boolean = false, 
     damageType?: string
   ) => {
-    const pokemon = getPokemon(nickname, side)
+    const pokemon = getPokemon(species, side)
     const prevHP = pokemon.hp
     let damage = 0
     
@@ -384,7 +381,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const side = player as SideID
       const slot = (side === 'p1' ? p1Team : p2Team).length + 1
       ;(side === 'p1' ? p1Team : p2Team).push(species)
-      getPokemon(species, side, species, slot)
+      getPokemon(species, side, slot)
     }
 
     if (line.startsWith('|drag|') || line.startsWith('|switch|')) {
@@ -393,9 +390,10 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const nick = getNickFromField(nickField)
       const species = cleanSpeciesName(parts[3].split(',')[0].trim())
       const side = sideOfNick(nickField)
-      const pokemon = getPokemon(nick, side, species)
+      const pokemon = getPokemon(species, side)
+      pokemon.nickname = nick;
       const slot = nickField.split(':')[0];
-      activePokemonInSlot[slot] = nick;
+      activePokemonInSlot[slot] = species;
 
       const hpMatch = parts[4]?.match(/(\d+)\/(\d+)/) || parts[3].match(/(\d+)\/(\d+)/)
       if (hpMatch) {
@@ -406,10 +404,12 @@ export function parseShowdownLog(log: string): DraftResult | null {
     if (line.startsWith('|move|')) {
       const parts = line.split('|')
       const atkField = parts[2]
-      const atkNick = getNickFromField(atkField)
       const atkSide = sideOfNick(atkField)
       const moveName = parts[3]
-      const atkKey = getPokemonKey(atkSide, atkNick)
+      const atkSlot = atkField.split(':')[0]
+      const atkSpecies = activePokemonInSlot[atkSlot]
+      if (!atkSpecies) return; // Should not happen
+      const atkKey = getPokemonKey(atkSide, atkSpecies)
       
       lastMoveUsed[atkKey] = { move: moveName, turn: currentTurn }
 
@@ -420,23 +420,28 @@ export function parseShowdownLog(log: string): DraftResult | null {
       if (moveName === 'Trick' || moveName === 'Switcheroo') {
         if(parts[4]) {
           const defField = parts[4];
-          const defNick = getNickFromField(defField);
           const defSide = sideOfNick(defField);
-          const defPokemon = getPokemon(defNick, defSide);
-          const atkPokemon = getPokemon(atkNick, atkSide);
+          const defSlot = defField.split(':')[0]
+          const defSpecies = activePokemonInSlot[defSlot]
+          if (!defSpecies) return;
+
+          const defPokemon = getPokemon(defSpecies, defSide);
+          const atkPokemon = getPokemon(atkSpecies, atkSide);
 
           defPokemon.trickedBy = atkKey;
-          atkPokemon.trickedBy = getPokemonKey(defSide, defNick);
+          atkPokemon.trickedBy = getPokemonKey(defSide, defSpecies);
         }
       }
 
       if (parts[4]) {
         const defField = parts[4]
-        const defNick = getNickFromField(defField)
         const defSide = sideOfNick(defField)
-        const defKey = getPokemonKey(defSide, defNick)
+        const defSlot = defField.split(':')[0]
+        const defSpecies = activePokemonInSlot[defSlot]
+        if (!defSpecies) return;
+        const defKey = getPokemonKey(defSide, defSpecies)
         lastHit[defKey] = { attackerKey: atkKey, turn: currentTurn, move: moveName }
-        getPokemon(defNick, defSide).lastAttacker = atkKey;
+        getPokemon(defSpecies, defSide).lastAttacker = atkKey;
       }
 
       if (moveName === 'Future Sight') battle.futureSightAttacker = atkKey;
@@ -446,9 +451,11 @@ export function parseShowdownLog(log: string): DraftResult | null {
     if (line.startsWith('|-status|')) {
       const parts = line.split('|')
       const targetField = parts[2]
-      const targetNick = getNickFromField(targetField)
       const targetSide = sideOfNick(targetField)
-      const pokemon = getPokemon(targetNick, targetSide)
+      const targetSlot = targetField.split(':')[0]
+      const targetSpecies = activePokemonInSlot[targetSlot]
+      if (!targetSpecies) return;
+      const pokemon = getPokemon(targetSpecies, targetSide)
       pokemon.status = parts[3] as PokemonState['status']
       
       const fromTag = parts[4] || ''
@@ -464,9 +471,11 @@ export function parseShowdownLog(log: string): DraftResult | null {
           if (prevLine.startsWith('|move|')) {
             const [, , atkField, , defField] = prevLine.split('|')
             if (defField === targetField) {
-              const atkNick = getNickFromField(atkField)
               const atkSide = sideOfNick(atkField)
-              pokemon.statusBy = getPokemonKey(atkSide, atkNick)
+              const atkSlot = atkField.split(':')[0]
+              const atkSpecies = activePokemonInSlot[atkSlot]
+              if (!atkSpecies) break;
+              pokemon.statusBy = getPokemonKey(atkSide, atkSpecies)
               break
             }
           }
@@ -476,15 +485,18 @@ export function parseShowdownLog(log: string): DraftResult | null {
 
     if (line.startsWith('|-sidestart|')) {
       const prev = lines[idx - 1] || ''
+      if (!prev.startsWith('|move|')) return;
+      
       const atkField = prev.split('|')[2]
-      const atkNick = atkField ? getNickFromField(atkField) : undefined
-      const atkSide = atkField ? sideOfNick(atkField) : undefined
+      const atkSide = sideOfNick(atkField)
+      const atkSlot = atkField.split(':')[0]
+      const atkSpecies = activePokemonInSlot[atkSlot]
 
       const parts = line.split('|')
       const side = sideOfNick(parts[2])
 
-      if (atkNick && atkSide) {
-        const setterKey = getPokemonKey(atkSide, atkNick);
+      if (atkSpecies) {
+        const setterKey = getPokemonKey(atkSide, atkSpecies);
         if (/Spikes/i.test(parts[3])) {
           battle.hazards[side].spikesLayers++;
           battle.hazards[side].spikesSetter = setterKey;
@@ -511,9 +523,11 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const fromAbilityMatch = line.match(/\[from\] ability: [^|]+\|\[of\] (p\da: [^|]+)/)
       if (fromAbilityMatch) {
         const ofField = fromAbilityMatch[1]
-        const nick = getNickFromField(ofField)
         const side = sideOfNick(ofField)
-        const key = getPokemonKey(side, nick)
+        const slot = ofField.split(':')[0]
+        const species = activePokemonInSlot[slot]
+        if (!species) return;
+        const key = getPokemonKey(side, species)
         if (line.includes('Sandstorm')) battle.sandstormSetter = key
         else if (line.includes('Hail')) battle.hailSetter = key
         else if (line.includes('RainDance')) battle.rainSetter = key
@@ -525,8 +539,10 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const parts = line.split('|')
       const victimField = parts[2]
       const hpInfo = parts[3]
-      const victimNick = getNickFromField(victimField)
       const victimSide = sideOfNick(victimField)
+      const victimSlot = victimField.split(':')[0];
+      const victimSpecies = activePokemonInSlot[victimSlot];
+      if (!victimSpecies) return;
       
       const newHP = parseInt(hpInfo.match(/(\d+)\/(\d+)|0 fnt/)?.[1] || '0')
       
@@ -544,39 +560,41 @@ export function parseShowdownLog(log: string): DraftResult | null {
         isDirectDamage = false
         const ofNick = ofField ? getNickFromField(ofField) : undefined
         const ofSide = ofField ? sideOfNick(ofField) : undefined
+        const ofSlot = ofField ? ofField.split(':')[0] : undefined
+        const ofSpecies = ofSlot ? activePokemonInSlot[ofSlot] : undefined
         
         if (fromContent.startsWith('ability:')) {
           damageType = 'Contact Ability';
-          if (ofNick && ofSide) attackerKey = getPokemonKey(ofSide, ofNick);
+          if (ofSpecies && ofSide) attackerKey = getPokemonKey(ofSide, ofSpecies);
         } else if (fromContent.startsWith('item:')) {
           if (fromContent.includes('Life Orb')) {
             isSelfDamage = true;
-            attackerKey = getPokemonKey(victimSide, victimNick);
+            attackerKey = getPokemonKey(victimSide, victimSpecies);
             damageType = 'Life Orb';
-          } else if (ofNick && ofSide) {
-            attackerKey = getPokemonKey(ofSide, ofNick);
+          } else if (ofSpecies && ofSide) {
+            attackerKey = getPokemonKey(ofSide, ofSpecies);
             if (fromContent.includes('Rocky Helmet')) damageType = 'Rocky Helmet';
           }
         } else if (fromContent === 'Recoil') {
           isSelfDamage = true;
-          attackerKey = getPokemonKey(victimSide, victimNick);
+          attackerKey = getPokemonKey(victimSide, victimSpecies);
           damageType = fromContent;
         } else if (fromContent === 'Leech Seed') {
           damageType = 'Leech Seed';
-          if (ofNick && ofSide) {
-            const potentialAttackerKey = getPokemonKey(ofSide, ofNick);
+          if (ofSpecies && ofSide) {
+            const potentialAttackerKey = getPokemonKey(ofSide, ofSpecies);
             if (battle.leechSeedUsers.has(potentialAttackerKey)) {
               attackerKey = potentialAttackerKey;
             }
           }
         } else if (fromContent === 'Curse') {
           damageType = 'Curse';
-          if (ofNick && ofSide) attackerKey = getPokemonKey(ofSide, ofNick);
+          if (ofSpecies && ofSide) attackerKey = getPokemonKey(ofSide, ofSpecies);
         } else if (['Stealth Rock', 'Spikes'].includes(fromContent)) {
           attackerKey = battle.hazards[victimSide][fromContent === 'Spikes' ? 'spikesSetter' : 'stealthRockSetter'];
           damageType = fromContent;
         } else if (['psn', 'brn', 'tox'].includes(fromContent)) {
-          attackerKey = getPokemon(victimNick, victimSide).statusBy;
+          attackerKey = getPokemon(victimSpecies, victimSide).statusBy;
           damageType = fromContent === 'brn' ? 'Burn' : 'Poison';
         } else if (fromContent === 'Sandstorm') {
           attackerKey = battle.sandstormSetter;
@@ -590,7 +608,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
         }
       }
       
-      const lastAction = lastHit[getPokemonKey(victimSide, victimNick)];
+      const lastAction = lastHit[getPokemonKey(victimSide, victimSpecies)];
       if (!fromContent && lastAction && lastAction.turn === currentTurn) {
         if (selfDamageNoFromTag.has(lastAction.move)) {
           isDirectDamage = false;
@@ -612,11 +630,11 @@ export function parseShowdownLog(log: string): DraftResult | null {
         if (subUserField === victimField) {
             isSelfDamage = true;
             damageType = 'Substitute';
-            getPokemon(victimNick, victimSide).substituteUses++;
+            getPokemon(victimSpecies, victimSide).substituteUses++;
         }
       }
 
-      lastDamageDealt = updatePokemonHP(victimNick, victimSide, newHP, false, attackerKey, isDirectDamage, isSelfDamage, damageType)
+      lastDamageDealt = updatePokemonHP(victimSpecies, victimSide, newHP, false, attackerKey, isDirectDamage, isSelfDamage, damageType)
       lastDamageWasDirect = isDirectDamage;
     }
 
@@ -624,11 +642,13 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const parts = line.split('|')
       const targetField = parts[2]
       const hpInfo = parts[3]
-      const targetNick = getNickFromField(targetField)
       const targetSide = sideOfNick(targetField)
+      const targetSlot = targetField.split(':')[0]
+      const targetSpecies = activePokemonInSlot[targetSlot]
+      if (!targetSpecies) return;
       const hpMatch = hpInfo.match(/(\d+)\/(\d+)/)
       if (hpMatch) {
-        updatePokemonHP(targetNick, targetSide, parseInt(hpMatch[1]), true)
+        updatePokemonHP(targetSpecies, targetSide, parseInt(hpMatch[1]), true)
       }
     }
 
@@ -640,11 +660,11 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const newNick = getNickFromField(pos);
       const side = sideOfNick(pos);
       const newSpecies = cleanSpeciesName(newDetails.split(',')[0].trim());
-      const oldNick = activePokemonInSlot[slot];
+      const oldSpecies = activePokemonInSlot[slot];
       
-      if (oldNick) {
-        const oldKey = getPokemonKey(side, oldNick);
-        const newKey = getPokemonKey(side, newNick);
+      if (oldSpecies) {
+        const oldKey = getPokemonKey(side, oldSpecies);
+        const newKey = getPokemonKey(side, newSpecies);
         
         if (lastHit[oldKey]) {
           lastHit[newKey] = lastHit[oldKey];
@@ -652,7 +672,8 @@ export function parseShowdownLog(log: string): DraftResult | null {
         }
         
         const oldMonState = battle.pokemon[oldKey];
-        const newMonState = getPokemon(newNick, side, newSpecies);
+        const newMonState = getPokemon(newSpecies, side);
+        newMonState.nickname = newNick;
         
         // Transfer all relevant state from the illusion to the real Pokémon
         newMonState.hp = oldMonState.hp;
@@ -688,26 +709,28 @@ export function parseShowdownLog(log: string): DraftResult | null {
         }
       }
       
-      activePokemonInSlot[slot] = newNick;
+      activePokemonInSlot[slot] = newSpecies;
     }
 
     if (line.startsWith('|faint|')) {
       const nickField = line.split('|')[2]
-      const nickname = getNickFromField(nickField)
       const side = sideOfNick(nickField)
-      const key = getPokemonKey(side, nickname)
-      const victimState = getPokemon(nickname, side);
+      const slot = nickField.split(':')[0]
+      const species = activePokemonInSlot[slot]
+      if (!species) return; // Should not happen
+      const key = getPokemonKey(side, species)
+      const victimState = getPokemon(species, side);
 
       const lastAction = lastMoveUsed[key];
       if (lastAction && lastAction.turn === currentTurn && sacrificialMoves.has(lastAction.move)) {
-        updatePokemonHP(nickname, side, 0, false, undefined, false, true, 'Sacrificial Move');
+        updatePokemonHP(species, side, 0, false, undefined, false, true, 'Sacrificial Move');
       }
 
       if (!faintedPokemon[key]) {
         if (side === 'p1') p1Remaining--
         else p2Remaining--
         faintedPokemon[key] = true
-        getPokemon(nickname, side).hp = 0
+        getPokemon(species, side).hp = 0
 
         // Check for a direct KO
         const lastHitData = lastHit[key];
