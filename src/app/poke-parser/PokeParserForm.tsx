@@ -24,6 +24,7 @@ type PokemonStat = {
   directDamageTaken: number; 
   indirectDamageTaken: number; 
   totalDamageTaken: number;
+  friendlyFireDamage: number;
   // Granular indirect damage categories
   damageDealtBySpikes: number;
   damageDealtByStealthRock: number;
@@ -295,6 +296,9 @@ export default function PokeParserForm() {
                       <th onClick={() => handleSort('indirectDamageDealt')} className={sortField === 'indirectDamageDealt' ? styles.activeSort : ''}>
                         Indirect Damage Dealt {getSortIcon('indirectDamageDealt')}
                       </th>
+                      <th onClick={() => handleSort('friendlyFireDamage')} className={sortField === 'friendlyFireDamage' ? styles.activeSort : ''}>
+                        Friendly Fire Dmg {getSortIcon('friendlyFireDamage')}
+                      </th>
                       <th onClick={() => handleSort('damageDealtBySpikes')} className={sortField === 'damageDealtBySpikes' ? styles.activeSort : ''}>
                         Spikes {getSortIcon('damageDealtBySpikes')}
                       </th>
@@ -397,6 +401,7 @@ export default function PokeParserForm() {
                         <td className={sortField === 'totalDamageDealt' ? styles.activeSort : ''}>{Math.round(pokemon.totalDamageDealt)}%</td>
                         <td className={sortField === 'directDamageDealt' ? styles.activeSort : ''}>{Math.round(pokemon.directDamageDealt)}%</td>
                         <td className={sortField === 'indirectDamageDealt' ? styles.activeSort : ''}>{Math.round(pokemon.indirectDamageDealt)}%</td>
+                        <td className={sortField === 'friendlyFireDamage' ? styles.activeSort : ''}>{Math.round(pokemon.friendlyFireDamage)}%</td>
                         <td className={sortField === 'damageDealtBySpikes' ? styles.activeSort : ''}>{Math.round(pokemon.damageDealtBySpikes)}%</td>
                         <td className={sortField === 'damageDealtByStealthRock' ? styles.activeSort : ''}>{Math.round(pokemon.damageDealtByStealthRock)}%</td>
                         <td className={sortField === 'damageDealtByPoison' ? styles.activeSort : ''}>{Math.round(pokemon.damageDealtByPoison)}%</td>

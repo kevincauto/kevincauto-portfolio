@@ -69,6 +69,7 @@ export async function POST(req: NextRequest) {
             gamesPlayed: 0, kos: 0, fainted: 0, won: 0,
             directDamageDealt: 0, indirectDamageDealt: 0, totalDamageDealt: 0,
             directDamageTaken: 0, indirectDamageTaken: 0, totalDamageTaken: 0,
+            friendlyFireDamage: 0,
             damageDealtBySpikes: 0, damageDealtByStealthRock: 0, damageDealtByPoison: 0,
             damageDealtByBurn: 0, damageDealtBySandstorm: 0, damageDealtByHail: 0,
             damageDealtByRockyHelmet: 0, damageDealtByContactAbility: 0,
@@ -101,6 +102,7 @@ export async function POST(req: NextRequest) {
         updatedStats.directDamageTaken += pokemon.directDamageTaken;
         updatedStats.indirectDamageTaken += pokemon.indirectDamageTaken;
         updatedStats.totalDamageTaken += pokemon.totalDamageTaken;
+        updatedStats.friendlyFireDamage += pokemon.friendlyFireDamage;
         updatedStats.damageDealtBySpikes += pokemon.damageDealtBySpikes;
         updatedStats.damageDealtByStealthRock += pokemon.damageDealtByStealthRock;
         updatedStats.damageDealtByPoison += pokemon.damageDealtByPoison;

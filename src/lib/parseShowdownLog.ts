@@ -21,6 +21,7 @@ export interface PokemonStats {
   directDamageTaken: number; // Direct damage taken from opponents
   indirectDamageTaken: number; // Indirect damage taken (including self-inflicted)
   totalDamageTaken: number; // Total damage taken including all damage (can exceed 100% due to healing)
+  friendlyFireDamage: number;
   // Granular indirect damage categories
   damageDealtBySpikes: number;
   damageDealtByStealthRock: number;
@@ -86,6 +87,7 @@ export interface PokemonState {
   healingDone: number;         // total % self-heal, Wish, etc.
   kos: number;                 // confirmed KOs
   substituteUses: number;      // number of times Substitute was used
+  friendlyFireDamage: number;
 
   /* attribution helpers */
   lastAttacker?: string;       // most recent damaging mon (uses unique pokemonKey)
@@ -245,6 +247,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
         healingDone: 0,
         kos: 0,
         substituteUses: 0,
+        friendlyFireDamage: 0,
         damageDealtBySpikes: 0,
         damageDealtByStealthRock: 0,
         damageDealtByPoison: 0,
@@ -332,22 +335,28 @@ export function parseShowdownLog(log: string): DraftResult | null {
       
       if (attackerKey && !isSelfDamage) {
         const attackerState = battle.pokemon[attackerKey];
-        if (isDirectDamage) {
-          attackerState.directDamageDealt += damage;
+        const victimState = pokemon;
+
+        if ((damageType === 'Sandstorm' || damageType === 'Hail') && attackerState.side === victimState.side) {
+          attackerState.friendlyFireDamage += damage;
         } else {
-          attackerState.indirectDamageDealt += damage;
-          if (damageType) {
-            switch (damageType) {
-              case 'Spikes': attackerState.damageDealtBySpikes += damage; break
-              case 'Stealth Rock': attackerState.damageDealtByStealthRock += damage; break
-              case 'Poison': attackerState.damageDealtByPoison += damage; break
-              case 'Burn': attackerState.damageDealtByBurn += damage; break
-              case 'Sandstorm': attackerState.damageDealtBySandstorm += damage; break
-              case 'Hail': attackerState.damageDealtByHail += damage; break
-              case 'Rocky Helmet': attackerState.damageDealtByRockyHelmet += damage; break
-              case 'Contact Ability': attackerState.damageDealtByContactAbility += damage; break
-              case 'Leech Seed': attackerState.damageDealtByLeechSeed += damage; break
-              case 'Curse': attackerState.damageDealtByCurse += damage; break;
+          if (isDirectDamage) {
+            attackerState.directDamageDealt += damage;
+          } else {
+            attackerState.indirectDamageDealt += damage;
+            if (damageType) {
+              switch (damageType) {
+                case 'Spikes': attackerState.damageDealtBySpikes += damage; break
+                case 'Stealth Rock': attackerState.damageDealtByStealthRock += damage; break
+                case 'Poison': attackerState.damageDealtByPoison += damage; break
+                case 'Burn': attackerState.damageDealtByBurn += damage; break
+                case 'Sandstorm': attackerState.damageDealtBySandstorm += damage; break
+                case 'Hail': attackerState.damageDealtByHail += damage; break
+                case 'Rocky Helmet': attackerState.damageDealtByRockyHelmet += damage; break
+                case 'Contact Ability': attackerState.damageDealtByContactAbility += damage; break
+                case 'Leech Seed': attackerState.damageDealtByLeechSeed += damage; break
+                case 'Curse': attackerState.damageDealtByCurse += damage; break;
+              }
             }
           }
         }
@@ -509,34 +518,6 @@ export function parseShowdownLog(log: string): DraftResult | null {
         else if (line.includes('Hail')) battle.hailSetter = key
         else if (line.includes('RainDance')) battle.rainSetter = key
         else if (line.includes('SunnyDay')) battle.sunSetter = key
-      }
-    }
-    
-    if (line.startsWith('|-damage|') && line.includes('0 fnt') && /\[from\]/.test(line)) {
-      const victimField = line.split('|')[2]
-      const fromTag = line.split('|').pop() || ''
-      const side = sideOfNick(victimField)
-      const victimNick = getNickFromField(victimField)
-      const victim = getPokemon(victimNick, side)
-      let attackerKey: string | undefined
-      let hazardType: string | undefined
-
-      if (/Stealth Rock/i.test(fromTag)) {
-        attackerKey = battle.hazards[side].stealthRockSetter;
-        hazardType = 'Stealth Rock'
-      } else if (/Spikes/i.test(fromTag)) {
-        attackerKey = battle.hazards[side].spikesSetter;
-        hazardType = 'Spikes'
-      } else if (/Toxic Spikes/i.test(fromTag)) {
-        attackerKey = battle.hazards[side].toxicSpikesSetter;
-        hazardType = 'Toxic Spikes'
-      }
-      
-      if (attackerKey) {
-        const attacker = battle.pokemon[attackerKey]
-        kos.push({ attacker: attacker.species, victim: victim.species, hazard: hazardType })
-        attacker.kos++
-        updatePokemonHP(victimNick, side, 0, false, attackerKey, false, false, hazardType)
       }
     }
 
@@ -779,6 +760,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
     const directDamageTaken = allStates.reduce((sum, p) => sum + p.directDamageTaken, 0)
     const indirectDamageTaken = allStates.reduce((sum, p) => sum + p.indirectDamageTaken, 0)
     const totalDamageTaken = allStates.reduce((sum, p) => sum + p.totalDamageTaken, 0)
+    const friendlyFireDamage = allStates.reduce((sum, p) => sum + p.friendlyFireDamage, 0);
 
     pokemonStats.push({
       name: pokemonSpecies,
@@ -791,6 +773,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
       directDamageTaken,
       indirectDamageTaken,
       totalDamageTaken,
+      friendlyFireDamage,
       damageDealtBySpikes: allStates.reduce((sum, p) => sum + p.damageDealtBySpikes, 0),
       damageDealtByStealthRock: allStates.reduce((sum, p) => sum + p.damageDealtByStealthRock, 0),
       damageDealtByPoison: allStates.reduce((sum, p) => sum + p.damageDealtByPoison, 0),
