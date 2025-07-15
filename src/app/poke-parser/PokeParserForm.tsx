@@ -6,7 +6,7 @@ import PokemonIcon from '../../components/PokemonIcon';
 import Image from 'next/image';
 
 const awardExplanations: { [key: string]: string } = {
-  "Shadow Realm Administrator": "Most KOs",
+  "The KO Machine": "Most KOs",
   "Conductor of the Pain Train": "Most Damage Dealt",
   "Frank the Tank": "Most Damage Taken",
   "The Passive Aggressor": "Most Indirect Damage Dealt",
@@ -258,7 +258,7 @@ export default function PokeParserForm() {
               <div className={styles.awardsSection}>
                 <h3>Award Winners</h3>
                 <div className={styles.awardCardsContainer}>
-                  {shadowRealmAdmin && <AwardCard pokemon={shadowRealmAdmin} award="Shadow Realm Administrator" />}
+                  {shadowRealmAdmin && <AwardCard pokemon={shadowRealmAdmin} award="The KO Machine" />}
                   {conductorOfThePainTrain && <AwardCard pokemon={conductorOfThePainTrain} award="Conductor of the Pain Train" />}
                   {frankTheTank && <AwardCard pokemon={frankTheTank} award="Frank the Tank" />}
                   {passiveAggressor && <AwardCard pokemon={passiveAggressor} award="The Passive Aggressor" />}

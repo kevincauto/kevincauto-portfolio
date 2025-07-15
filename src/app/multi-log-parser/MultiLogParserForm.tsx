@@ -8,12 +8,12 @@ import PokemonIcon from '../../components/PokemonIcon';
 import Image from 'next/image';
 
 const awardExplanations: { [key: string]: string } = {
-  "Most Valuable Pocket Monster": "Best K/D, High Usage",
+  "Most Valuable Pokémon": "Best K/D, High Usage",
   "Frank the Tank": "Most Damage Taken",
   "The Passive Aggressor": "Most Indirect Damage Dealt",
   "I'm Trying My Best": "Worst K/D",
   "Conductor of the Pain Train": "Most Damage Dealt",
-  "Shadow Realm Administrator": "Most KOs",
+  "The KO Machine": "Most KOs",
 };
 
 type SortField = keyof AggregatedPokemonStats;
@@ -561,8 +561,8 @@ export default function MultiLogParserForm() {
         <div className={styles.awardsSection}>
           <h2>Award Winners</h2>
           <div className={styles.awardCardsContainer}>
-            {mvp && <AwardCard pokemon={mvp} award="Most Valuable Pocket Monster" />}
-            {shadowRealmAdmin && <AwardCard pokemon={shadowRealmAdmin} award="Shadow Realm Administrator" />}
+            {mvp && <AwardCard pokemon={mvp} award="Most Valuable Pokémon" />}
+            {shadowRealmAdmin && <AwardCard pokemon={shadowRealmAdmin} award="The KO Machine" />}
             {conductorOfThePainTrain && <AwardCard pokemon={conductorOfThePainTrain} award="Conductor of the Pain Train" />}
             {frankTheTank && <AwardCard pokemon={frankTheTank} award="Frank the Tank" />}
             {passiveAggressor && <AwardCard pokemon={passiveAggressor} award="The Passive Aggressor" />}
