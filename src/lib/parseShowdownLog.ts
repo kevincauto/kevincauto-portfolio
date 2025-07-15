@@ -220,6 +220,13 @@ export function parseShowdownLog(log: string): DraftResult | null {
     return idx === -1 ? field.trim() : field.substring(idx + 1).trim();
   };
 
+  const cleanSpeciesName = (name: string): string => {
+    if (name.endsWith('-*')) {
+      return name.slice(0, -2);
+    }
+    return name;
+  };
+
   /* helper: get or create Pokémon state */
   const getPokemon = (nickname: string, side: SideID, species?: string, slot?: number): PokemonState => {
     const key = getPokemonKey(side, nickname);
@@ -364,7 +371,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
 
     if (line.startsWith('|poke|')) {
       const [, , player, raw] = line.split('|')
-      const species = raw.split(',')[0].trim()
+      const species = cleanSpeciesName(raw.split(',')[0].trim())
       const side = player as SideID
       const slot = (side === 'p1' ? p1Team : p2Team).length + 1
       ;(side === 'p1' ? p1Team : p2Team).push(species)
@@ -375,7 +382,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const parts = line.split('|')
       const nickField = parts[2]
       const nick = getNickFromField(nickField)
-      const species = parts[3].split(',')[0].trim()
+      const species = cleanSpeciesName(parts[3].split(',')[0].trim())
       const side = sideOfNick(nickField)
       const pokemon = getPokemon(nick, side, species)
       const slot = nickField.split(':')[0];
@@ -647,7 +654,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const slot = pos.split(':')[0]; // e.g. 'p1a'
       const newNick = getNickFromField(pos);
       const side = sideOfNick(pos);
-      const newSpecies = newDetails.split(',')[0].trim();
+      const newSpecies = cleanSpeciesName(newDetails.split(',')[0].trim());
       const oldNick = activePokemonInSlot[slot];
       
       if (oldNick) {
