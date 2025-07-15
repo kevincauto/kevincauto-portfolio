@@ -558,7 +558,6 @@ export function parseShowdownLog(log: string): DraftResult | null {
 
       if (fromContent) {
         isDirectDamage = false
-        const ofNick = ofField ? getNickFromField(ofField) : undefined
         const ofSide = ofField ? sideOfNick(ofField) : undefined
         const ofSlot = ofField ? ofField.split(':')[0] : undefined
         const ofSpecies = ofSlot ? activePokemonInSlot[ofSlot] : undefined

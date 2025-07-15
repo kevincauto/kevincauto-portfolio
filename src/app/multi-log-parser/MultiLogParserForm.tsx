@@ -410,8 +410,83 @@ export default function MultiLogParserForm() {
   };
 
   const handleDeleteAll = () => {
-    if (window.confirm('Are you sure you want to delete all URLs?')) {
-      setUrls(['']);
+    setUrls(['']);
+    setResults(null);
+    setError(null);
+  };
+
+  const handleParseSeason2 = async () => {
+    setLoading(true);
+    setError(null);
+    setResults(null);
+    try {
+      const response = await fetch('/season-2.txt');
+      if (!response.ok) {
+        throw new Error('Failed to fetch season 2 games list.');
+      }
+      const text = await response.text();
+      const urls = text.split('\n').filter(url => url.trim() !== '');
+      
+      const res = await fetch('/api/multi-poke-parser', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ urls }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'An unexpected error occurred');
+      }
+
+      const data = await res.json();
+      setResults(data.aggregatedStats);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleParseSeason3 = async () => {
+    setLoading(true);
+    setError(null);
+    setResults(null);
+    
+    try {
+      // Fetch the list of URLs from the text file
+      const response = await fetch('/season-3-games.txt');
+      if (!response.ok) {
+        throw new Error('Failed to fetch season 3 games list.');
+      }
+      const text = await response.text();
+      const urls = text.split('\n').filter(url => url.trim() !== '');
+      
+      // Use these URLs to submit
+      const res = await fetch('/api/multi-poke-parser', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ urls }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'An unexpected error occurred');
+      }
+
+      const data = await res.json();
+      setResults(data.aggregatedStats);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -548,6 +623,12 @@ export default function MultiLogParserForm() {
             className={styles.deleteAllButton}
           >
             Delete All URLs
+          </button>
+          <button onClick={handleParseSeason2} className={styles.parseButton} disabled={loading}>
+            {loading ? 'Parsing...' : 'Parse Season 2'}
+          </button>
+          <button onClick={handleParseSeason3} className={styles.parseButton} disabled={loading}>
+            {loading ? 'Parsing...' : 'Parse Season 3'}
           </button>
           <button type="submit" className={styles.parseButton} disabled={loading}>
             {loading ? 'Parsing...' : 'Parse All'}
