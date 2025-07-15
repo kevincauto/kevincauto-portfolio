@@ -10,8 +10,6 @@ export interface AggregatedPokemonStats extends PokemonStats {
   kosPerFaint: number;
 }
 
-const PREFIX = 'https://replay.pokemonshowdown.com/';
-
 /**
  * Normalizes a Pokémon species name to its base form for aggregation.
  * e.g., "Florges-Blue" -> "Florges"
@@ -26,21 +24,32 @@ function getBaseSpeciesName(name: string): string {
   return name;
 }
 
+function normalizeToShowdownUrl(url: string): string | null {
+  const trimmedUrl = url.trim().split('?')[0]; // remove query params first
+  if (trimmedUrl.startsWith('https://play.pokemonshowdown.com/battle-')) {
+    return trimmedUrl.replace('https://play.pokemonshowdown.com/battle-', 'https://replay.pokemonshowdown.com/');
+  } else if (trimmedUrl.startsWith('https://replay.pokemonshowdown.com/')) {
+    return trimmedUrl;
+  }
+  return null;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { urls } = await req.json();
-    if (!Array.isArray(urls) || urls.some(u => typeof u !== 'string' || !u.startsWith(PREFIX))) {
+    if (!Array.isArray(urls) || urls.some(u => typeof u !== 'string')) {
       return NextResponse.json({ message: 'Invalid replay URLs provided.' }, { status: 400 });
     }
 
     const allParsedLogs = await Promise.all(
       urls.filter(url => url.trim() !== '').map(async (url) => {
         try {
-          let normalizedUrl = url.split('?')[0].trim();
-          if (!normalizedUrl.endsWith('.log')) {
-            normalizedUrl += '.log';
-          }
-          const resp = await fetch(normalizedUrl, { signal: AbortSignal.timeout(10000) });
+          const normalizedUrl = normalizeToShowdownUrl(url);
+          if (!normalizedUrl) return null;
+
+          const logUrl = normalizedUrl.endsWith('.log') ? normalizedUrl : `${normalizedUrl}.log`;
+          
+          const resp = await fetch(logUrl, { signal: AbortSignal.timeout(10000) });
           if (!resp.ok) return null;
           const log = await resp.text();
           return parseShowdownLog(log);
