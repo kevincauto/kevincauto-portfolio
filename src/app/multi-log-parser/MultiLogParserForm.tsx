@@ -13,7 +13,7 @@ const awardExplanations: { [key: string]: string } = {
   "The Passive Aggressor": "Most Indirect Damage Dealt",
   "I'm Trying My Best": "Worst K/D",
   "Conductor of the Pain Train": "Most Damage Dealt",
-  "The KO Machine": "Most KOs",
+  "The KO Machine": "Most Knockouts",
 };
 
 type SortField = keyof AggregatedPokemonStats;
@@ -128,6 +128,10 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
               {renderHeader('kosPerGame', 'KOs/Game')}
               {renderHeader('fainted', 'Faints')}
               {renderHeader('kosPerFaint', 'K/D Ratio')}
+              {renderHeader('amountHealed', 'Amount Healed')}
+              {renderHeader('amountHealedPerGame', 'Healed/Game')}
+              {renderHeader('amountHealedByRegenerator', 'Amount Regenerated')}
+              {renderHeader('amountRegeneratedPerGame', 'Regen/Game')}
               
               {/* Damage Dealt Section */}
               {renderHeader('totalDamageDealt', 'Total Dmg Dealt')}
@@ -135,6 +139,7 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
               {renderHeader('directDamageDealt', 'Direct Dmg Dealt')}
               {renderHeader('indirectDamageDealt', 'Indirect Dmg Dealt')}
               {renderHeader('friendlyFireDamage', 'Friendly Fire Dmg')}
+              {renderHeader('amountHealed', 'Amount Healed')}
               {renderHeader('damageDealtBySpikes', 'Spikes Dmg')}
               {renderHeader('damageDealtByStealthRock', 'SR Dmg')}
               {renderHeader('damageDealtByPoison', 'Poison Dmg')}
@@ -183,6 +188,10 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
                 <td className={sortField === 'kosPerGame' ? styles.activeSort : ''}>{pokemon.kosPerGame.toFixed(2)}</td>
                 <td className={sortField === 'fainted' ? styles.activeSort : ''}>{pokemon.fainted}</td>
                 <td className={sortField === 'kosPerFaint' ? styles.activeSort : ''}>{pokemon.kosPerFaint.toFixed(2)}</td>
+                <td className={sortField === 'amountHealed' ? styles.activeSort : ''}>{Math.round(pokemon.amountHealed)}%</td>
+                <td className={sortField === 'amountHealedPerGame' ? styles.activeSort : ''}>{Math.round(pokemon.amountHealedPerGame)}%</td>
+                <td className={sortField === 'amountHealedByRegenerator' ? styles.activeSort : ''}>{Math.round(pokemon.amountHealedByRegenerator)}%</td>
+                <td className={sortField === 'amountRegeneratedPerGame' ? styles.activeSort : ''}>{Math.round(pokemon.amountRegeneratedPerGame)}%</td>
                 
                 {/* Damage Dealt Data */}
                 <td className={sortField === 'totalDamageDealt' ? styles.activeSort : ''}>{Math.round(pokemon.totalDamageDealt)}%</td>
@@ -190,6 +199,7 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
                 <td className={sortField === 'directDamageDealt' ? styles.activeSort : ''}>{Math.round(pokemon.directDamageDealt)}%</td>
                 <td className={sortField === 'indirectDamageDealt' ? styles.activeSort : ''}>{Math.round(pokemon.indirectDamageDealt)}%</td>
                 <td className={sortField === 'friendlyFireDamage' ? styles.activeSort : ''}>{Math.round(pokemon.friendlyFireDamage)}%</td>
+                <td className={sortField === 'amountHealed' ? styles.activeSort : ''}>{Math.round(pokemon.amountHealed)}%</td>
                 <td className={sortField === 'damageDealtBySpikes' ? styles.activeSort : ''}>{Math.round(pokemon.damageDealtBySpikes)}%</td>
                 <td className={sortField === 'damageDealtByStealthRock' ? styles.activeSort : ''}>{Math.round(pokemon.damageDealtByStealthRock)}%</td>
                 <td className={sortField === 'damageDealtByPoison' ? styles.activeSort : ''}>{Math.round(pokemon.damageDealtByPoison)}%</td>

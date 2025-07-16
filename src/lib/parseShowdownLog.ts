@@ -22,6 +22,8 @@ export interface PokemonStats {
   indirectDamageTaken: number; // Indirect damage taken (including self-inflicted)
   totalDamageTaken: number; // Total damage taken including all damage (can exceed 100% due to healing)
   friendlyFireDamage: number;
+  amountHealed: number;
+  amountHealedByRegenerator: number;
   // Granular indirect damage categories
   damageDealtBySpikes: number;
   damageDealtByStealthRock: number;
@@ -77,6 +79,7 @@ export interface PokemonState {
   status?: 'brn' | 'psn' | 'tox' | 'par' | 'slp' | 'frz';
   faintedByDirectHit?: boolean;
   faintCause?: string;
+  hpOnSwitchOut?: number;
  
   /* cumulative tallies */
   directDamageDealt: number;   // Direct damage dealt to opponents
@@ -88,6 +91,7 @@ export interface PokemonState {
   kos: number;                 // confirmed KOs
   substituteUses: number;      // number of times Substitute was used
   friendlyFireDamage: number;
+  amountHealedByRegenerator: number;
 
   /* attribution helpers */
   lastAttacker?: string;       // most recent damaging mon (uses unique pokemonKey)
@@ -196,6 +200,13 @@ export function parseShowdownLog(log: string): DraftResult | null {
   const selfDamageNoFromTag = new Set(['Belly Drum', 'Curse', 'Clangorous Soul', 'Fillet Away']);
   const riskRewardMoves = new Set(['Belly Drum', 'Clangorous Soul', 'Fillet Away']);
 
+  const regeneratorPokemon = new Set([
+    'Slowpoke', 'Slowpoke-Galar', 'Slowbro', 'Slowbro-Galar', 'Slowking', 'Slowking-Galar',
+    'Tangela', 'Tangrowth', 'Corsola', 'Ho-Oh', 'Audino', 'Solosis', 'Duosion', 'Reuniclus',
+    'Foongus', 'Amoonguss', 'Alomomola', 'Mienfoo', 'Mienshao', 'Tornadus-Therian',
+    'Mareanie', 'Toxapex', 'Gossifleur', 'Eldegoss', 'Klawf', 'Cyclizar', 'Hydrapple'
+  ]);
+
   const battle: BattleState = {
     turn: 0,
     pokemon: {},
@@ -248,6 +259,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
         kos: 0,
         substituteUses: 0,
         friendlyFireDamage: 0,
+        amountHealedByRegenerator: 0,
         damageDealtBySpikes: 0,
         damageDealtByStealthRock: 0,
         damageDealtByPoison: 0,
@@ -393,11 +405,26 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const pokemon = getPokemon(species, side)
       pokemon.nickname = nick;
       const slot = nickField.split(':')[0];
+      
+      // Handle Regenerator healing
+      const oldSpecies = activePokemonInSlot[slot];
+      if (oldSpecies && oldSpecies !== species) {
+        const oldPokemon = getPokemon(oldSpecies, side);
+        oldPokemon.hpOnSwitchOut = oldPokemon.hp;
+      }
+
       activePokemonInSlot[slot] = species;
 
       const hpMatch = parts[4]?.match(/(\d+)\/(\d+)/) || parts[3].match(/(\d+)\/(\d+)/)
       if (hpMatch) {
-        pokemon.hp = parseInt(hpMatch[1])
+        const newHP = parseInt(hpMatch[1])
+        if (regeneratorPokemon.has(species) && pokemon.hpOnSwitchOut !== undefined && newHP > pokemon.hpOnSwitchOut) {
+          const regeneratedHealth = newHP - pokemon.hpOnSwitchOut;
+          pokemon.healingDone += regeneratedHealth;
+          pokemon.amountHealedByRegenerator += regeneratedHealth;
+        }
+        pokemon.hp = newHP
+        pokemon.hpOnSwitchOut = undefined;
       }
     }
 
@@ -787,6 +814,8 @@ export function parseShowdownLog(log: string): DraftResult | null {
     const indirectDamageTaken = allStates.reduce((sum, p) => sum + p.indirectDamageTaken, 0)
     const totalDamageTaken = allStates.reduce((sum, p) => sum + p.totalDamageTaken, 0)
     const friendlyFireDamage = allStates.reduce((sum, p) => sum + p.friendlyFireDamage, 0);
+    const amountHealed = allStates.reduce((sum, p) => sum + p.healingDone, 0);
+    const amountHealedByRegenerator = allStates.reduce((sum, p) => sum + p.amountHealedByRegenerator, 0);
 
     pokemonStats.push({
       name: pokemonSpecies,
@@ -800,6 +829,8 @@ export function parseShowdownLog(log: string): DraftResult | null {
       indirectDamageTaken,
       totalDamageTaken,
       friendlyFireDamage,
+      amountHealed,
+      amountHealedByRegenerator,
       damageDealtBySpikes: allStates.reduce((sum, p) => sum + p.damageDealtBySpikes, 0),
       damageDealtByStealthRock: allStates.reduce((sum, p) => sum + p.damageDealtByStealthRock, 0),
       damageDealtByPoison: allStates.reduce((sum, p) => sum + p.damageDealtByPoison, 0),

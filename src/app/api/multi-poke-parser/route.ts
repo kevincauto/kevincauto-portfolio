@@ -8,6 +8,8 @@ export interface AggregatedPokemonStats extends PokemonStats {
   totalDamageDealtPerGame: number;
   totalDamageTakenPerGame: number;
   kosPerFaint: number;
+  amountHealedPerGame: number;
+  amountRegeneratedPerGame: number;
 }
 
 /**
@@ -79,6 +81,8 @@ export async function POST(req: NextRequest) {
             directDamageDealt: 0, indirectDamageDealt: 0, totalDamageDealt: 0,
             directDamageTaken: 0, indirectDamageTaken: 0, totalDamageTaken: 0,
             friendlyFireDamage: 0,
+            amountHealed: 0,
+            amountHealedByRegenerator: 0,
             damageDealtBySpikes: 0, damageDealtByStealthRock: 0, damageDealtByPoison: 0,
             damageDealtByBurn: 0, damageDealtBySandstorm: 0, damageDealtByHail: 0,
             damageDealtByRockyHelmet: 0, damageDealtByContactAbility: 0,
@@ -89,6 +93,8 @@ export async function POST(req: NextRequest) {
             damageTakenBySacrificialMove: 0, damageTakenByRiskRewardMove: 0,
             kosPerGame: 0, totalDamageDealtPerGame: 0, totalDamageTakenPerGame: 0,
             kosPerFaint: 0,
+            amountHealedPerGame: 0,
+            amountRegeneratedPerGame: 0,
             damageDealtByLeechSeed: 0,
             damageTakenByLeechSeed: 0,
             damageDealtByCurse: 0,
@@ -112,6 +118,8 @@ export async function POST(req: NextRequest) {
         updatedStats.indirectDamageTaken += pokemon.indirectDamageTaken;
         updatedStats.totalDamageTaken += pokemon.totalDamageTaken;
         updatedStats.friendlyFireDamage += pokemon.friendlyFireDamage;
+        updatedStats.amountHealed += pokemon.amountHealed;
+        updatedStats.amountHealedByRegenerator += pokemon.amountHealedByRegenerator;
         updatedStats.damageDealtBySpikes += pokemon.damageDealtBySpikes;
         updatedStats.damageDealtByStealthRock += pokemon.damageDealtByStealthRock;
         updatedStats.damageDealtByPoison += pokemon.damageDealtByPoison;
@@ -153,6 +161,8 @@ export async function POST(req: NextRequest) {
         kosPerGame: gamesPlayed > 0 ? kos / gamesPlayed : 0,
         totalDamageDealtPerGame: gamesPlayed > 0 ? stats.totalDamageDealt / gamesPlayed : 0,
         totalDamageTakenPerGame: gamesPlayed > 0 ? stats.totalDamageTaken / gamesPlayed : 0,
+        amountHealedPerGame: gamesPlayed > 0 ? stats.amountHealed / gamesPlayed : 0,
+        amountRegeneratedPerGame: gamesPlayed > 0 ? stats.amountHealedByRegenerator / gamesPlayed : 0,
         kosPerFaint: fainted > 0 ? kos / fainted : kos, // Handle division by zero
       });
     }

@@ -6,7 +6,7 @@ import PokemonIcon from '../../components/PokemonIcon';
 import Image from 'next/image';
 
 const awardExplanations: { [key: string]: string } = {
-  "The KO Machine": "Most KOs",
+  "The KO Machine": "Most Knockouts",
   "Conductor of the Pain Train": "Most Damage Dealt",
   "Frank the Tank": "Most Damage Taken",
   "The Passive Aggressor": "Most Indirect Damage Dealt",
@@ -25,6 +25,8 @@ type PokemonStat = {
   indirectDamageTaken: number; 
   totalDamageTaken: number;
   friendlyFireDamage: number;
+  amountHealed: number;
+  amountHealedByRegenerator: number;
   // Granular indirect damage categories
   damageDealtBySpikes: number;
   damageDealtByStealthRock: number;
@@ -338,6 +340,8 @@ export default function PokeParserForm() {
                         {renderHeader('directDamageDealt', 'Direct Damage Dealt')}
                         {renderHeader('indirectDamageDealt', 'Indirect Damage Dealt')}
                         {renderHeader('friendlyFireDamage', 'Friendly Fire Dmg')}
+                        {renderHeader('amountHealed', 'Amount Healed')}
+                        {renderHeader('amountHealedByRegenerator', 'Amount Regenerated')}
                         {renderHeader('damageDealtBySpikes', 'Spikes')}
                         {renderHeader('damageDealtByStealthRock', 'Stealth Rock')}
                         {renderHeader('damageDealtByPoison', 'Poison')}
@@ -384,6 +388,8 @@ export default function PokeParserForm() {
                           <td className={sortField === 'directDamageDealt' ? styles.activeSort : ''}>{Math.round(pokemon.directDamageDealt)}%</td>
                           <td className={sortField === 'indirectDamageDealt' ? styles.activeSort : ''}>{Math.round(pokemon.indirectDamageDealt)}%</td>
                           <td className={sortField === 'friendlyFireDamage' ? styles.activeSort : ''}>{Math.round(pokemon.friendlyFireDamage)}%</td>
+                          <td className={sortField === 'amountHealed' ? styles.activeSort : ''}>{Math.round(pokemon.amountHealed)}%</td>
+                          <td className={sortField === 'amountHealedByRegenerator' ? styles.activeSort : ''}>{Math.round(pokemon.amountHealedByRegenerator)}%</td>
                           <td className={sortField === 'damageDealtBySpikes' ? styles.activeSort : ''}>{Math.round(pokemon.damageDealtBySpikes)}%</td>
                           <td className={sortField === 'damageDealtByStealthRock' ? styles.activeSort : ''}>{Math.round(pokemon.damageDealtByStealthRock)}%</td>
                           <td className={sortField === 'damageDealtByPoison' ? styles.activeSort : ''}>{Math.round(pokemon.damageDealtByPoison)}%</td>
