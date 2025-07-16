@@ -166,3 +166,13 @@ a.secondary {
     filter: invert();
   }
 }
+
+.contributionLink {
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease-in-out;
+}
+
+.contributionLink:hover {
+  transform: scale(1.02);
+}

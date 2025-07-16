@@ -1,0 +1,17 @@
+.container {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loading,
+.error {
+  margin-top: 2rem;
+  font-style: italic;
+  color: #666;
+}
+
+.error {
+  color: #c23b22;
+} 
