@@ -152,25 +152,6 @@ export default function PokeParserForm() {
     }
   }
 
-  function getSortedPokemonStats() {
-    if (!data?.pokemonStats) return [];
-    
-    return [...data.pokemonStats].sort((a, b) => {
-      let aValue: string | number = a[sortField];
-      let bValue: string | number = b[sortField];
-      
-      // Handle string comparison
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
-        aValue = aValue.toLowerCase();
-        bValue = bValue.toLowerCase();
-      }
-      
-      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-      return 0;
-    });
-  }
-
   const getRankedData = (): RankedPokemonStat[] => {
     if (!data?.pokemonStats) return [];
 

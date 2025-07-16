@@ -172,17 +172,38 @@
   z-index: 3;
 }
 
+.results__stats th:nth-child(2),
+.results__stats td:nth-child(2) {
+  position: -webkit-sticky;
+  position: sticky;
+  left: 80px; /* Adjust based on the width of the first column */
+  z-index: 1;
+}
+
+.results__stats th:nth-child(2) {
+  z-index: 3;
+}
+
 /* Sticky cells need a solid background */
-.results__stats tbody tr td:first-child {
+.results__stats tbody tr td:first-child,
+.results__stats tbody tr td:nth-child(2) {
   background-color: #1e1e1e;
 }
 
-.results__stats tbody tr:nth-child(odd) td:first-child {
+.results__stats tbody tr:nth-child(odd) td:first-child,
+.results__stats tbody tr:nth-child(odd) td:nth-child(2) {
   background-color: #222;
 }
 
-.results__stats tbody tr:hover td:first-child {
+.results__stats tbody tr:hover td:first-child,
+.results__stats tbody tr:hover td:nth-child(2) {
   background-color: #3c3c3c;
+}
+
+.rankHeader,
+.rankCell {
+  min-width: 80px;
+  width: 80px;
 }
 
 .activeSort {
