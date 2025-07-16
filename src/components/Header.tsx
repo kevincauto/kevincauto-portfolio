@@ -14,6 +14,9 @@ export default function Header() {
         <Link href="/multi-log-parser" className={styles.link}>
           Multi Parser
         </Link>
+        <Link href="/lease-editor" className={styles.link}>
+          Lease Editor
+        </Link>
       </nav>
     </header>
   );

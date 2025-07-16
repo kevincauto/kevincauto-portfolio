@@ -1,0 +1,93 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #1e1e1e;
+  border-radius: 8px;
+  border: 1px solid #333;
+}
+
+.fieldset {
+  border: 1px solid #444;
+  padding: 1.5rem;
+  border-radius: 6px;
+}
+
+.legend {
+  padding: 0 0.5rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #e0e0e0;
+}
+
+.propertyToggle {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.toggleButton {
+  padding: 0.8rem 1.2rem;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background-color: #2c2c2c;
+  color: #ccc;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.toggleButton:hover {
+  background-color: #3a3a3a;
+  border-color: #777;
+}
+
+.toggleButton.active {
+  background-color: #ffb400;
+  color: #1a1a1a;
+  border-color: #ffb400;
+  font-weight: bold;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.checkboxGrid {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.checkboxWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkboxWrapper input {
+  width: 18px;
+  height: 18px;
+}
+
+.button {
+  padding: 0.8rem 1.5rem;
+  border-radius: 6px;
+  border: none;
+  background-color: #ffb400;
+  color: #1a1a1a;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  align-self: flex-end;
+}
+
+.button:hover {
+  background-color: #ffc733;
+} 

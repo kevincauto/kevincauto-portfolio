@@ -1,0 +1,110 @@
+'use client';
+
+import { useState } from 'react';
+import styles from './LeaseEditorForm.module.css';
+import FormInput from '../FormInput';
+
+interface Property {
+  id: number;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+}
+
+const properties: Property[] = [
+  { id: 1, address: '900 E Hector St', city: 'Conshohocken', state: 'PA', zip: '19428' },
+  { id: 2, address: '503 E 9th Ave', city: 'Conshohocken', state: 'PA', zip: '19428' },
+  { id: 3, address: '224 Maple St', city: 'Conshohocken', state: 'PA', zip: '19428' },
+];
+
+export default function LeaseEditorForm() {
+  const [selectedProperty, setSelectedProperty] = useState<Property>(properties[0]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Form submission logic will go here
+    console.log('Generating lease for:', selectedProperty);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className={styles.form}>
+      <fieldset className={styles.fieldset}>
+        <legend className={styles.legend}>Select a Property</legend>
+        <div className={styles.propertyToggle}>
+          {properties.map((prop) => (
+            <button
+              key={prop.id}
+              type="button"
+              className={`${styles.toggleButton} ${
+                selectedProperty.id === prop.id ? styles.active : ''
+              }`}
+              onClick={() => setSelectedProperty(prop)}
+            >
+              {prop.address}
+            </button>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset className={styles.fieldset}>
+        <legend className={styles.legend}>Tenant Information</legend>
+        <div className={styles.grid}>
+          <FormInput label="Tenant Full Name" name="tenantName" required />
+          <FormInput label="Tenant Email" name="tenantEmail" type="email" placeholder="tenant@example.com" required />
+          <FormInput label="Tenant Phone Number" name="tenantPhone" type="tel" placeholder="123-456-7890" required />
+        </div>
+      </fieldset>
+
+      <fieldset className={styles.fieldset}>
+        <legend className={styles.legend}>Lease Term & Financials</legend>
+        <div className={styles.grid}>
+          <FormInput label="Lease Start Date" name="startDate" type="date" required />
+          <FormInput label="Lease End Date" name="endDate" type="date" required />
+          <FormInput label="Monthly Rent" name="monthlyRent" type="number" placeholder="2000" required />
+          <FormInput label="Security Deposit" name="securityDeposit" type="number" placeholder="2000" required />
+        </div>
+      </fieldset>
+
+      <fieldset className={styles.fieldset}>
+        <legend className={styles.legend}>Property Features</legend>
+        <div className={styles.checkboxGrid}>
+          <div className={styles.checkboxWrapper}>
+            <input type="checkbox" id="includesBasement" name="includesBasement" />
+            <label htmlFor="includesBasement">Includes Basement</label>
+          </div>
+          <div className={styles.checkboxWrapper}>
+            <input type="checkbox" id="includesDeck" name="includesDeck" />
+            <label htmlFor="includesDeck">Includes Deck</label>
+          </div>
+          <div className={styles.checkboxWrapper}>
+            <input type="checkbox" id="includesPorch" name="includesPorch" />
+            <label htmlFor="includesPorch">Includes Porch</label>
+          </div>
+          <div className={styles.checkboxWrapper}>
+            <input type="checkbox" id="includesGarage" name="includesGarage" />
+            <label htmlFor="includesGarage">Includes Garage</label>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset className={styles.fieldset}>
+        <legend className={styles.legend}>Added Amenities</legend>
+        <div className={styles.checkboxGrid}>
+          <div className={styles.checkboxWrapper}>
+            <input type="checkbox" id="maidService" name="maidService" />
+            <label htmlFor="maidService">Maid Service</label>
+          </div>
+          <div className={styles.checkboxWrapper}>
+            <input type="checkbox" id="privateParking" name="privateParking" />
+            <label htmlFor="privateParking">Private Parking</label>
+          </div>
+        </div>
+      </fieldset>
+
+      <button type="submit" className={styles.button}>
+        Generate Lease
+      </button>
+    </form>
+  );
+} 
