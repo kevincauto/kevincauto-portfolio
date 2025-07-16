@@ -16,9 +16,10 @@ const awardExplanations: { [key: string]: string } = {
   "The KO Machine": "Most Knockouts",
 };
 
-type SortField = keyof AggregatedPokemonStats;
+type DisplayPokemonStats = AggregatedPokemonStats & { winPercentage: number };
+type SortField = keyof DisplayPokemonStats;
 type SortDirection = 'asc' | 'desc';
-type RankedPokemonStats = AggregatedPokemonStats & { rank: number };
+type RankedPokemonStats = DisplayPokemonStats & { rank: number };
 
 // A new component for displaying the results
 function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
@@ -35,7 +36,12 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
   };
 
   const getRankedData = (): RankedPokemonStats[] => {
-    const sorted = [...data].sort((a, b) => {
+    const dataWithWinPercentage: DisplayPokemonStats[] = data.map(pokemon => ({
+      ...pokemon,
+      winPercentage: pokemon.gamesPlayed > 0 ? (pokemon.won / pokemon.gamesPlayed) * 100 : 0,
+    }));
+
+    const sorted = [...dataWithWinPercentage].sort((a, b) => {
       const aValue = a[sortField];
       const bValue = b[sortField];
 
@@ -124,6 +130,7 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
               {renderHeader('name', 'Pokémon')}
               {renderHeader('gamesPlayed', 'GP')}
               {renderHeader('won', 'Wins')}
+              {renderHeader('winPercentage', 'Win %')}
               {renderHeader('kos', 'KOs')}
               {renderHeader('kosPerGame', 'KOs/Game')}
               {renderHeader('fainted', 'Faints')}
@@ -184,6 +191,7 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
                 </td>
                 <td className={sortField === 'gamesPlayed' ? styles.activeSort : ''}>{pokemon.gamesPlayed}</td>
                 <td className={sortField === 'won' ? styles.activeSort : ''}>{pokemon.won}</td>
+                <td className={sortField === 'winPercentage' ? styles.activeSort : ''}>{pokemon.winPercentage.toFixed(1)}%</td>
                 <td className={sortField === 'kos' ? styles.activeSort : ''}>{pokemon.kos}</td>
                 <td className={sortField === 'kosPerGame' ? styles.activeSort : ''}>{pokemon.kosPerGame.toFixed(2)}</td>
                 <td className={sortField === 'fainted' ? styles.activeSort : ''}>{pokemon.fainted}</td>
