@@ -5,6 +5,10 @@
   align-items: center;
 }
 
+.title {
+  margin-bottom: 1rem;
+}
+
 .loading,
 .error {
   margin-top: 2rem;

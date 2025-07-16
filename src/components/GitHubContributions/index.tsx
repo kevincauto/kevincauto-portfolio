@@ -72,7 +72,7 @@ const GitHubContributions = () => {
 
   return (
     <div className={styles.container}>
-      <h2>{totalContributions} GitHub contributions in the last year</h2>
+      <h2 className={styles.title}>{totalContributions} GitHub contributions in the last year</h2>
       <ActivityCalendar
         data={data}
         theme={{
