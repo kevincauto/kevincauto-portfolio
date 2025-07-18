@@ -1,4 +1,4 @@
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, Footer } from 'docx';
+import { Document, Packer, Paragraph, TextRun, AlignmentType, Footer, PageOrientation } from 'docx';
 import { saveAs } from 'file-saver';
 
 export interface LeaseData {
@@ -15,10 +15,8 @@ export interface LeaseData {
   endDate: string;
   monthlyRent: number;
   securityDeposit: number;
-  includesBasement: boolean;
-  includesDeck: boolean;
-  includesPorch: boolean;
-  includesGarage: boolean;
+  roomName: string;
+  bathroom: string;
   maidService: boolean;
   privateParking: boolean;
 }
@@ -50,13 +48,73 @@ export const generateLease = async (data: LeaseData) => {
   
   const nextMonthDate = new Date(localStartDate);
   nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
+  nextMonthDate.setDate(1);
   const nextMonthPaymentDate = nextMonthDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
   const firstMonthName = localStartDate.toLocaleString('en-US', { month: 'long' });
 
 
+  const startDay = localStartDate.getDate();
+  const endDayOfMonth = new Date(localStartDate.getFullYear(), localStartDate.getMonth() + 1, 0).getDate();
+  const endDayOfLease = localEndDate.getDate();
+  
+  const isFullFirstMonth = startDay === 1 && endDayOfLease === endDayOfMonth;
+  
+  let firstMonthRentText = `${firstMonthName} rent`;
+  let firstMonthRentAmount = data.monthlyRent;
+  
+  if (!isFullFirstMonth && localStartDate.getFullYear() === localEndDate.getFullYear() && localStartDate.getMonth() === localEndDate.getMonth()) {
+      const leasedDays = endDayOfLease - startDay + 1;
+      const proratedAmount = (leasedDays / endDayOfMonth) * data.monthlyRent;
+      firstMonthRentAmount = Math.floor(proratedAmount);
+      firstMonthRentText = `${firstMonthName} prorated rent`;
+  }
+  
+  const totalPaidPriorToMoveIn = firstMonthRentAmount + data.securityDeposit;
+  
+  const storageArea = data.property.address === '900 E Hector St' ? 'basement' : 'garage';
+  const outdoorArea = data.property.address === '900 E Hector St' ? 'porch' : 'deck';
+
+
   const doc = new Document({
+    numbering: {
+        config: [
+            {
+                reference: 'rent-numbering',
+                levels: [
+                    {
+                        level: 0,
+                        format: 'decimal',
+                        text: '%1.',
+                        style: {
+                            paragraph: {
+                                indent: { left: 720, hanging: 360 },
+                            },
+                        },
+                    },
+                    {
+                        level: 1,
+                        format: 'bullet',
+                        text: '•',
+                        style: {
+                            paragraph: {
+                                indent: { left: 1440, hanging: 360 },
+                            },
+                        },
+                    },
+                ],
+            },
+        ],
+    },
     sections: [{
-      properties: {},
+      properties: {
+        page: {
+          size: {
+            orientation: PageOrientation.PORTRAIT,
+            width: 8.5 * 72 * 20, // Letter width in twips
+            height: 11 * 72 * 20, // Letter height in twips
+          },
+        },
+      },
       footers: {
         default: new Footer({
           children: [
@@ -69,9 +127,14 @@ export const generateLease = async (data: LeaseData) => {
       },
       children: [
         new Paragraph({
-          text: 'Lease Agreement',
-          heading: HeadingLevel.TITLE,
           alignment: AlignmentType.CENTER,
+          children: [
+            new TextRun({
+              text: 'Lease Agreement',
+              size: 36, // 18pt
+              bold: true,
+            }),
+          ],
         }),
         br(),
 
@@ -87,16 +150,16 @@ export const generateLease = async (data: LeaseData) => {
         new Paragraph({ children: [b('CONTACT INFORMATION: '), t(`LANDLORD’s Current Phone Number: ${formatPhoneNumber(landlordPhone)}. TENANT’s Current Phone Number: ${formatPhoneNumber(data.tenantPhone)}. LANDLORD’s Current Email Address: ${landlordEmail}. TENANT’s Current Email Address: ${data.tenantEmail}. TENANT shall notify the LANDLORD of any change to their telephone number or email immediately, if there is a change.`)]}),
         br(),
         
-        new Paragraph({ children: [b('BEDROOM: '), t('The TENANT will occupy the second floor bedroom. The TENANT is prohibited from entering any other bedroom. This bedroom is unfurnished and is single-occupancy.')]}),
+        new Paragraph({ children: [b('BEDROOM: '), t(`The TENANT will occupy the ${data.roomName}. The TENANT is prohibited from entering any other bedroom. This bedroom is unfurnished and is single-occupancy.`)]}),
         br(),
 
-        new Paragraph({ children: [b('BATHROOM: '), t('The TENANT may use the second floor shared bathroom or the main floor shared bathroom.')]}),
+        new Paragraph({ children: [b('BATHROOM: '), t(`The TENANT may use the ${data.bathroom} or the main floor half bathroom.`)]}),
         br(),
 
         new Paragraph({ children: [b('HOUSEMATE/HOUSEHOLD RULES: '), t('TENANT understands they will be sharing the Premises with several other housemates. TENANT will be respectful and amicable towards other housemates. The TENANT will not use, consume, or touch other housemates’ property, food, or possessions without permission. TENANT acknowledges that housemates will move-out over time and they will be replaced by new housemates selected by the LANDLORD.')]}),
         br(),
 
-        new Paragraph({ children: [b('CLEAN SHARED AREAS: '), t('The living room, kitchen, and deck is to be shared by all housemates and kept in a clean condition.  Personal items should not be left on the main floor.  Shoes should be removed immediately upon entering the Premises.')]}),
+        new Paragraph({ children: [b('CLEAN SHARED AREAS: '), t(`The living room, kitchen, and ${outdoorArea} is to be shared by all housemates and kept in a clean condition.  Personal items should not be left on the main floor.  Shoes should be removed immediately upon entering the Premises.`)]}),
         br(),
 
         new Paragraph({ children: [b('KITCHEN RULES: '), t('TENANT will clean up after cooking and eating.  TENANT will not leave dirty dishes in the sink, but rather place them in the dishwasher or hand-wash them. Communal kitchen items like pots, pans, and spatulas need to be hand-washed right after use so others can use them.  Hand-washed items should be dried and put away immediately.')]}),
@@ -113,30 +176,44 @@ export const generateLease = async (data: LeaseData) => {
         
         new Paragraph({ children: [b('RENT: '), t('The following terms apply to the rent payment for this Lease.')]}),
         new Paragraph({
-          children: [t(`\t1. RENT AMOUNT: The rent for the Premises will be $${data.monthlyRent} per month. This amount includes utilities, internet, and cleaning service of the shared spaces.`)],
+          children: [b('RENT AMOUNT: '), t(`The rent for the Premises will be $${data.monthlyRent} per month. This amount includes utilities, internet, and cleaning service of the shared spaces.`)],
+          numbering: { reference: 'rent-numbering', level: 0 },
         }),
         new Paragraph({
-            children: [t(`\t2. PARKING: TENANT’s rent amount does ${data.privateParking ? '' : 'not '}include private parking.`)],
+            children: [b('PARKING: '), t(`TENANT’s rent amount does ${data.privateParking ? '' : 'not '}include private parking.`)],
+            numbering: { reference: 'rent-numbering', level: 0 },
         }),
         new Paragraph({
-            children: [t(`\t3. MONEY PAID PRIOR TO MOVE-IN: Total: $${data.monthlyRent + data.securityDeposit}`)],
+            children: [b('MONEY PAID PRIOR TO MOVE-IN: '), t(`Total: $${totalPaidPriorToMoveIn}`)],
+            numbering: { reference: 'rent-numbering', level: 0 },
         }),
-        new Paragraph({ text: `\t\t* $${data.securityDeposit} for the deposit-to-hold/security deposit (due within 48 hours of lease signing)`}),
-        new Paragraph({ text: `\t\t* $${data.monthlyRent} for ${firstMonthName} rent (due before ${startDate})`}),
-        new Paragraph({
-            children: [t(`\t4. NEXT MONTH’S PAYMENT: The next payment is due on ${nextMonthPaymentDate} in the amount of $${data.monthlyRent}.`)],
+        new Paragraph({ 
+            text: `$${data.securityDeposit} for the deposit-to-hold/security deposit (due within 48 hours of lease signing)`,
+            numbering: { reference: 'rent-numbering', level: 1 },
         }),
-        new Paragraph({
-            children: [t('\t5. DUE DATE/LATE FEE: Rent (including, without limitation, any other fees) shall be due on or before the 1st day of each month in advance, without notice or demand, and without deduction or offset. Monthly rent payments must be received no later than the end of the “grace period” which is the 5th day of the month. (Weekends or holidays occurring within those days shall not be added to the grace period.) If a monthly rent payment is received after the grace period, it shall be late and the TENANT shall be charged a late charge of $100 with an additional charge of $10 for each day the rent is not paid after the grace period until rent has been paid in full including late fee billing. Late fees and all other balances due with rent shall be considered rent as due. Payment must be received no later than 11:59pm on the last day of the grace period. This late charge is due with the monthly rent payment. Bad health, reduced hours at work, the loss of job, financial emergency or other circumstances will not excuse any late rent payments. The foregoing of late fees and charges shall not be construed as a waiver by LANDLORD of its right to declare a default under this Lease.')],
-        }),
-        new Paragraph({
-            children: [t('\t6. EVICTION NOTICE: Should the TENANT fail to pay rent by the due date, LANDLORD may terminate the month-to-month lease at the end of the current month in accordance with Pennsylvania law. Any eviction proceedings will be conducted in compliance with the Pennsylvania Landlord and Tenant Act, including any required notice periods. LANDLORD may serve an eviction notice as required by applicable Pennsylvania law, and TENANT agrees to vacate the Premises within the legally prescribed time frame.')],
+        new Paragraph({ 
+            text: `$${firstMonthRentAmount} for ${firstMonthRentText} (due before ${startDate})`,
+            numbering: { reference: 'rent-numbering', level: 1 },
         }),
         new Paragraph({
-            children: [t('\t7. PAYMENT METHOD:  All payments should be made using the Innago.com invoice system. Please note that there is a fee to use this service. This will be an approximate $2 fee to use the ACH payment system or approximately a 2.99% fee for credit card use.  Any other payment type needs to be approved by the LANDLORD in writing or email.')],
+            children: [b('NEXT MONTH’S PAYMENT: '), t(`The next payment is due on ${nextMonthPaymentDate} in the amount of $${data.monthlyRent}.`)],
+            numbering: { reference: 'rent-numbering', level: 0 },
         }),
         new Paragraph({
-            children: [t('\t8. PARTIAL PAYMENT: LANDLORD’s acceptance of any partial rent payment shall not waive LANDLORD’s right to require immediate payment of the unpaid balance of rent, or waive or affect LANDLORD’s rights with respect to any remaining unpaid rent.')],
+            children: [b('DUE DATE/LATE FEE: '), t('Rent (including, without limitation, any other fees) shall be due on or before the 1st day of each month in advance, without notice or demand, and without deduction or offset. Monthly rent payments must be received no later than the end of the “grace period” which is the 5th day of the month. (Weekends or holidays occurring within those days shall not be added to the grace period.) If a monthly rent payment is received after the grace period, it shall be late and the TENANT shall be charged a late charge of $100 with an additional charge of $10 for each day the rent is not paid after the grace period until rent has been paid in full including late fee billing. Late fees and all other balances due with rent shall be considered rent as due. Payment must be received no later than 11:59pm on the last day of the grace period. This late charge is due with the monthly rent payment. Bad health, reduced hours at work, the loss of job, financial emergency or other circumstances will not excuse any late rent payments. The foregoing of late fees and charges shall not be construed as a waiver by LANDLORD of its right to declare a default under this Lease.')],
+            numbering: { reference: 'rent-numbering', level: 0 },
+        }),
+        new Paragraph({
+            children: [b('EVICTION NOTICE: '), t('Should the TENANT fail to pay rent by the due date, LANDLORD may terminate the month-to-month lease at the end of the current month in accordance with Pennsylvania law. Any eviction proceedings will be conducted in compliance with the Pennsylvania Landlord and Tenant Act, including any required notice periods. LANDLORD may serve an eviction notice as required by applicable Pennsylvania law, and TENANT agrees to vacate the Premises within the legally prescribed time frame.')],
+            numbering: { reference: 'rent-numbering', level: 0 },
+        }),
+        new Paragraph({
+            children: [b('PAYMENT METHOD:  '), t('All payments should be made using the Innago.com invoice system. Please note that there is a fee to use this service. This will be an approximate $2 fee to use the ACH payment system or approximately a 2.99% fee for credit card use.  Any other payment type needs to be approved by the LANDLORD in writing or email.')],
+            numbering: { reference: 'rent-numbering', level: 0 },
+        }),
+        new Paragraph({
+            children: [b('PARTIAL PAYMENT: '), t('LANDLORD’s acceptance of any partial rent payment shall not waive LANDLORD’s right to require immediate payment of the unpaid balance of rent, or waive or affect LANDLORD’s rights with respect to any remaining unpaid rent.')],
+            numbering: { reference: 'rent-numbering', level: 0 },
         }),
         br(),
 
@@ -146,10 +223,10 @@ export const generateLease = async (data: LeaseData) => {
         new Paragraph({ children: [b('SECURITY DEPOSIT: '), t(`Contemporaneously with the execution of this Lease, TENANT shall deposit with LANDLORD a security deposit in the amount of $${data.securityDeposit}. The deposit will be returned to TENANT within the lesser of (i) sixty (60) days after the expiration of the term of this Lease or (ii) the maximum time period allowed by Pennsylvania law. Deductions from the security deposit will be itemized in writing and provided to the TENANT. Acceptable deductions include, but are not limited to: Unpaid rent, utilities, or other outstanding balances; Excessive damage beyond normal wear and tear (e.g., holes in walls, broken fixtures, stained carpets); Cleaning fees if the unit is left in an unsanitary condition; Costs associated with abandoned property removal. If the security deposit is held for more than two (2) years, it will be placed in an interest-bearing escrow account as required by Pennsylvania law.`)]}),
         br(),
 
-        new Paragraph({ children: [b('FURNISHINGS AND APPLIANCES: '), t('The following appliances are supplied with the Premises: Refrigerator, Stove, Dishwasher, Washer, Dryer, and Microwave,. TENANT agrees to keep the appliances they use in good condition. Supplied appliances may not be removed.  Furniture and decor in the main level will be supplied solely by the LANDLORD unless otherwise expressed by the LANDLORD.  No furniture may be added to the first floor without the LANDLORD’s approval. Televisions, electronics, or other devices may not be added to the shared common space. LANDLORD can remove furniture, televisions, and electronics from the first floor. Storage of large items in the garage is at the LANDLORD’s discretion. The LANDLORD is not liable for any damage done to TENANT’s items while stored in the garage by moisture, dust, pests, or otherwise.')]}),
+        new Paragraph({ children: [b('FURNISHINGS AND APPLIANCES: '), t(`The following appliances are supplied with the Premises: Refrigerator, Stove, Dishwasher, Washer, Dryer, and Microwave,. TENANT agrees to keep the appliances they use in good condition. Supplied appliances may not be removed.  Furniture and decor in the main level will be supplied solely by the LANDLORD unless otherwise expressed by the LANDLORD.  No furniture may be added to the first floor without the LANDLORD’s approval. Televisions, electronics, or other devices may not be added to the shared common space. LANDLORD can remove furniture, televisions, and electronics from the first floor. Storage of large items in the ${storageArea} is at the LANDLORD’s discretion. The LANDLORD is not liable for any damage done to TENANT’s items while stored in the ${storageArea} by moisture, dust, pests, or otherwise.`)]}),
         br(),
 
-        new Paragraph({ children: [b('GUESTS: '), t('The TENANT’s room is single-occupancy and may only have one person, the TENANT, living there. No other person may live in the second floor bedroom.  Overnight guests are allowed, but should not live at the Premises. Guests must abide by all applicable terms and conditions of this Lease, including any rules and regulations applicable to the Premises. Guest(s) should not sleep in the common area. If the TENANT has a guest or combination of guests staying more than eight (8) days within any thirty (30) day period, it is considered a violation of the lease agreement.')]}),
+        new Paragraph({ children: [b('GUESTS: '), t(`The TENANT’s room is single-occupancy and may only have one person, the TENANT, living there. No other person may live in the ${data.roomName}.  Overnight guests are allowed, but should not live at the Premises. Guests must abide by all applicable terms and conditions of this Lease, including any rules and regulations applicable to the Premises. Guest(s) should not sleep in the common area. If the TENANT has a guest or combination of guests staying more than eight (8) days within any thirty (30) day period, it is considered a violation of the lease agreement.`)]}),
         br(),
 
         new Paragraph({ children: [b('PREMISES USE: '), t('TENANT shall not use the Premises, nor any neighboring premises, for any illegal purpose, or for any other purpose than that of a residence. TENANT agrees to comply with and abide by all federal, state, county and municipal laws and ordinances in connection with TENANT’s occupancy and use of the Premises. No illegal drugs or controlled substances (unless specifically prescribed by a physician for a specific person residing or present on the Premises) are permitted on the Premises. No hazardous or dangerous activities are permitted on the Premises. TENANT  is to stay off the roof.  Absolutely no illegal drug use, public disturbances, physical abuse, verbal abuse, threats, pets, animals, firearms, or smoking is permitted on Premises. Any violations of the foregoing paragraph shall be an immediate and incurable default of this Lease and shall be cause for ending the lease or eviction.')]}),

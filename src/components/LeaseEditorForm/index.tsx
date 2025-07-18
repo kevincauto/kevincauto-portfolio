@@ -27,15 +27,14 @@ export default function LeaseEditorForm() {
     tenantPhone: '',
     startDate: '',
     endDate: '',
-    monthlyRent: 2000,
-    securityDeposit: 2000,
-    includesBasement: false,
-    includesDeck: false,
-    includesPorch: false,
-    includesGarage: false,
+    monthlyRent: '2000',
+    securityDeposit: '2000',
+    roomName: '',
+    bathroom: '',
     maidService: false,
     privateParking: false,
   });
+  const [dateError, setDateError] = useState('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -55,19 +54,40 @@ export default function LeaseEditorForm() {
         }));
       }
     } else {
-      const isNumeric = name === 'monthlyRent' || name === 'securityDeposit';
       setFormData((prev) => ({
         ...prev,
-        [name]: type === 'checkbox' ? checked : isNumeric ? parseFloat(value) || 0 : value,
+        [name]: type === 'checkbox' ? checked : value,
       }));
+    }
+    if (name === 'startDate' || name === 'endDate') {
+      setDateError('');
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const startDate = new Date(formData.startDate);
+    const endDate = new Date(formData.endDate);
+
+    if (endDate < startDate) {
+      setDateError('End Date cannot be before Start Date.');
+      return;
+    }
+
     const leaseData: LeaseData = {
       property: selectedProperty,
-      ...formData,
+      tenantName: formData.tenantName,
+      tenantEmail: formData.tenantEmail,
+      tenantPhone: formData.tenantPhone,
+      startDate: formData.startDate,
+      endDate: formData.endDate,
+      monthlyRent: parseFloat(formData.monthlyRent) || 0,
+      securityDeposit: parseFloat(formData.securityDeposit) || 0,
+      roomName: formData.roomName,
+      bathroom: formData.bathroom,
+      maidService: formData.maidService,
+      privateParking: formData.privateParking,
     };
     generateLease(leaseData);
   };
@@ -102,6 +122,12 @@ export default function LeaseEditorForm() {
       </fieldset>
 
       <fieldset className={styles.fieldset}>
+        <legend className={styles.legend}>Room Information</legend>
+        <FormInput label="Room Name" name="roomName" placeholder="e.g., Second Floor Bedroom" onChange={handleInputChange} value={formData.roomName} required />
+        <FormInput label="Bathroom" name="bathroom" placeholder="e.g., second floor shared bathroom" onChange={handleInputChange} value={formData.bathroom} required />
+      </fieldset>
+
+      <fieldset className={styles.fieldset}>
         <legend className={styles.legend}>Lease Term & Financials</legend>
         <div className={styles.grid}>
           <FormInput label="Lease Start Date" name="startDate" type="date" onChange={handleInputChange} value={formData.startDate} required />
@@ -109,28 +135,7 @@ export default function LeaseEditorForm() {
           <FormInput label="Monthly Rent" name="monthlyRent" type="number" placeholder="2000" onChange={handleInputChange} value={formData.monthlyRent} required />
           <FormInput label="Security Deposit" name="securityDeposit" type="number" placeholder="2000" onChange={handleInputChange} value={formData.securityDeposit} required />
         </div>
-      </fieldset>
-
-      <fieldset className={styles.fieldset}>
-        <legend className={styles.legend}>Property Features</legend>
-        <div className={styles.checkboxGrid}>
-          <div className={styles.checkboxWrapper}>
-            <input type="checkbox" id="includesBasement" name="includesBasement" onChange={handleInputChange} checked={formData.includesBasement} />
-            <label htmlFor="includesBasement">Includes Basement</label>
-          </div>
-          <div className={styles.checkboxWrapper}>
-            <input type="checkbox" id="includesDeck" name="includesDeck" onChange={handleInputChange} checked={formData.includesDeck} />
-            <label htmlFor="includesDeck">Includes Deck</label>
-          </div>
-          <div className={styles.checkboxWrapper}>
-            <input type="checkbox" id="includesPorch" name="includesPorch" onChange={handleInputChange} checked={formData.includesPorch} />
-            <label htmlFor="includesPorch">Includes Porch</label>
-          </div>
-          <div className={styles.checkboxWrapper}>
-            <input type="checkbox" id="includesGarage" name="includesGarage" onChange={handleInputChange} checked={formData.includesGarage} />
-            <label htmlFor="includesGarage">Includes Garage</label>
-          </div>
-        </div>
+        {dateError && <p className={styles.errorText}>{dateError}</p>}
       </fieldset>
 
       <fieldset className={styles.fieldset}>
