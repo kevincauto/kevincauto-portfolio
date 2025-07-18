@@ -8,6 +8,9 @@ interface FormInputProps {
   type?: string;
   placeholder?: string;
   required?: boolean;
+  value: string | number;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  maxLength?: number;
 }
 
 export default function FormInput({
@@ -16,6 +19,9 @@ export default function FormInput({
   type = 'text',
   placeholder,
   required = false,
+  value,
+  onChange,
+  maxLength,
 }: FormInputProps) {
   return (
     <div className={styles.inputGroup}>
@@ -29,6 +35,9 @@ export default function FormInput({
         placeholder={placeholder}
         required={required}
         className={styles.input}
+        value={value}
+        onChange={onChange}
+        maxLength={maxLength}
       />
     </div>
   );
