@@ -475,6 +475,82 @@ export function parseShowdownLog(log: string): DraftResult | null {
       if (moveName === 'Doom Desire') battle.doomDesireAttacker = atkKey;
     }
 
+    if (line.startsWith('|-mega|')) {
+      const megaParts = line.split('|');
+      const megaField = megaParts[2];
+      const oldSpecies = cleanSpeciesName(megaParts[3]);
+      const side = sideOfNick(megaField);
+      const slot = megaField.split(':')[0];
+      
+      const prevLine = lines[idx - 1];
+      if (prevLine && prevLine.startsWith('|detailschange|')) {
+        const detailsParts = prevLine.split('|');
+        const detailsField = detailsParts[2];
+        const newSpecies = cleanSpeciesName(detailsParts[3]);
+
+        if (detailsField === megaField) {
+          const activeSpeciesInSlot = activePokemonInSlot[slot];
+
+          if (activeSpeciesInSlot === oldSpecies) {
+            const oldKey = getPokemonKey(side, oldSpecies);
+            const newKey = getPokemonKey(side, newSpecies);
+            const oldMonState = battle.pokemon[oldKey];
+
+            if (oldMonState) {
+              battle.pokemon[newKey] = oldMonState;
+              delete battle.pokemon[oldKey];
+              battle.pokemon[newKey].species = newSpecies;
+              activePokemonInSlot[slot] = newSpecies;
+
+              const team = side === 'p1' ? p1Team : p2Team;
+              const index = team.indexOf(oldSpecies);
+              if (index !== -1) {
+                team[index] = newSpecies;
+              }
+              
+              Object.values(battle.pokemon).forEach(pState => {
+                if (pState.lastAttacker === oldKey) pState.lastAttacker = newKey;
+                if (pState.statusBy === oldKey) pState.statusBy = newKey;
+                if (pState.trickedBy === oldKey) pState.trickedBy = newKey;
+              });
+
+              for (const s of ['p1', 'p2'] as SideID[]) {
+                if (battle.hazards[s].spikesSetter === oldKey) battle.hazards[s].spikesSetter = newKey;
+                if (battle.hazards[s].stealthRockSetter === oldKey) battle.hazards[s].stealthRockSetter = newKey;
+                if (battle.hazards[s].toxicSpikesSetter === oldKey) battle.hazards[s].toxicSpikesSetter = newKey;
+              }
+              
+              if (battle.sandstormSetter === oldKey) battle.sandstormSetter = newKey;
+              if (battle.hailSetter === oldKey) battle.hailSetter = newKey;
+              if (battle.rainSetter === oldKey) battle.rainSetter = newKey;
+              if (battle.sunSetter === oldKey) battle.sunSetter = newKey;
+
+              if (battle.leechSeedUsers.has(oldKey)) {
+                battle.leechSeedUsers.delete(oldKey);
+                battle.leechSeedUsers.add(newKey);
+              }
+
+              if (battle.futureSightAttacker === oldKey) battle.futureSightAttacker = newKey;
+              if (battle.doomDesireAttacker === oldKey) battle.doomDesireAttacker = newKey;
+              
+              if (lastHit[oldKey]) {
+                lastHit[newKey] = lastHit[oldKey];
+                delete lastHit[oldKey];
+              }
+              if (lastMoveUsed[oldKey]) {
+                lastMoveUsed[newKey] = lastMoveUsed[oldKey];
+                delete lastMoveUsed[oldKey];
+              }
+              if (faintedPokemon[oldKey]) {
+                faintedPokemon[newKey] = faintedPokemon[oldKey];
+                delete faintedPokemon[oldKey];
+              }
+            }
+          }
+        }
+      }
+    }
+
     if (line.startsWith('|-status|')) {
       const parts = line.split('|')
       const targetField = parts[2]
