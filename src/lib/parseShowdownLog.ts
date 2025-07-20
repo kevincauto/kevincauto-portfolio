@@ -849,16 +849,19 @@ export function parseShowdownLog(log: string): DraftResult | null {
             attackerState.kos++;
           }
         } else if (victimState.faintedByDirectHit === false) {
-         const attackerKey = victimState.lastAttacker;
-         if (attackerKey) {
-           const attackerState = battle.pokemon[attackerKey];
-           if (attackerState && attackerKey !== key) {
-             kos.push({
-               attacker: attackerState.species,
-               victim: victimState.species,
-               hazard: victimState.faintCause,
-             });
-             attackerState.kos++;
+         const selfKOCauses = new Set(['Sacrificial Move', 'Recoil', 'Life Orb', 'CurseSelf', 'Risk Reward Move', 'Substitute']);
+         if (!selfKOCauses.has(victimState.faintCause || '')) {
+           const attackerKey = victimState.lastAttacker;
+           if (attackerKey) {
+             const attackerState = battle.pokemon[attackerKey];
+             if (attackerState && attackerKey !== key) {
+               kos.push({
+                 attacker: attackerState.species,
+                 victim: victimState.species,
+                 hazard: victimState.faintCause,
+               });
+               attackerState.kos++;
+             }
            }
          }
         }
