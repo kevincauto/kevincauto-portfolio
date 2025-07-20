@@ -6,6 +6,8 @@ import PokemonIcon from '../../components/PokemonIcon';
 import Image from 'next/image';
 
 const awardExplanations: { [key: string]: string } = {
+  'Glaceon Award (Did Nothing)': 'This Pokémon did not deal or receive any damage, and did not faint.',
+  'Shuckle Award (Took a Beating)': 'This Pokémon received the most total damage.',
   "The KO Machine": "Most Knockouts",
   "Conductor of the Pain Train": "Most Damage Dealt",
   "Frank the Tank": "Most Damage Taken",
@@ -113,6 +115,18 @@ export default function PokeParserForm() {
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
+  const normalizeUrl = (inputUrl: string): string => {
+    let normalized = inputUrl.trim();
+    if (normalized.startsWith('https://play.pokemonshowdown.com/')) {
+      normalized = normalized.replace('play.pokemonshowdown.com/', 'replay.pokemonshowdown.com/');
+      normalized = normalized.replace('/battle-', '/');
+    }
+    if (!normalized.endsWith('.log')) {
+      normalized += '.log';
+    }
+    return normalized;
+  };
+
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
@@ -120,18 +134,22 @@ export default function PokeParserForm() {
     setData(null);
 
     try {
-      const res = await fetch('/api/poke-parser', {
+      const normalizedUrl = normalizeUrl(url);
+      const response = await fetch('/api/poke-parser', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url: normalizedUrl }),
       });
 
-      const responseData = await res.json();
-      
-      if (!res.ok) {
-        throw new Error(responseData.message ?? 'Unknown server error');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
+      const responseData = await response.json();
+      
       setData(responseData.parsed);
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);

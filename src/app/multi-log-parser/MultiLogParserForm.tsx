@@ -508,6 +508,18 @@ export default function MultiLogParserForm() {
     }
   };
 
+  const normalizeUrl = (inputUrl: string): string => {
+    let normalized = inputUrl.trim();
+    if (normalized.startsWith('https://play.pokemonshowdown.com/')) {
+      normalized = normalized.replace('play.pokemonshowdown.com/', 'replay.pokemonshowdown.com/');
+      normalized = normalized.replace('/battle-', '/');
+    }
+    if (!normalized.endsWith('.log')) {
+      normalized += '.log';
+    }
+    return normalized;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsAccordionOpen(false); // Always close accordion on submit
@@ -516,10 +528,11 @@ export default function MultiLogParserForm() {
     setResults(null);
 
     try {
+      const normalizedUrls = urls.map(normalizeUrl);
       const res = await fetch('/api/multi-poke-parser', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ urls }),
+        body: JSON.stringify({ urls: normalizedUrls }),
       });
 
       const responseData = await res.json();
