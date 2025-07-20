@@ -440,6 +440,11 @@ export function parseShowdownLog(log: string): DraftResult | null {
       
       lastMoveUsed[atkKey] = { move: moveName, turn: currentTurn }
 
+      if (moveName === 'Sandstorm') battle.sandstormSetter = atkKey;
+      if (moveName === 'Hail') battle.hailSetter = atkKey;
+      if (moveName === 'Rain Dance') battle.rainSetter = atkKey;
+      if (moveName === 'Sunny Day') battle.sunSetter = atkKey;
+
       if (moveName === 'Leech Seed') {
         battle.leechSeedUsers.add(atkKey);
       }
@@ -623,18 +628,26 @@ export function parseShowdownLog(log: string): DraftResult | null {
     }
 
     if (line.startsWith('|-weather|')) {
-      const fromAbilityMatch = line.match(/\[from\] ability: [^|]+\|\[of\] (p\da: [^|]+)/)
-      if (fromAbilityMatch) {
-        const ofField = fromAbilityMatch[1]
-        const side = sideOfNick(ofField)
-        const slot = ofField.split(':')[0]
-        const species = activePokemonInSlot[slot]
-        if (!species) return;
-        const key = getPokemonKey(side, species)
-        if (line.includes('Sandstorm')) battle.sandstormSetter = key
-        else if (line.includes('Hail')) battle.hailSetter = key
-        else if (line.includes('RainDance')) battle.rainSetter = key
-        else if (line.includes('SunnyDay')) battle.sunSetter = key
+      const parts = line.split('|');
+      if (parts[2] === 'none') {
+        battle.sandstormSetter = undefined;
+        battle.hailSetter = undefined;
+        battle.rainSetter = undefined;
+        battle.sunSetter = undefined;
+      } else {
+        const fromAbilityMatch = line.match(/\[from\] ability: [^|]+\|\[of\] (p\da: [^|]+)/)
+        if (fromAbilityMatch) {
+          const ofField = fromAbilityMatch[1]
+          const side = sideOfNick(ofField)
+          const slot = ofField.split(':')[0]
+          const species = activePokemonInSlot[slot]
+          if (!species) return;
+          const key = getPokemonKey(side, species)
+          if (line.includes('Sandstorm')) battle.sandstormSetter = key
+          else if (line.includes('Hail')) battle.hailSetter = key
+          else if (line.includes('RainDance')) battle.rainSetter = key
+          else if (line.includes('SunnyDay')) battle.sunSetter = key
+        }
       }
     }
 
@@ -854,7 +867,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
            const attackerKey = victimState.lastAttacker;
            if (attackerKey) {
              const attackerState = battle.pokemon[attackerKey];
-             if (attackerState && attackerKey !== key) {
+             if (attackerState && attackerKey !== key && attackerState.side !== victimState.side) {
                kos.push({
                  attacker: attackerState.species,
                  victim: victimState.species,
