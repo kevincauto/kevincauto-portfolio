@@ -246,11 +246,53 @@ export default function PokeParserForm() {
     );
   }
 
-  const renderHeader = (field: SortField, title: string) => (
-    <th onClick={() => handleSort(field)} className={sortField === field ? styles.activeSort : ''}>
-      {title} {getSortIcon(field)}
-    </th>
-  );
+  const renderHeader = (field: SortField, title: string) => {
+    const emojis: { [key: string]: string } = {
+      'KOs': '😵🥊', // Updated to smiley with xx eyes
+      'Fainted': '💀',
+      'Won': '🏆',
+      'Total Damage Dealt': '⚔️',
+      'Direct Damage Dealt': '💥', // Updated to explosion emoji
+      'Indirect Damage Dealt': '🎯',
+      'Friendly Fire Dmg': '🔥',
+      'Amount Healed': '💊',
+      'Amount Regenerated': '🌿',
+      'Spikes': '🌵',
+      'Stealth Rock': '🪨',
+      'Poison': '☠️',
+      'Burn': '🔥',
+      'Sandstorm': '🌪️',
+      'Hail': '❄️',
+      'Rocky Helmet': '🪖',
+      'Contact Ability': '🤝',
+      'Leech Seed Dealt': '🌱',
+      'Curse Dealt': '👻',
+      'Total Damage Taken': '🛡️',
+      'Direct Damage Taken': '💥', // Following pattern of Direct Damage Dealt
+      'Indirect Damage Taken': '🎯', // Following pattern of Indirect Damage Dealt
+      'Life Orb Taken': '⚡',
+      'Move Recoil Taken': '😵‍💫',
+      'Substitute Taken': '🪆',
+      'Sacrificial Move Taken': '⚰️',
+      'Risk Reward Move Taken': '🎲',
+      'Leech Seed Taken': '🌱', // Following pattern of Leech Seed Dealt
+      'Curse Taken': '👻', // Following pattern of Curse Dealt
+      'Curse Self': '👻', // Following pattern of Curse Dealt
+      'Poison Taken': '☠️', // Reusing emoji from Poison
+      'Stealth Rock Taken': '🪨', // Reusing emoji from Stealth Rock
+      'Spikes Taken': '🌵',
+      'Burn Taken': '🔥',
+      'Sandstorm Taken': '🌪️',
+      'Hail Taken': '❄️',
+      'Rocky Helmet Taken': '🪖',
+      'Contact Ability Taken': '🤝'
+    };
+    return (
+      <th onClick={() => handleSort(field)} className={sortField === field ? styles.activeSort : ''}>
+        {title} {emojis[title] || ''} {getSortIcon(field)}
+      </th>
+    );
+  };
 
   let shadowRealmAdmin: PokemonStat | undefined;
   let conductorOfThePainTrain: PokemonStat | undefined;
