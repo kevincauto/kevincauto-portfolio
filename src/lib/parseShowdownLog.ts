@@ -234,10 +234,15 @@ export function parseShowdownLog(log: string): DraftResult | null {
   };
 
   const cleanSpeciesName = (name: string): string => {
-    if (name.endsWith('-*')) {
-      return name.slice(0, -2);
+    // If the name contains additional data after a comma (e.g., gender, shiny), keep only the part before the comma
+    let base = name.split(',')[0].trim();
+
+    // Handle Pokémon with placeholder forms like "Urshifu-*" → "Urshifu"
+    if (base.endsWith('-*')) {
+      base = base.slice(0, -2);
     }
-    return name;
+
+    return base;
   };
 
   /* helper: get or create Pokémon state */
