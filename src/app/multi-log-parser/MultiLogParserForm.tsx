@@ -42,11 +42,20 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
     }));
 
     const sorted = [...dataWithWinPercentage].sort((a, b) => {
+      // Special handling for KOs: if tied, sort by fainted (asc)
+      if (sortField === 'kos') {
+        const kosComparison = sortDirection === 'asc' ? a.kos - b.kos : b.kos - a.kos;
+        if (kosComparison !== 0) {
+          return kosComparison;
+        }
+        return a.fainted - b.fainted; // Ascending faints is better
+      }
+
       const aValue = a[sortField];
       const bValue = b[sortField];
 
-      // Handle numeric comparison for descending order on most stats
-      if (typeof aValue === 'number' && typeof bValue === 'number' && sortField !== 'name') {
+      // Handle numeric comparison
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
         return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
       }
 
@@ -57,10 +66,7 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
           : bValue.localeCompare(aValue);
       }
 
-      // Fallback for mixed types, though shouldn't happen with current data
-      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-      return 0;
+      return 0; // Should not be reached with current data types
     });
 
     if (sorted.length === 0) {
