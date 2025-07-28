@@ -420,7 +420,8 @@ export function parseShowdownLog(log: string): DraftResult | null {
 
       activePokemonInSlot[slot] = species;
 
-      const hpMatch = parts[4]?.match(/(\d+)\/(\d+)/) || parts[3].match(/(\d+)\/(\d+)/)
+      const hpAndStatusPart = parts[4] || '';
+      const hpMatch = hpAndStatusPart.match(/(\d+)\/(\d+)/) || parts[3].match(/(\d+)\/(\d+)/);
       if (hpMatch) {
         const newHP = parseInt(hpMatch[1])
         if (regeneratorPokemon.has(species) && pokemon.hpOnSwitchOut !== undefined && newHP > pokemon.hpOnSwitchOut) {
@@ -430,6 +431,28 @@ export function parseShowdownLog(log: string): DraftResult | null {
         }
         pokemon.hp = newHP
         pokemon.hpOnSwitchOut = undefined;
+      }
+
+      // Handle status on switch-in from lines like `|switch|...|100/100 tox`
+      const possibleStatuses = ['brn', 'psn', 'tox', 'par', 'slp', 'frz'];
+      let statusFound: PokemonState['status'] | undefined;
+      for (const s of possibleStatuses) {
+        if (hpAndStatusPart.endsWith(s)) {
+          statusFound = s as PokemonState['status'];
+          break;
+        }
+      }
+
+      if (statusFound) {
+        pokemon.status = statusFound;
+        // If poison is acquired on switch-in, it must be from Toxic Spikes
+        if (statusFound === 'psn' || statusFound === 'tox') {
+          const opponentSide = side === 'p1' ? 'p2' : 'p1';
+          const setter = battle.hazards[opponentSide].toxicSpikesSetter;
+          if (setter) {
+            pokemon.statusBy = setter;
+          }
+        }
       }
     }
 
@@ -569,7 +592,8 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const targetSpecies = activePokemonInSlot[targetSlot]
       if (!targetSpecies) return;
       const pokemon = getPokemon(targetSpecies, targetSide)
-      pokemon.status = parts[3] as PokemonState['status']
+      const newStatus = parts[3] as PokemonState['status']
+      pokemon.status = newStatus;
       
       const fromTag = parts[4] || ''
       if (fromTag.includes('[from] item:') && (fromTag.includes('Flame Orb') || fromTag.includes('Toxic Orb'))) {
@@ -579,18 +603,45 @@ export function parseShowdownLog(log: string): DraftResult | null {
           pokemon.statusBy = undefined;
         }
       } else {
-        for (let i = idx - 1; i >= Math.max(0, idx - 5); i--) {
-          const prevLine = lines[i]
+        let moveFound = false;
+        // Search for a move in the current turn that could be the cause
+        for (let i = idx - 1; i >= 0; i--) {
+          const prevLine = lines[i];
+          if (prevLine.startsWith('|turn|')) break; // Stop at the beginning of the turn
+
           if (prevLine.startsWith('|move|')) {
-            const [, , atkField, , defField] = prevLine.split('|')
+            const moveParts = prevLine.split('|');
+            const atkField = moveParts[2];
+            const defField = moveParts[4];
+            
             if (defField === targetField) {
-              const atkSide = sideOfNick(atkField)
-              const atkSlot = atkField.split(':')[0]
-              const atkSpecies = activePokemonInSlot[atkSlot]
-              if (!atkSpecies) break;
-              pokemon.statusBy = getPokemonKey(atkSide, atkSpecies)
-              break
+              const atkSide = sideOfNick(atkField);
+              const atkSlot = atkField.split(':')[0];
+              const atkSpecies = activePokemonInSlot[atkSlot];
+              if (atkSpecies) {
+                // Check if the move is a status move that matches the new status
+                const isMatchingStatusMove = 
+                  (newStatus === 'psn' || newStatus === 'tox') && (moveParts[3] === 'Poison Powder' || moveParts[3] === 'Toxic') ||
+                  (newStatus === 'brn' && moveParts[3] === 'Will-O-Wisp') ||
+                  (newStatus === 'par' && moveParts[3] === 'Thunder Wave') ||
+                  (newStatus === 'slp' && moveParts[3] === 'Spore');
+
+                if (isMatchingStatusMove) {
+                  pokemon.statusBy = getPokemonKey(atkSide, atkSpecies);
+                  moveFound = true;
+                }
+              }
+              break;
             }
+          }
+        }
+
+        // If no move was found and the status is poison, it's from Toxic Spikes
+        if (!moveFound && (newStatus === 'psn' || newStatus === 'tox')) {
+          const opponentSide = targetSide === 'p1' ? 'p2' : 'p1';
+          const setter = battle.hazards[opponentSide].toxicSpikesSetter;
+          if (setter) {
+            pokemon.statusBy = setter;
           }
         }
       }
@@ -714,7 +765,12 @@ export function parseShowdownLog(log: string): DraftResult | null {
           attackerKey = battle.hazards[victimSide][fromContent === 'Spikes' ? 'spikesSetter' : 'stealthRockSetter'];
           damageType = fromContent;
         } else if (['psn', 'brn', 'tox'].includes(fromContent)) {
-          attackerKey = getPokemon(victimSpecies, victimSide).statusBy;
+          const victimPokemon = getPokemon(victimSpecies, victimSide);
+          if ((fromContent === 'psn' || fromContent === 'tox')) {
+            attackerKey = battle.hazards[victimSide].toxicSpikesSetter;
+          } else {
+            attackerKey = victimPokemon.statusBy;
+          }
           damageType = fromContent === 'brn' ? 'Burn' : 'Poison';
         } else if (fromContent === 'Sandstorm') {
           attackerKey = battle.sandstormSetter;

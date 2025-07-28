@@ -1,0 +1,462 @@
+|j|☆Kaiser Cauto
+|j|☆ryanmali
+|t:|1719756022
+|gametype|singles
+|player|p1|Kaiser Cauto|koga|
+|player|p2|ryanmali|burglar|
+|teamsize|p1|6
+|teamsize|p2|6
+|gen|6
+|tier|[Gen 6] Draft
+|rule|Sleep Clause Mod: Limit one foe put to sleep
+|rule|OHKO Clause: OHKO moves are banned
+|rule|Evasion Clause: Evasion abilities, items, and moves are banned
+|rule|Evasion Abilities Clause: Evasion abilities are banned
+|rule|Evasion Items Clause: Evasion items are banned
+|rule|Evasion Moves Clause: Evasion moves are banned
+|rule|Endless Battle Clause: Forcing endless battles is banned
+|rule|HP Percentage Mod: HP is shown in percentages
+|rule|Moody Clause: Moody is banned
+|rule|Swagger Clause: Swagger is banned
+|clearpoke
+|poke|p1|Bronzong|item
+|poke|p1|Serperior, F|item
+|poke|p1|Snorlax, F|item
+|poke|p1|Forretress, M|item
+|poke|p1|Mismagius, M|item
+|poke|p1|Suicune|item
+|poke|p2|Magmortar, M|item
+|poke|p2|Keldeo|item
+|poke|p2|Ferrothorn, M|item
+|poke|p2|Meloetta|item
+|poke|p2|Donphan, F|item
+|poke|p2|Florges, F|item
+|teampreview
+|j| crystopper_pkmn
+|j| TheWillager
+|j| Bman5422
+|c|☆ryanmali|surprised we have viewers this early
+|l| Bman5422
+|c| TheWillager|i had to feed the cats
+|c|☆Kaiser Cauto|yeah, kinda cool
+|c| TheWillager|they just keep licking the door until i do
+|c| crystopper_pkmn|i had pancakes
+|c| crystopper_pkmn|now need pokemon
+|c|☆ryanmali|ready whenever/ im trying to go sleep lol
+|c|☆ryanmali|egos for me
+|c|☆Kaiser Cauto|lol sounds good
+|c|☆Kaiser Cauto|glhf
+|
+|t:|1719756188
+|start
+|switch|p1a: Golden Snitcher|Forretress, M, shiny|100/100
+|switch|p2a: Water Horse|Keldeo|100/100
+|turn|1
+|
+|t:|1719756220
+|switch|p1a: Severus Snake|Serperior, F|100/100
+|move|p2a: Water Horse|Substitute|p2a: Water Horse
+|-start|p2a: Water Horse|Substitute
+|-damage|p2a: Water Horse|75/100
+|
+|-heal|p2a: Water Horse|82/100|[from] item: Leftovers
+|upkeep
+|turn|2
+|j| Bman5422
+|
+|t:|1719756232
+|move|p1a: Severus Snake|Leaf Storm|p2a: Water Horse
+|-supereffective|p2a: Water Horse
+|-end|p2a: Water Horse|Substitute
+|-boost|p1a: Severus Snake|spa|2
+|move|p2a: Water Horse|Icy Wind|p1a: Severus Snake
+|-supereffective|p1a: Severus Snake
+|-damage|p1a: Severus Snake|60/100
+|-boost|p1a: Severus Snake|spe|1
+|
+|-heal|p1a: Severus Snake|67/100|[from] item: Leftovers
+|-heal|p2a: Water Horse|88/100|[from] item: Leftovers
+|upkeep
+|turn|3
+|
+|t:|1719756257
+|switch|p2a: Gorlock|Magmortar, M|100/100
+|move|p1a: Severus Snake|Dragon Pulse|p2a: Gorlock
+|-damage|p2a: Gorlock|63/100
+|
+|-heal|p1a: Severus Snake|73/100|[from] item: Leftovers
+|upkeep
+|turn|4
+|j| son_of_ringo
+|
+|t:|1719756270
+|switch|p1a: Nimbus 2024|Suicune, shiny|100/100
+|-ability|p1a: Nimbus 2024|Pressure
+|move|p2a: Gorlock|Flamethrower|p1a: Nimbus 2024
+|-resisted|p1a: Nimbus 2024
+|-damage|p1a: Nimbus 2024|79/100
+|-damage|p2a: Gorlock|53/100|[from] item: Life Orb
+|
+|-heal|p1a: Nimbus 2024|85/100|[from] item: Leftovers
+|upkeep
+|turn|5
+|j| Notabot1234
+|
+|t:|1719756295
+|move|p2a: Gorlock|Thunderbolt|p1a: Nimbus 2024
+|-supereffective|p1a: Nimbus 2024
+|-damage|p1a: Nimbus 2024|22/100
+|-damage|p2a: Gorlock|43/100|[from] item: Life Orb
+|move|p1a: Nimbus 2024|Scald|p2a: Gorlock
+|-supereffective|p2a: Gorlock
+|-damage|p2a: Gorlock|0 fnt
+|faint|p2a: Gorlock
+|
+|-heal|p1a: Nimbus 2024|28/100|[from] item: Leftovers
+|upkeep
+|c| Notabot1234|IT BOY
+|c| Notabot1234|BBNO$
+|
+|t:|1719756335
+|switch|p2a: Rose|Ferrothorn, M|100/100
+|turn|6
+|
+|t:|1719756341
+|switch|p1a: Golden Snitcher|Forretress, M, shiny|100/100
+|move|p2a: Rose|Stealth Rock|p1a: Golden Snitcher
+|-sidestart|p1: Kaiser Cauto|move: Stealth Rock
+|
+|upkeep
+|turn|7
+|
+|t:|1719756366
+|switch|p2a: Melo from deep|Meloetta|100/100
+|move|p1a: Golden Snitcher|Toxic Spikes|p2a: Melo from deep
+|-sidestart|p2: ryanmali|move: Toxic Spikes
+|
+|upkeep
+|turn|8
+|
+|t:|1719756373
+|move|p2a: Melo from deep|Fire Punch|p1a: Golden Snitcher
+|-supereffective|p1a: Golden Snitcher
+|-damage|p1a: Golden Snitcher|50/100
+|move|p1a: Golden Snitcher|Toxic Spikes|p2a: Melo from deep
+|-sidestart|p2: ryanmali|move: Toxic Spikes
+|
+|-heal|p1a: Golden Snitcher|56/100|[from] item: Leftovers
+|upkeep
+|turn|9
+|
+|t:|1719756385
+|move|p1a: Golden Snitcher|Protect|p1a: Golden Snitcher
+|-singleturn|p1a: Golden Snitcher|Protect
+|move|p2a: Melo from deep|U-turn|p1a: Golden Snitcher
+|-activate|p1a: Golden Snitcher|move: Protect
+|
+|-heal|p1a: Golden Snitcher|62/100|[from] item: Leftovers
+|upkeep
+|turn|10
+|
+|t:|1719756391
+|move|p2a: Melo from deep|Fire Punch|p1a: Golden Snitcher
+|-supereffective|p1a: Golden Snitcher
+|-damage|p1a: Golden Snitcher|17/100
+|move|p1a: Golden Snitcher|Rapid Spin|p2a: Melo from deep
+|-damage|p2a: Melo from deep|96/100
+|-sideend|p1: Kaiser Cauto|Stealth Rock|[from] move: Rapid Spin|[of] p1a: Golden Snitcher
+|
+|-heal|p1a: Golden Snitcher|23/100|[from] item: Leftovers
+|upkeep
+|turn|11
+|l| Bman5422
+|
+|t:|1719756404
+|move|p1a: Golden Snitcher|Protect|p1a: Golden Snitcher
+|-singleturn|p1a: Golden Snitcher|Protect
+|move|p2a: Melo from deep|Fire Punch|p1a: Golden Snitcher
+|-activate|p1a: Golden Snitcher|move: Protect
+|
+|-heal|p1a: Golden Snitcher|29/100|[from] item: Leftovers
+|upkeep
+|turn|12
+|
+|t:|1719756427
+|switch|p1a: Snagrid|Snorlax, F, shiny|100/100
+|move|p2a: Melo from deep|Fire Punch|p1a: Snagrid
+|-damage|p1a: Snagrid|93/100
+|-status|p1a: Snagrid|brn
+|
+|-heal|p1a: Snagrid|99/100 brn|[from] item: Leftovers
+|-damage|p1a: Snagrid|87/100 brn|[from] brn
+|upkeep
+|turn|13
+|
+|t:|1719756439
+|move|p2a: Melo from deep|Close Combat|p1a: Snagrid
+|-supereffective|p1a: Snagrid
+|-damage|p1a: Snagrid|40/100 brn
+|-unboost|p2a: Melo from deep|def|1
+|-unboost|p2a: Melo from deep|spd|1
+|move|p1a: Snagrid|Rest|p1a: Snagrid
+|-status|p1a: Snagrid|slp|[from] move: Rest
+|-heal|p1a: Snagrid|100/100 slp|[silent]
+|
+|upkeep
+|turn|14
+|
+|t:|1719756463
+|switch|p1a: Neville Zongbottom|Bronzong|100/100
+|move|p2a: Melo from deep|Close Combat|p1a: Neville Zongbottom
+|-damage|p1a: Neville Zongbottom|73/100
+|-unboost|p2a: Melo from deep|def|1
+|-unboost|p2a: Melo from deep|spd|1
+|
+|-heal|p1a: Neville Zongbottom|79/100|[from] item: Leftovers
+|upkeep
+|turn|15
+|l| Notabot1234
+|c| son_of_ringo|lmao
+|c| son_of_ringo|neville zongbottom
+|
+|t:|1719756476
+|switch|p2a: DONophan McNabb|Donphan, F|100/100
+|-status|p2a: DONophan McNabb|tox
+|move|p1a: Neville Zongbottom|Stealth Rock|p2a: DONophan McNabb
+|-sidestart|p2: ryanmali|move: Stealth Rock
+|
+|-heal|p1a: Neville Zongbottom|85/100|[from] item: Leftovers
+|-damage|p2a: DONophan McNabb|94/100 tox|[from] psn
+|upkeep
+|turn|16
+|
+|t:|1719756486
+|switch|p1a: Hermoine Danger|Mismagius, M|100/100
+|move|p2a: DONophan McNabb|Rapid Spin|p1a: Hermoine Danger
+|-immune|p1a: Hermoine Danger
+|
+|-damage|p2a: DONophan McNabb|82/100 tox|[from] psn
+|upkeep
+|turn|17
+|j| Notabot1234
+|
+|t:|1719756501
+|move|p1a: Hermoine Danger|Hex|p2a: DONophan McNabb
+|-damage|p2a: DONophan McNabb|51/100 tox
+|move|p2a: DONophan McNabb|Knock Off|p1a: Hermoine Danger
+|-supereffective|p1a: Hermoine Danger
+|-enditem|p1a: Hermoine Danger|Colbur Berry|[eat]
+|-enditem|p1a: Hermoine Danger|Colbur Berry|[weaken]
+|-damage|p1a: Hermoine Danger|70/100
+|
+|-damage|p2a: DONophan McNabb|33/100 tox|[from] psn
+|upkeep
+|turn|18
+|
+|t:|1719756511
+|switch|p2a: Rose|Ferrothorn, M|100/100
+|-damage|p2a: Rose|94/100|[from] Stealth Rock
+|move|p1a: Hermoine Danger|Hex|p2a: Rose
+|-damage|p2a: Rose|75/100
+|
+|upkeep
+|turn|19
+|l| Notabot1234
+|
+|t:|1719756525
+|move|p1a: Hermoine Danger|Will-O-Wisp|p2a: Rose|[miss]
+|-miss|p1a: Hermoine Danger|p2a: Rose
+|move|p2a: Rose|Leech Seed|p1a: Hermoine Danger
+|-start|p1a: Hermoine Danger|move: Leech Seed
+|
+|-damage|p1a: Hermoine Danger|57/100|[from] Leech Seed|[of] p2a: Rose
+|-heal|p2a: Rose|87/100|[silent]
+|upkeep
+|turn|20
+|j| Notabot1234
+|
+|t:|1719756533
+|switch|p1a: Golden Snitcher|Forretress, M, shiny|29/100
+|move|p2a: Rose|Stealth Rock|p1a: Golden Snitcher
+|-sidestart|p1: Kaiser Cauto|move: Stealth Rock
+|
+|-heal|p1a: Golden Snitcher|36/100|[from] item: Leftovers
+|upkeep
+|turn|21
+|
+|t:|1719756555
+|switch|p2a: Melo from deep|Meloetta|96/100
+|-status|p2a: Melo from deep|tox
+|-damage|p2a: Melo from deep|83/100 tox|[from] Stealth Rock
+|move|p1a: Golden Snitcher|Rapid Spin|p2a: Melo from deep
+|-damage|p2a: Melo from deep|78/100 tox
+|-sideend|p1: Kaiser Cauto|Stealth Rock|[from] move: Rapid Spin|[of] p1a: Golden Snitcher
+|
+|-heal|p1a: Golden Snitcher|42/100|[from] item: Leftovers
+|-damage|p2a: Melo from deep|72/100 tox|[from] psn
+|upkeep
+|turn|22
+|
+|t:|1719756571
+|move|p1a: Golden Snitcher|Protect|p1a: Golden Snitcher
+|-singleturn|p1a: Golden Snitcher|Protect
+|move|p2a: Melo from deep|U-turn|p1a: Golden Snitcher
+|-activate|p1a: Golden Snitcher|move: Protect
+|
+|-heal|p1a: Golden Snitcher|48/100|[from] item: Leftovers
+|-damage|p2a: Melo from deep|60/100 tox|[from] psn
+|upkeep
+|turn|23
+|
+|t:|1719756579
+|switch|p1a: Neville Zongbottom|Bronzong|85/100
+|move|p2a: Melo from deep|Fire Punch|p1a: Neville Zongbottom
+|-supereffective|p1a: Neville Zongbottom
+|-damage|p1a: Neville Zongbottom|68/100
+|
+|-heal|p1a: Neville Zongbottom|74/100|[from] item: Leftovers
+|-damage|p2a: Melo from deep|41/100 tox|[from] psn
+|upkeep
+|turn|24
+|
+|t:|1719756598
+|switch|p2a: DONophan McNabb|Donphan, F|33/100 tox
+|-damage|p2a: DONophan McNabb|26/100 tox|[from] Stealth Rock
+|move|p1a: Neville Zongbottom|Zen Headbutt|p2a: DONophan McNabb
+|-damage|p2a: DONophan McNabb|7/100 tox
+|
+|-heal|p1a: Neville Zongbottom|81/100|[from] item: Leftovers
+|-damage|p2a: DONophan McNabb|0 fnt|[from] psn
+|faint|p2a: DONophan McNabb
+|upkeep
+|
+|t:|1719756628
+|switch|p2a: Rose|Ferrothorn, M|87/100
+|-damage|p2a: Rose|81/100|[from] Stealth Rock
+|turn|25
+|
+|t:|1719756652
+|switch|p1a: Hermoine Danger|Mismagius, M|57/100
+|move|p2a: Rose|Knock Off|p1a: Hermoine Danger
+|-supereffective|p1a: Hermoine Danger
+|-damage|p1a: Hermoine Danger|22/100
+|
+|upkeep
+|turn|26
+|
+|t:|1719756658
+|move|p1a: Hermoine Danger|Will-O-Wisp|p2a: Rose
+|-status|p2a: Rose|brn
+|move|p2a: Rose|Knock Off|p1a: Hermoine Danger
+|-supereffective|p1a: Hermoine Danger
+|-crit|p1a: Hermoine Danger
+|-damage|p1a: Hermoine Danger|0 fnt
+|faint|p1a: Hermoine Danger
+|
+|-damage|p2a: Rose|68/100 brn|[from] brn
+|upkeep
+|
+|t:|1719756684
+|switch|p1a: Severus Snake|Serperior, F|73/100
+|turn|27
+|
+|t:|1719756721
+|switch|p2a: Thorn|Florges, F|100/100
+|-status|p2a: Thorn|tox
+|-damage|p2a: Thorn|88/100 tox|[from] Stealth Rock
+|move|p1a: Severus Snake|Leaf Storm|p2a: Thorn
+|-damage|p2a: Thorn|65/100 tox
+|-boost|p1a: Severus Snake|spa|2
+|
+|-heal|p1a: Severus Snake|79/100|[from] item: Leftovers
+|-heal|p2a: Thorn|71/100 tox|[from] item: Leftovers
+|-damage|p2a: Thorn|65/100 tox|[from] psn
+|upkeep
+|turn|28
+|j| Bman5422
+|
+|t:|1719756736
+|move|p1a: Severus Snake|Leaf Storm|p2a: Thorn
+|-damage|p2a: Thorn|17/100 tox
+|-boost|p1a: Severus Snake|spa|2
+|move|p2a: Thorn|Heal Bell|p2a: Thorn
+|-activate|p2a: Thorn|move: Heal Bell
+|-curestatus|p2a: Thorn|tox|[msg]
+|-curestatus|p2: Melo from deep|tox|[msg]
+|-curestatus|p2: Rose|brn|[msg]
+|
+|-heal|p1a: Severus Snake|85/100|[from] item: Leftovers
+|-heal|p2a: Thorn|23/100|[from] item: Leftovers
+|upkeep
+|turn|29
+|
+|t:|1719756775
+|move|p1a: Severus Snake|Leaf Storm|p2a: Thorn
+|-damage|p2a: Thorn|0 fnt
+|-boost|p1a: Severus Snake|spa|2
+|faint|p2a: Thorn
+|
+|-heal|p1a: Severus Snake|91/100|[from] item: Leftovers
+|upkeep
+|
+|t:|1719756802
+|switch|p2a: Rose|Ferrothorn, M|68/100
+|-damage|p2a: Rose|62/100|[from] Stealth Rock
+|turn|30
+|c| Notabot1234|Sizzurperior
+|
+|t:|1719756810
+|move|p1a: Severus Snake|Hidden Power|p2a: Rose
+|-supereffective|p2a: Rose
+|-crit|p2a: Rose
+|-enditem|p2a: Rose|Occa Berry|[eat]
+|-enditem|p2a: Rose|Occa Berry|[weaken]
+|-damage|p2a: Rose|0 fnt
+|faint|p2a: Rose
+|
+|-heal|p1a: Severus Snake|98/100|[from] item: Leftovers
+|upkeep
+|
+|t:|1719756829
+|switch|p2a: Melo from deep|Meloetta|41/100
+|-status|p2a: Melo from deep|tox
+|-damage|p2a: Melo from deep|29/100 tox|[from] Stealth Rock
+|turn|31
+|
+|t:|1719756854
+|move|p1a: Severus Snake|Dragon Pulse|p2a: Melo from deep
+|-damage|p2a: Melo from deep|3/100 tox
+|move|p2a: Melo from deep|Fire Punch|p1a: Severus Snake
+|-supereffective|p1a: Severus Snake
+|-damage|p1a: Severus Snake|59/100
+|
+|-heal|p1a: Severus Snake|65/100|[from] item: Leftovers
+|-damage|p2a: Melo from deep|0 fnt|[from] psn
+|faint|p2a: Melo from deep
+|upkeep
+|
+|t:|1719756863
+|switch|p2a: Water Horse|Keldeo|88/100
+|-status|p2a: Water Horse|tox
+|-damage|p2a: Water Horse|82/100 tox|[from] Stealth Rock
+|turn|32
+|
+|t:|1719756873
+|move|p1a: Severus Snake|Leaf Storm|p2a: Water Horse
+|-supereffective|p2a: Water Horse
+|-damage|p2a: Water Horse|0 fnt
+|faint|p2a: Water Horse
+|
+|win|Kaiser Cauto
+|c|☆Kaiser Cauto|gg
+|c| son_of_ringo|gg
+|l| Bman5422
+|c|☆ryanmali|gg
+|l|☆ryanmali
+|player|p2|
+|c| Notabot1234|Gg
+|c| TheWillager|gg
+|l| son_of_ringo
+|l| Notabot1234
+|l| TheWillager
+|j| seto slima
