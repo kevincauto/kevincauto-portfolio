@@ -255,13 +255,13 @@ export default function PokeParserForm() {
       'Direct Damage Dealt': '💥', // Updated to explosion emoji
       'Indirect Damage Dealt': '🎯',
       'Friendly Fire Dmg': '🔥',
-      'Amount Healed': '💊',
-      'Amount Regenerated': '🌿',
-      'Spikes': '🌵',
+      'Amount Healed': '❤️‍🩹',
+      'Amount Regenerated': '🔄',
+      'Spikes': '✨',
       'Stealth Rock': '🪨',
       'Poison': '☠️',
       'Burn': '🔥',
-      'Sandstorm': '🌪️',
+      'Sandstorm': '🏜️',
       'Hail': '❄️',
       'Rocky Helmet': '🪖',
       'Contact Ability': '🤝',
@@ -270,7 +270,7 @@ export default function PokeParserForm() {
       'Total Damage Taken': '🛡️',
       'Direct Damage Taken': '💥', // Following pattern of Direct Damage Dealt
       'Indirect Damage Taken': '🎯', // Following pattern of Indirect Damage Dealt
-      'Life Orb Taken': '⚡',
+      'Life Orb Taken': '🔮',
       'Move Recoil Taken': '😵‍💫',
       'Substitute Taken': '🪆',
       'Sacrificial Move Taken': '⚰️',
@@ -280,9 +280,9 @@ export default function PokeParserForm() {
       'Curse Self': '👻', // Following pattern of Curse Dealt
       'Poison Taken': '☠️', // Reusing emoji from Poison
       'Stealth Rock Taken': '🪨', // Reusing emoji from Stealth Rock
-      'Spikes Taken': '🌵',
+      'Spikes Taken': '✨',
       'Burn Taken': '🔥',
-      'Sandstorm Taken': '🌪️',
+      'Sandstorm Taken': '🏜️',
       'Hail Taken': '❄️',
       'Rocky Helmet Taken': '🪖',
       'Contact Ability Taken': '🤝'

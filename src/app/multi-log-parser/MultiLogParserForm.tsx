@@ -118,11 +118,54 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
     );
   };
 
-  const renderHeader = (field: SortField, title: string) => (
-    <th onClick={() => handleSort(field)} className={sortField === field ? styles.activeSort : ''}>
-      {title} {getSortIcon(field)}
-    </th>
-  );
+  const renderHeader = (field: SortField, title: string) => {
+    const emojis: { [key: string]: string } = {
+      'Wins': '🏆',
+      'KOs': '😵🥊',
+      'Faints': '💀',
+      'Amount Healed': '❤️‍🩹',
+      'Amount Regenerated': '🔄',
+      'Total Dmg Dealt': '⚔️',
+      'Direct Dmg Dealt': '💥',
+      'Indirect Dmg Dealt': '🎯',
+      'Friendly Fire Dmg': '🔥',
+      'Spikes Dmg': '✨',
+      'SR Dmg': '🪨',
+      'Poison Dmg': '☠️',
+      'Burn Dmg': '🔥',
+      'Sand Dmg': '🏜️',
+      'Hail Dmg': '❄️',
+      'Helmet Dmg': '🪖',
+      'Contact Ability Dmg': '🤝',
+      'Leech Seed Dmg': '🌱',
+      'Curse Dmg': '👻',
+      'Total Dmg Taken': '🛡️',
+      'Direct Dmg Taken': '💥',
+      'Indirect Dmg Taken': '🎯',
+      'Spikes Taken': '✨',
+      'SR Taken': '🪨',
+      'Poison Taken': '☠️',
+      'Burn Taken': '🔥',
+      'Sand Taken': '🏜️',
+      'Hail Taken': '❄️',
+      'Helmet Taken': '🪖',
+      'Contact Ability Taken': '🤝',
+      'Life Orb Taken': '🔮',
+      'Recoil Taken': '😵‍💫',
+      'Sub Taken': '🪆',
+      'Sacrifice Taken': '⚰️',
+      'Belly Drum Taken': '🎲',
+      'Leech Seed Taken': '🌱',
+      'Curse Taken': '👻',
+      'Curse Self Dmg': '👻'
+    };
+
+    return (
+      <th onClick={() => handleSort(field)} className={sortField === field ? styles.activeSort : ''}>
+        {title} {emojis[title] || ''} {getSortIcon(field)}
+      </th>
+    );
+  };
   
   const sortedData = getRankedData();
 
@@ -152,7 +195,6 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
               {renderHeader('directDamageDealt', 'Direct Dmg Dealt')}
               {renderHeader('indirectDamageDealt', 'Indirect Dmg Dealt')}
               {renderHeader('friendlyFireDamage', 'Friendly Fire Dmg')}
-              {renderHeader('amountHealed', 'Amount Healed')}
               {renderHeader('damageDealtBySpikes', 'Spikes Dmg')}
               {renderHeader('damageDealtByStealthRock', 'SR Dmg')}
               {renderHeader('damageDealtByPoison', 'Poison Dmg')}
@@ -213,7 +255,6 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
                 <td className={sortField === 'directDamageDealt' ? styles.activeSort : ''}>{Math.round(pokemon.directDamageDealt)}%</td>
                 <td className={sortField === 'indirectDamageDealt' ? styles.activeSort : ''}>{Math.round(pokemon.indirectDamageDealt)}%</td>
                 <td className={sortField === 'friendlyFireDamage' ? styles.activeSort : ''}>{Math.round(pokemon.friendlyFireDamage)}%</td>
-                <td className={sortField === 'amountHealed' ? styles.activeSort : ''}>{Math.round(pokemon.amountHealed)}%</td>
                 <td className={sortField === 'damageDealtBySpikes' ? styles.activeSort : ''}>{Math.round(pokemon.damageDealtBySpikes)}%</td>
                 <td className={sortField === 'damageDealtByStealthRock' ? styles.activeSort : ''}>{Math.round(pokemon.damageDealtByStealthRock)}%</td>
                 <td className={sortField === 'damageDealtByPoison' ? styles.activeSort : ''}>{Math.round(pokemon.damageDealtByPoison)}%</td>
