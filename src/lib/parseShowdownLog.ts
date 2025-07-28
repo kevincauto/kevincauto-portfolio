@@ -923,21 +923,41 @@ export function parseShowdownLog(log: string): DraftResult | null {
             attackerState.kos++;
           }
         } else if (victimState.faintedByDirectHit === false) {
-         const selfKOCauses = new Set(['Sacrificial Move', 'Recoil', 'Life Orb', 'CurseSelf', 'Risk Reward Move', 'Substitute']);
-         if (!selfKOCauses.has(victimState.faintCause || '')) {
-           const attackerKey = victimState.lastAttacker;
-           if (attackerKey) {
-             const attackerState = battle.pokemon[attackerKey];
-             if (attackerState && attackerKey !== key && attackerState.side !== victimState.side) {
-               kos.push({
-                 attacker: attackerState.species,
-                 victim: victimState.species,
-                 hazard: victimState.faintCause,
-               });
-               attackerState.kos++;
-             }
-           }
-         }
+          const selfKOCauses = new Set(['Sacrificial Move', 'Recoil', 'Life Orb', 'CurseSelf', 'Risk Reward Move', 'Substitute']);
+          if (!selfKOCauses.has(victimState.faintCause || '')) {
+            let attackerKey: string | undefined;
+
+            switch (victimState.faintCause) {
+              case 'Poison':
+              case 'Burn':
+                attackerKey = victimState.statusBy;
+                if (!attackerKey && victimState.faintCause === 'Poison') {
+                  // Fallback to Toxic Spikes setter if statusBy is missing
+                  attackerKey = battle.hazards[victimState.side].toxicSpikesSetter;
+                }
+                break;
+              case 'Stealth Rock':
+                attackerKey = battle.hazards[victimState.side].stealthRockSetter;
+                break;
+              case 'Spikes':
+                attackerKey = battle.hazards[victimState.side].spikesSetter;
+                break;
+              default:
+                attackerKey = victimState.lastAttacker;
+            }
+
+            if (attackerKey) {
+              const attackerState = battle.pokemon[attackerKey];
+              if (attackerState && attackerKey !== key && attackerState.side !== victimState.side) {
+                kos.push({
+                  attacker: attackerState.species,
+                  victim: victimState.species,
+                  hazard: victimState.faintCause,
+                });
+                attackerState.kos++;
+              }
+            }
+          }
         }
       }
     }

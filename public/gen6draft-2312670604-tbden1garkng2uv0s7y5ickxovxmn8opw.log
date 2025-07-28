@@ -1,0 +1,496 @@
+|j|☆Kaiser Cauto
+|j|☆seto slima
+|t:|1741135824
+|gametype|singles
+|player|p1|Kaiser Cauto|koga-gen3|
+|player|p2|seto slima|steven|
+|teamsize|p1|6
+|teamsize|p2|6
+|gen|6
+|tier|[Gen 6] Draft
+|rule|Sleep Clause Mod: Limit one foe put to sleep
+|rule|OHKO Clause: OHKO moves are banned
+|rule|Evasion Clause: Evasion abilities, items, and moves are banned
+|rule|Evasion Abilities Clause: Evasion abilities are banned
+|rule|Evasion Items Clause: Evasion items are banned
+|rule|Evasion Moves Clause: Evasion moves are banned
+|rule|Endless Battle Clause: Forcing endless battles is banned
+|rule|HP Percentage Mod: HP is shown in percentages
+|rule|Moody Clause: Moody is banned
+|rule|Swagger Clause: Swagger is banned
+|clearpoke
+|poke|p1|Latios, M|item
+|poke|p1|Suicune|item
+|poke|p1|Muk, M|item
+|poke|p1|Blissey, F|item
+|poke|p1|Klefki, F|item
+|poke|p1|Talonflame, F|
+|poke|p2|Gliscor, M|item
+|poke|p2|Xatu, F|item
+|poke|p2|Bronzong|item
+|poke|p2|Barbaracle, M|item
+|poke|p2|Chandelure, M|item
+|poke|p2|Whimsicott, F|item
+|teampreview
+|j| BMan5422
+|c|☆seto slima|1 sec
+|j| Minot4uredits
+|c|☆Kaiser Cauto|no prob
+|c|☆Kaiser Cauto|glhf
+|c|☆seto slima|ight! Glhf
+|
+|t:|1741136000
+|start
+|switch|p1a: Djingle Unchained|Klefki, F|100/100
+|switch|p2a: Xatu|Xatu, F|100/100
+|turn|1
+|
+|t:|1741136011
+|move|p1a: Djingle Unchained|Reflect|p1a: Djingle Unchained
+|-sidestart|p1: Kaiser Cauto|Reflect
+|move|p2a: Xatu|Light Screen|p2a: Xatu
+|-sidestart|p2: seto slima|move: Light Screen
+|
+|upkeep
+|turn|2
+|
+|t:|1741136069
+|switch|p1a: Liquid Death|Suicune, shiny|100/100
+|-ability|p1a: Liquid Death|Pressure
+|move|p2a: Xatu|Reflect|p2a: Xatu
+|-sidestart|p2: seto slima|Reflect
+|
+|upkeep
+|turn|3
+|
+|t:|1741136073
+|move|p2a: Xatu|Toxic|p1a: Liquid Death
+|-status|p1a: Liquid Death|tox
+|move|p1a: Liquid Death|Calm Mind|p1a: Liquid Death
+|-boost|p1a: Liquid Death|spa|1
+|-boost|p1a: Liquid Death|spd|1
+|
+|-damage|p1a: Liquid Death|94/100 tox|[from] psn
+|upkeep
+|turn|4
+|
+|t:|1741136084
+|move|p2a: Xatu|U-turn|p1a: Liquid Death
+|-damage|p1a: Liquid Death|90/100 tox
+|
+|t:|1741136090
+|switch|p2a: Whimsicott|Whimsicott, F|100/100|[from] U-turn
+|move|p1a: Liquid Death|Ice Beam|p2a: Whimsicott
+|-supereffective|p2a: Whimsicott
+|-damage|p2a: Whimsicott|48/100
+|-status|p2a: Whimsicott|frz
+|
+|-heal|p1a: Liquid Death|96/100 tox|[from] item: Leftovers
+|-damage|p1a: Liquid Death|84/100 tox|[from] psn
+|upkeep
+|turn|5
+|j| nickyg26
+|j| Ryanmal1108
+|j| crystopper_pkmn
+|
+|t:|1741136191
+|switch|p2a: Bronzong|Bronzong|100/100
+|move|p1a: Liquid Death|Ice Beam|p2a: Bronzong
+|-resisted|p2a: Bronzong
+|-damage|p2a: Bronzong|95/100
+|-enditem|p2a: Bronzong|Red Card|[of] p1a: Liquid Death
+|drag|p1a: Djingle Unchained|Klefki, F|100/100
+|
+|-sideend|p1: Kaiser Cauto|Reflect
+|upkeep
+|turn|6
+|l| nickyg26
+|
+|t:|1741136213
+|move|p1a: Djingle Unchained|Reflect|p1a: Djingle Unchained
+|-sidestart|p1: Kaiser Cauto|Reflect
+|move|p2a: Bronzong|Stealth Rock|p1a: Djingle Unchained
+|-sidestart|p1: Kaiser Cauto|move: Stealth Rock
+|
+|upkeep
+|turn|7
+|
+|t:|1741136237
+|switch|p1a: Liquid Death|Suicune, shiny|84/100 tox
+|-damage|p1a: Liquid Death|71/100 tox|[from] Stealth Rock
+|-ability|p1a: Liquid Death|Pressure
+|switch|p2a: Xatu|Xatu, F|100/100
+|
+|-heal|p1a: Liquid Death|77/100 tox|[from] item: Leftovers
+|-damage|p1a: Liquid Death|71/100 tox|[from] psn
+|upkeep
+|turn|8
+|l| crystopper_pkmn
+|
+|t:|1741136250
+|move|p2a: Xatu|U-turn|p1a: Liquid Death
+|-damage|p1a: Liquid Death|67/100 tox
+|
+|t:|1741136252
+|switch|p2a: Chandelure|Chandelure, M|100/100|[from] U-turn
+|move|p1a: Liquid Death|Rest|p1a: Liquid Death
+|-status|p1a: Liquid Death|slp|[from] move: Rest
+|-heal|p1a: Liquid Death|100/100 slp|[silent]
+|
+|-sideend|p2: seto slima|move: Light Screen
+|upkeep
+|turn|9
+|
+|t:|1741136268
+|switch|p1a: Slimer|Muk, M, shiny|100/100
+|-damage|p1a: Slimer|88/100|[from] Stealth Rock
+|move|p2a: Chandelure|Trick|p1a: Slimer
+|-immune|p1a: Slimer
+|
+|-heal|p1a: Slimer|94/100|[from] item: Black Sludge
+|-sideend|p2: seto slima|Reflect
+|upkeep
+|turn|10
+|j| crystopper_pkmn
+|
+|t:|1741136308
+|switch|p2a: Bronzong|Bronzong|95/100
+|move|p1a: Slimer|Curse|p1a: Slimer
+|-unboost|p1a: Slimer|spe|1
+|-boost|p1a: Slimer|atk|1
+|-boost|p1a: Slimer|def|1
+|
+|-heal|p1a: Slimer|100/100|[from] item: Black Sludge
+|-sideend|p1: Kaiser Cauto|Reflect
+|upkeep
+|turn|11
+|
+|t:|1741136354
+|switch|p2a: Xatu|Xatu, F|100/100
+|move|p1a: Slimer|Curse|p1a: Slimer
+|-unboost|p1a: Slimer|spe|1
+|-boost|p1a: Slimer|atk|1
+|-boost|p1a: Slimer|def|1
+|
+|upkeep
+|turn|12
+|j| jmils9
+|
+|t:|1741136370
+|move|p2a: Xatu|Reflect|p2a: Xatu
+|-sidestart|p2: seto slima|Reflect
+|move|p1a: Slimer|Curse|p1a: Slimer
+|-unboost|p1a: Slimer|spe|1
+|-boost|p1a: Slimer|atk|1
+|-boost|p1a: Slimer|def|1
+|
+|upkeep
+|turn|13
+|
+|t:|1741136398
+|move|p2a: Xatu|U-turn|p1a: Slimer
+|-resisted|p1a: Slimer
+|-damage|p1a: Slimer|98/100
+|
+|t:|1741136401
+|switch|p2a: Chandelure|Chandelure, M|100/100|[from] U-turn
+|move|p1a: Slimer|Curse|p1a: Slimer
+|-unboost|p1a: Slimer|spe|1
+|-boost|p1a: Slimer|atk|1
+|-boost|p1a: Slimer|def|1
+|
+|-heal|p1a: Slimer|100/100|[from] item: Black Sludge
+|upkeep
+|turn|14
+|
+|t:|1741136409
+|move|p2a: Chandelure|Fire Blast|p1a: Slimer
+|-damage|p1a: Slimer|57/100
+|move|p1a: Slimer|Payback|p2a: Chandelure
+|-supereffective|p2a: Chandelure
+|-damage|p2a: Chandelure|0 fnt
+|faint|p2a: Chandelure
+|
+|-heal|p1a: Slimer|63/100|[from] item: Black Sludge
+|upkeep
+|
+|t:|1741136415
+|switch|p2a: Gliscor|Gliscor, M|100/100
+|turn|15
+|
+|t:|1741136422
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Slimer|Ice Punch|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|7/100
+|
+|-heal|p1a: Slimer|70/100|[from] item: Black Sludge
+|-status|p2a: Gliscor|tox|[from] item: Toxic Orb
+|upkeep
+|turn|16
+|
+|t:|1741136465
+|move|p2a: Gliscor|Earthquake|p1a: Slimer
+|-supereffective|p1a: Slimer
+|-damage|p1a: Slimer|13/100
+|move|p1a: Slimer|Ice Punch|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|0 fnt
+|faint|p2a: Gliscor
+|
+|-heal|p1a: Slimer|20/100|[from] item: Black Sludge
+|upkeep
+|
+|t:|1741136514
+|switch|p2a: Barbaracle|Barbaracle, M|100/100
+|turn|17
+|l| Ryanmal1108
+|l| Minot4uredits
+|j| Minot4uredits
+|
+|t:|1741136571
+|move|p2a: Barbaracle|Shell Smash|p2a: Barbaracle
+|-unboost|p2a: Barbaracle|def|1
+|-unboost|p2a: Barbaracle|spd|1
+|-boost|p2a: Barbaracle|atk|2
+|-boost|p2a: Barbaracle|spa|2
+|-boost|p2a: Barbaracle|spe|2
+|move|p1a: Slimer|Payback|p2a: Barbaracle
+|-damage|p2a: Barbaracle|41/100
+|
+|-heal|p1a: Slimer|26/100|[from] item: Black Sludge
+|upkeep
+|turn|18
+|
+|t:|1741136617
+|move|p2a: Barbaracle|Ice Beam|p1a: Slimer
+|-damage|p1a: Slimer|0 fnt
+|faint|p1a: Slimer
+|
+|upkeep
+|
+|t:|1741136673
+|switch|p1a: Djingle Unchained|Klefki, F|100/100
+|-damage|p1a: Djingle Unchained|95/100|[from] Stealth Rock
+|turn|19
+|
+|t:|1741136732
+|move|p1a: Djingle Unchained|Switcheroo|p2a: Barbaracle
+|-activate|p1a: Djingle Unchained|move: Trick|[of] p2a: Barbaracle
+|-item|p2a: Barbaracle|Toxic Orb|[from] move: Switcheroo
+|-item|p1a: Djingle Unchained|Expert Belt|[from] move: Switcheroo
+|move|p2a: Barbaracle|Shell Smash|p2a: Barbaracle
+|-unboost|p2a: Barbaracle|def|1
+|-unboost|p2a: Barbaracle|spd|1
+|-boost|p2a: Barbaracle|atk|2
+|-boost|p2a: Barbaracle|spa|2
+|-boost|p2a: Barbaracle|spe|2
+|
+|-sideend|p2: seto slima|Reflect
+|-status|p2a: Barbaracle|tox|[from] item: Toxic Orb
+|upkeep
+|turn|20
+|
+|t:|1741136748
+|move|p2a: Barbaracle|Superpower|p1a: Djingle Unchained
+|-damage|p1a: Djingle Unchained|0 fnt
+|-unboost|p2a: Barbaracle|atk|1
+|-unboost|p2a: Barbaracle|def|1
+|faint|p1a: Djingle Unchained
+|
+|-damage|p2a: Barbaracle|35/100 tox|[from] psn
+|upkeep
+|
+|t:|1741136795
+|switch|p1a: Hell's Messenger|Talonflame, F|100/100
+|-damage|p1a: Hell's Messenger|51/100|[from] Stealth Rock
+|turn|21
+|j| ryanmali
+|
+|t:|1741136808
+|switch|p2a: Bronzong|Bronzong|95/100
+|move|p1a: Hell's Messenger|Acrobatics|p2a: Bronzong
+|-resisted|p2a: Bronzong
+|-damage|p2a: Bronzong|79/100
+|
+|upkeep
+|turn|22
+|
+|t:|1741136834
+|switch|p1a: Aegon Snow|Latios, M|100/100
+|-damage|p1a: Aegon Snow|88/100|[from] Stealth Rock
+|move|p2a: Bronzong|Ancient Power|p1a: Aegon Snow
+|-damage|p1a: Aegon Snow|77/100
+|-boost|p2a: Bronzong|atk|1
+|-boost|p2a: Bronzong|def|1
+|-boost|p2a: Bronzong|spa|1
+|-boost|p2a: Bronzong|spd|1
+|-boost|p2a: Bronzong|spe|1
+|
+|upkeep
+|turn|23
+|c|☆seto slima|👀
+|
+|t:|1741136866
+|switch|p1a: Liquid Death|Suicune, shiny|100/100 slp
+|-damage|p1a: Liquid Death|88/100 slp|[from] Stealth Rock
+|-ability|p1a: Liquid Death|Pressure
+|move|p2a: Bronzong|Gyro Ball|p1a: Liquid Death
+|-resisted|p1a: Liquid Death
+|-damage|p1a: Liquid Death|76/100 slp
+|
+|-heal|p1a: Liquid Death|82/100 slp|[from] item: Leftovers
+|upkeep
+|turn|24
+|l| jmils9
+|
+|t:|1741136972
+|switch|p2a: Whimsicott|Whimsicott, F|48/100 frz
+|cant|p1a: Liquid Death|slp
+|
+|-heal|p1a: Liquid Death|89/100 slp|[from] item: Leftovers
+|upkeep
+|turn|25
+|
+|t:|1741136982
+|cant|p2a: Whimsicott|frz
+|cant|p1a: Liquid Death|slp
+|
+|-heal|p1a: Liquid Death|95/100 slp|[from] item: Leftovers
+|upkeep
+|turn|26
+|
+|t:|1741136988
+|cant|p2a: Whimsicott|frz
+|-curestatus|p1a: Liquid Death|slp|[msg]
+|move|p1a: Liquid Death|Ice Beam|p2a: Whimsicott
+|-supereffective|p2a: Whimsicott
+|-damage|p2a: Whimsicott|0 fnt
+|faint|p2a: Whimsicott
+|
+|-heal|p1a: Liquid Death|100/100|[from] item: Leftovers
+|upkeep
+|
+|t:|1741136996
+|switch|p2a: Xatu|Xatu, F|100/100
+|turn|27
+|
+|t:|1741137008
+|move|p2a: Xatu|Light Screen|p2a: Xatu
+|-sidestart|p2: seto slima|move: Light Screen
+|move|p1a: Liquid Death|Calm Mind|p1a: Liquid Death
+|-boost|p1a: Liquid Death|spa|1
+|-boost|p1a: Liquid Death|spd|1
+|
+|upkeep
+|turn|28
+|
+|t:|1741137020
+|move|p2a: Xatu|Toxic|p1a: Liquid Death
+|-status|p1a: Liquid Death|tox
+|move|p1a: Liquid Death|Calm Mind|p1a: Liquid Death
+|-boost|p1a: Liquid Death|spa|1
+|-boost|p1a: Liquid Death|spd|1
+|
+|-damage|p1a: Liquid Death|94/100 tox|[from] psn
+|upkeep
+|turn|29
+|
+|t:|1741137027
+|move|p2a: Xatu|U-turn|p1a: Liquid Death
+|-damage|p1a: Liquid Death|85/100 tox
+|
+|t:|1741137030
+|switch|p2a: Bronzong|Bronzong|79/100|[from] U-turn
+|move|p1a: Liquid Death|Scald|p2a: Bronzong
+|-damage|p2a: Bronzong|57/100
+|
+|-heal|p1a: Liquid Death|91/100 tox|[from] item: Leftovers
+|-damage|p1a: Liquid Death|79/100 tox|[from] psn
+|upkeep
+|turn|30
+|
+|t:|1741137039
+|move|p1a: Liquid Death|Rest|p1a: Liquid Death
+|-status|p1a: Liquid Death|slp|[from] move: Rest
+|-heal|p1a: Liquid Death|100/100 slp|[silent]
+|move|p2a: Bronzong|Gyro Ball|p1a: Liquid Death
+|-resisted|p1a: Liquid Death
+|-damage|p1a: Liquid Death|88/100 slp
+|
+|-heal|p1a: Liquid Death|94/100 slp|[from] item: Leftovers
+|upkeep
+|turn|31
+|
+|t:|1741137046
+|switch|p2a: Barbaracle|Barbaracle, M|35/100 tox
+|cant|p1a: Liquid Death|slp
+|
+|-heal|p1a: Liquid Death|99/100 slp|[from] item: Leftovers
+|-damage|p2a: Barbaracle|29/100 tox|[from] psn
+|upkeep
+|turn|32
+|
+|t:|1741137055
+|cant|p1a: Liquid Death|slp
+|move|p2a: Barbaracle|Shell Smash|p2a: Barbaracle
+|-unboost|p2a: Barbaracle|def|1
+|-unboost|p2a: Barbaracle|spd|1
+|-boost|p2a: Barbaracle|atk|2
+|-boost|p2a: Barbaracle|spa|2
+|-boost|p2a: Barbaracle|spe|2
+|
+|-heal|p1a: Liquid Death|100/100 slp|[from] item: Leftovers
+|-damage|p2a: Barbaracle|17/100 tox|[from] psn
+|upkeep
+|turn|33
+|
+|t:|1741137112
+|switch|p1a: Aegon Snow|Latios, M|77/100
+|-damage|p1a: Aegon Snow|65/100|[from] Stealth Rock
+|move|p2a: Barbaracle|Grass Knot|p1a: Aegon Snow
+|-resisted|p1a: Aegon Snow
+|-damage|p1a: Aegon Snow|46/100
+|
+|-damage|p2a: Barbaracle|0 fnt|[from] psn
+|faint|p2a: Barbaracle
+|upkeep
+|
+|t:|1741137126
+|switch|p2a: Bronzong|Bronzong|57/100
+|turn|34
+|
+|t:|1741137132
+|move|p1a: Aegon Snow|Recover|p1a: Aegon Snow
+|-heal|p1a: Aegon Snow|96/100
+|move|p2a: Bronzong|Ancient Power|p1a: Aegon Snow
+|-damage|p1a: Aegon Snow|86/100
+|
+|-sideend|p2: seto slima|move: Light Screen
+|upkeep
+|turn|35
+|
+|t:|1741137143
+|switch|p1a: Liquid Death|Suicune, shiny|100/100 slp
+|-damage|p1a: Liquid Death|88/100 slp|[from] Stealth Rock
+|-ability|p1a: Liquid Death|Pressure
+|move|p2a: Bronzong|Gyro Ball|p1a: Liquid Death
+|-resisted|p1a: Liquid Death
+|-damage|p1a: Liquid Death|76/100 slp
+|
+|-heal|p1a: Liquid Death|82/100 slp|[from] item: Leftovers
+|upkeep
+|turn|36
+|c|☆seto slima|gg
+|-message|seto slima forfeited.
+|
+|win|Kaiser Cauto
+|l|☆seto slima
+|player|p2|
+|c|☆Kaiser Cauto|gg
+|c| Minot4uredits|Gg
+|l| Minot4uredits
+|l| crystopper_pkmn
+|l| ryanmali
+|l| BMan5422
