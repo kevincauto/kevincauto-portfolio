@@ -130,10 +130,13 @@ a.secondary {
   .page {
     padding: 32px;
     padding-bottom: 80px;
+    min-width: 0;
   }
 
   .main {
     align-items: center;
+    min-width: 0;
+    width: 100%;
   }
 
   .main ol {
@@ -171,8 +174,30 @@ a.secondary {
   text-decoration: none;
   color: inherit;
   transition: transform 0.2s ease-in-out;
+  width: 100%;
+  max-width: 100%;
+  display: block;
+}
+
+/* Desktop styles to maintain centering */
+@media (min-width: 769px) {
+  .contributionLink {
+    width: auto;
+    max-width: none;
+    display: inline-block;
+  }
 }
 
 .contributionLink:hover {
   transform: scale(1.02);
+}
+
+@media (max-width: 768px) {
+  .contributionLink {
+    transform: none;
+  }
+  
+  .contributionLink:hover {
+    transform: none;
+  }
 }
