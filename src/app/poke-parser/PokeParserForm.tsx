@@ -112,8 +112,8 @@ export default function PokeParserForm() {
   const [data, setData] = useState<Parsed | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [sortField, setSortField] = useState<SortField>('name');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [sortField, setSortField] = useState<SortField>('kos');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
   const normalizeUrl = (inputUrl: string): string => {
     let normalized = inputUrl.trim();
