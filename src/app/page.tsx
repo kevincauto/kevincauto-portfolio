@@ -1,6 +1,7 @@
 import styles from "./page.module.css";
 import Hero from "../components/Hero";
 import GitHubContributions from "@/components/GitHubContributions";
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -39,6 +40,21 @@ export default function Home() {
             <span className={styles.badge}>Supabase (Auth, Storage, DB)</span>
             <span className={styles.badge}>Postgres</span>
             <span className={styles.badge}>Vercel</span>
+          </div>
+
+          {/* Visual hero featuring Sweet Potato Tattoo screenshot */}
+          <div className={styles.visualHero}>
+            <Image
+              src={"/screenshot-homepage.png"}
+              alt={"Sweet Potato Tattoo — site screenshot"}
+              fill
+              className={styles.visualImg}
+              priority
+            />
+            <div className={styles.visualOverlay} />
+            <div className={styles.visualCaption}>
+              Sweet Potato Tattoo — gallery-rich brand brought to life with a modern, editorial UI.
+            </div>
           </div>
 
           <div className={styles.contentGrid}>
@@ -106,7 +122,7 @@ export default function Home() {
 
           <div className={styles.screenRail}>
             {[
-              { label: 'Home', url: 'sweetpotatotattoo.com' },
+              { label: 'Home', url: 'sweetpotatotattoo.com', img: '/screenshot-homepage.png' },
               { label: 'Gallery', url: '…/gallery' },
               { label: 'Admin', url: '…/admin' },
               { label: 'Booking', url: '…/booking' },
@@ -121,7 +137,22 @@ export default function Home() {
                   </div>
                   <div className={styles.urlBar}>{screen.url}</div>
                 </div>
-                <div className={styles.surface} aria-label={`${screen.label} placeholder`}>{screen.label}</div>
+                <div className={styles.surface} aria-label={`${screen.label} preview`}>
+                  {screen.img ? (
+                    <>
+                      <Image
+                        src={screen.img}
+                        alt={`${screen.label} preview`}
+                        fill
+                        className={styles.screenImg}
+                        sizes="(max-width: 900px) 100vw, 33vw"
+                      />
+                      <div className={styles.surfaceBadge}>{screen.label}</div>
+                    </>
+                  ) : (
+                    screen.label
+                  )}
+                </div>
               </div>
             ))}
           </div>

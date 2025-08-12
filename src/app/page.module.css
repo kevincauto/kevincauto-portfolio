@@ -106,6 +106,61 @@
   margin-bottom: 6px;
 }
 
+/* Visual hero using supplied flat-lay image */
+.visualHero {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 32%;
+  border-radius: calc(var(--radius) + 2px);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--card) 80%, transparent);
+  margin-top: 12px;
+}
+
+.visualImg {
+  object-fit: cover;
+  filter: saturate(0.85) contrast(1.03);
+}
+
+.visualOverlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.1), transparent 35%),
+    radial-gradient(120% 120% at 0% 0%, rgba(0,0,0,0.25), transparent 55%),
+    radial-gradient(120% 120% at 100% 100%, rgba(0,0,0,0.25), transparent 55%);
+}
+
+.visualCaption {
+  position: absolute;
+  left: 16px;
+  bottom: 14px;
+  padding: 8px 12px;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font-size: 13px;
+}
+
+/* Screen rail image preview */
+.screenImg { object-fit: cover; }
+.surface { position: relative; }
+.surfaceBadge {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
 .badge {
   font-size: 12px;
   padding: 8px 12px;
