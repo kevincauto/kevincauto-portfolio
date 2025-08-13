@@ -1,17 +1,30 @@
 import styles from "./page.module.css";
 import Hero from "../components/Hero";
-import GitHubContributions from "@/components/GitHubContributions";
 import Image from "next/image";
 
 export default function Home() {
   return (
     <>
       <main className={styles.main}>
-        <Hero />
-        <a href="https://github.com/kevincauto" target="_blank" rel="noopener noreferrer" className={styles.contributionLink}>
-          <GitHubContributions />
-        </a>
-        <section className={styles.showcase}>
+        <section className={styles.imageHero}>
+          <Image
+            src={"/Men%27s%20Accessories%20Flat%20Lay.png"}
+            alt={"Clean flat-lay of men's accessories"}
+            fill
+            priority
+            className={styles.imageHeroImg}
+          />
+          <div className={styles.imageHeroOverlay} />
+          <div className={styles.imageHeroContent}>
+            <h1 className={styles.heroTitle}>Kevin Cauto</h1>
+            <p className={styles.heroTagline}>AI‑First Software Engineer</p>
+            <div className={styles.heroButtons}>
+              <a href="#projects" className={styles.primaryCta}>View projects</a>
+            </div>
+          </div>
+          <a href="#projects" aria-label="Scroll to projects" className={styles.scrollCue} />
+        </section>
+        <section className={styles.showcase} id="projects">
           <div className={styles.showcaseInner}>
           <div className={styles.spotlightHeader}>
             <div>

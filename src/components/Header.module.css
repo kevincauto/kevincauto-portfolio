@@ -1,13 +1,13 @@
 .header {
   background-color: #1a1a1a;
-  padding: 1rem 2rem;
-  border-bottom: 1px solid #333;
+  padding: 0.75rem 2rem;
+  border-top: 1px solid #333;
   width: 100%;
 }
 
 .nav {
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   gap: 2rem;
   max-width: 1200px;
