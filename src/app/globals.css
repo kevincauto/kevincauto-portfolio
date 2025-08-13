@@ -4,11 +4,15 @@
   /* design tokens */
   --accent: #7c3aed;          /* violet */
   --accent-2: #06b6d4;        /* cyan */
+  --accent-red: #8c1d18;      /* deep red matching image */
+  --accent-red-2: #a12520;    /* hover */
   --muted: #6b7280;           /* gray-500 */
   --border: rgba(0, 0, 0, 0.1);
   --card: rgba(255, 255, 255, 0.6);
   --radius: 12px;
 }
+
+html { scroll-behavior: smooth; }
 
 @media (prefers-color-scheme: dark) {
   :root {

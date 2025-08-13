@@ -87,11 +87,18 @@
 .heroTagline {
   color: #e5e7eb;
   font-size: clamp(14px, 1.6vw, 18px);
+  margin-top: -6px;
   margin-bottom: 18px;
   opacity: 0.95;
 }
 
 .heroButtons { display: inline-flex; gap: 12px; }
+
+/* CTA elevated over dark hero: add subtle focus ring */
+.primaryCta:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--accent-red-2) 60%, #ffffff 40%);
+  outline-offset: 2px;
+}
 
 .scrollCue {
   position: absolute;
@@ -430,13 +437,15 @@
   justify-content: center;
   padding: 10px 16px;
   border-radius: 10px;
-  background: var(--foreground);
-  color: var(--background);
+  background: var(--accent-red);
+  color: #fff;
   text-decoration: none;
   font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.35);
 }
 
-.primaryCta:hover { filter: brightness(0.92); }
+.primaryCta:hover { background: var(--accent-red-2); }
 
 .featureList {
   border: 1px solid var(--border);

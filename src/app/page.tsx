@@ -16,9 +16,9 @@ export default function Home() {
           <div className={styles.imageHeroOverlay} />
           <div className={styles.imageHeroContent}>
             <h1 className={styles.heroTitle}>Kevin Cauto</h1>
-            <p className={styles.heroTagline}>AI‑First Software Engineer</p>
+            <p className={styles.heroTagline}>AI‑Focused Software Engineer</p>
             <div className={styles.heroButtons}>
-              <a href="#projects" className={styles.primaryCta}>View projects</a>
+              <a href="#projects" className={styles.primaryCta}>View Projects</a>
             </div>
           </div>
           <a href="#projects" aria-label="Scroll to projects" className={styles.scrollCue} />
