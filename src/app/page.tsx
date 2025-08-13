@@ -1,5 +1,6 @@
 import styles from "./page.module.css";
 import Image from "next/image";
+import GitHubContributions from "@/components/GitHubContributions";
 
 export default function Home() {
   return (
@@ -15,10 +16,14 @@ export default function Home() {
           />
           <div className={styles.imageHeroOverlay} />
           <div className={styles.imageHeroContent}>
-            <h1 className={styles.heroTitle}>Kevin Cauto</h1>
-            <p className={styles.heroTagline}>AI‑Focused Software Engineer</p>
-            <div className={styles.heroButtons}>
-              <a href="#projects" className={styles.primaryCta}>View Projects</a>
+            <div className={styles.heroTop}>
+              <h1 className={styles.heroTitle}>Kevin Cauto</h1>
+              <p className={styles.heroTagline}>AI‑Focused Software Engineer</p>
+            </div>
+            <div className={styles.heroCenter}>
+              <div className={styles.heroButtons}>
+                <a href="#projects" className={styles.primaryCta}>View Projects</a>
+              </div>
             </div>
           </div>
           <a href="#projects" aria-label="Scroll to projects" className={styles.scrollCue} />
@@ -102,6 +107,13 @@ export default function Home() {
                 </div>
               </div>
               <div className={styles.featureItem}>
+                <span className={styles.featureIcon}>🎯</span>
+                <div>
+                  <h4>Filterable Design Page</h4>
+                  <p>Filter and explore flash designs by theme and size for faster client discovery.</p>
+                </div>
+              </div>
+              <div className={styles.featureItem}>
                 <span className={styles.featureIcon}>🛠️</span>
                 <div>
                   <h4>Admin Backend</h4>
@@ -135,7 +147,8 @@ export default function Home() {
           <div className={styles.screenRail}>
             {[
               { label: 'Home', url: 'sweetpotatotattoo.com', img: '/screenshot-homepage.png' },
-              { label: 'Gallery', url: '…/gallery' },
+              { label: 'Available Flash', url: '…/available-flash', img: '/screenshot-flash.png' },
+              { label: 'Gallery', url: '…/gallery', img: '/screenshot-gallery.png' },
               { label: 'Admin', url: '…/admin' },
               { label: 'Booking', url: '…/booking' },
               { label: 'Consent', url: '…/consent' },
@@ -170,6 +183,10 @@ export default function Home() {
           </div>
           </div>
         </section>
+
+        <a href="https://github.com/kevincauto" target="_blank" rel="noopener noreferrer" className={styles.contributionLink}>
+          <GitHubContributions />
+        </a>
       </main>
     </>
   );
