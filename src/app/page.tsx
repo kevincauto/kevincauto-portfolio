@@ -18,7 +18,7 @@ export default function Home() {
           <div className={styles.imageHeroContent}>
             <div className={styles.heroTop}>
               <h1 className={styles.heroTitle}>Kevin Cauto</h1>
-              <p className={styles.heroTagline}>AI‑Focused Software Engineer</p>
+              <p className={styles.heroTagline}>AI Enthusiast • Software Engineer</p>
             </div>
             <div className={styles.heroCenter}>
               <div className={styles.heroButtons}>
@@ -32,7 +32,7 @@ export default function Home() {
           <div className={styles.showcaseInner}>
           <div className={styles.spotlightHeader}>
             <div>
-              <h2 className={styles.showcaseTitle}>Sweet Potato Tattoo</h2>
+              <h2 className={styles.showcaseTitle}>SweetPotatoTattoo.com</h2>
               <p className={styles.showcaseSubtitle}>
                 A polished studio site with a rich gallery, streamlined booking, and a creator-friendly admin.
               </p>
@@ -70,7 +70,7 @@ export default function Home() {
             />
             <div className={styles.visualOverlay} />
             <div className={styles.visualCaption}>
-              Sweet Potato Tattoo — gallery-rich brand brought to life with a modern, editorial UI.
+              SweetPotatoTattoo.com - gallery-rich brand brought to life with a modern, editorial UI.
             </div>
           </div>
 
@@ -83,8 +83,14 @@ export default function Home() {
                   <span className={styles.pill}>Booking</span>
                   <span className={styles.pill}>Consent</span>
                 </div>
-                <h3 className={styles.caseHeadline}>Built for artists, optimized for clients.</h3>
-                <p className={styles.caseLead}>Fast, responsive, and easy to update. Drag-and-drop ordering, secure uploads, and smooth intake.</p>
+                <h3 className={styles.caseHeadline}>A fast, responsive, gallery site with a focus on lead capture and booking
+                </h3>
+                <p className={styles.caseLead}>The site is built with Next.js, TypeScript, React, CSS Modules, Supabase (Auth, Storage, DB), Postgres, and Vercel.
+                  It pulls the user in with a beautiful gallery of tattoos while still focusing on lead capture and booking. Some of
+                  the features include: a full gallery to highlight the artist's work, a filterable design page to showcase the bookable flash, 
+                  an admin backend to manage the site, email capture to collect emails for follow-up and marketing, and 
+                  a booking & availability system to streamline requests and workload.
+                </p>
                 <div className={styles.spotlightCtas}>
                   <a
                     href="https://sweetpotatotattoo.com/"
@@ -146,12 +152,10 @@ export default function Home() {
 
           <div className={styles.screenRail}>
             {[
-              { label: 'Home', url: 'sweetpotatotattoo.com', img: '/screenshot-homepage.png' },
+              { label: 'Gallery', url: 'sweetpotatotattoo.com', img: '/screenshot-gallery.png' },
               { label: 'Available Flash', url: '…/available-flash', img: '/screenshot-flash.png' },
-              { label: 'Gallery', url: '…/gallery', img: '/screenshot-gallery.png' },
-              { label: 'Admin', url: '…/admin' },
-              { label: 'Booking', url: '…/booking' },
-              { label: 'Consent', url: '…/consent' },
+              { label: 'Consent Form', url: '…/consent-form', img: '/screenshot-consent-form.png' },
+              { label: 'Booking', url: '…/booking', img: '/screenshot-booking.png' },
             ].map((screen) => (
               <div key={screen.label} className={styles.screenCard}>
                 <div className={styles.browserChrome}>
