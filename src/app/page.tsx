@@ -87,7 +87,7 @@ export default function Home() {
                 </h3>
                 <p className={styles.caseLead}>The site is built with Next.js, TypeScript, React, CSS Modules, Supabase (Auth, Storage, DB), Postgres, and Vercel.
                   It pulls the user in with a beautiful gallery of tattoos while still focusing on lead capture and booking. Some of
-                  the features include: a full gallery to highlight the artist's work, a filterable design page to showcase the bookable flash, 
+                  the features include: a full gallery to highlight the artist&apos;s work, a filterable design page to showcase the bookable flash, 
                   an admin backend to manage the site, email capture to collect emails for follow-up and marketing, and 
                   a booking & availability system to streamline requests and workload.
                 </p>
