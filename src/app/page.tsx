@@ -49,15 +49,16 @@ export default function Home() {
             </div>
           </div>
 
-          <div className={styles.stackBadges}>
-            <span className={styles.badge}>Next.js</span>
-            <span className={styles.badge}>TypeScript</span>
-            <span className={styles.badge}>React</span>
-            <span className={styles.badge}>CSS Modules</span>
-            <span className={styles.badge}>Supabase (Auth, Storage, DB)</span>
-            <span className={styles.badge}>Postgres</span>
-            <span className={styles.badge}>Vercel</span>
-          </div>
+                      <div className={styles.stackBadges}>
+              <span className={styles.badge}>Next.js 15</span>
+              <span className={styles.badge}>React 19</span>
+              <span className={styles.badge}>TypeScript</span>
+              <span className={styles.badge}>Tailwind CSS 4</span>
+              <span className={styles.badge}>@vercel/kv</span>
+              <span className={styles.badge}>@vercel/blob</span>
+              <span className={styles.badge}>Resend</span>
+              <span className={styles.badge}>Vercel</span>
+            </div>
 
           {/* Visual hero featuring Sweet Potato Tattoo screenshot */}
           <div className={styles.visualHero}>
@@ -85,7 +86,7 @@ export default function Home() {
                 </div>
                 <h3 className={styles.caseHeadline}>A fast, responsive, gallery site with a focus on lead capture and booking
                 </h3>
-                <p className={styles.caseLead}>The site is built with Next.js, TypeScript, React, CSS Modules, Supabase (Auth, Storage, DB), Postgres, and Vercel.
+                <p className={styles.caseLead}>The site is built with Next.js 15, React 19, TypeScript, Tailwind CSS 4, @vercel/kv for data storage, @vercel/blob for file storage, and Resend for transactional emails.
                   It pulls the user in with a beautiful gallery of tattoos while still focusing on lead capture and booking. Some of
                   the features include: a full gallery to highlight the artist&apos;s work, a filterable design page to showcase the bookable flash, 
                   an admin backend to manage the site, email capture to collect emails for follow-up and marketing, and 
