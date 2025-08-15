@@ -176,7 +176,7 @@ export const generateLease = async (data: LeaseData) => {
         
         new Paragraph({ children: [b('RENT: '), t('The following terms apply to the rent payment for this Lease.')]}),
         new Paragraph({
-          children: [b('RENT AMOUNT: '), t(`The rent for the Premises will be $${data.monthlyRent} per month. This amount includes utilities, internet, and cleaning service of the shared spaces.`)],
+          children: [b('RENT AMOUNT: '), t(`The rent for the Premises will be $${data.monthlyRent} per month. This amount includes utilities, internet, and cleaning service of the shared spaces${data.maidService ? ' and the TENANT\'s bedroom' : ''}.`)],
           numbering: { reference: 'rent-numbering', level: 0 },
         }),
         new Paragraph({
