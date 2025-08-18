@@ -189,6 +189,134 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Lease Generator Section */}
+        <section className={styles.showcase}>
+          <div className={styles.showcaseInner}>
+            <div className={styles.spotlightHeader}>
+              <div>
+                <h2 className={styles.showcaseTitle}>Lease Generator</h2>
+                <p className={styles.showcaseSubtitle}>
+                  Automated lease document generation with customizable terms and professional formatting.
+                </p>
+              </div>
+              <div className={styles.spotlightCtas}>
+                <a
+                  href="/lease-editor"
+                  className={styles.visitButton}
+                >
+                  Try it →
+                </a>
+              </div>
+            </div>
+
+            <div className={styles.stackBadges}>
+              <span className={styles.badge}>Next.js</span>
+              <span className={styles.badge}>React</span>
+              <span className={styles.badge}>TypeScript</span>
+              <span className={styles.badge}>docx</span>
+              <span className={styles.badge}>File-Saver</span>
+            </div>
+
+            <div className={styles.contentGrid}>
+              <div className={`${styles.caseHero} ${styles.glass}`}>
+                <div className={styles.caseHeroInner}>
+                  <div className={styles.heroPills}>
+                    <span className={styles.pill}>Document Generation</span>
+                    <span className={styles.pill}>Customizable</span>
+                    <span className={styles.pill}>Professional</span>
+                    <span className={styles.pill}>PDF Ready</span>
+                  </div>
+                  <h3 className={styles.caseHeadline}>Streamlined lease creation for property managers.</h3>
+                  <p className={styles.caseLead}>
+                    Built with Next.js, React, TypeScript, and the docx library for professional document generation. 
+                    Features include customizable property details, tenant information, lease terms, and amenities. 
+                    Generates properly formatted Word documents that can be easily converted to PDF for legal use.
+                  </p>
+                  <div className={styles.spotlightCtas}>
+                    <a
+                      href="/lease-editor"
+                      className={styles.primaryCta}
+                    >
+                      Generate lease
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.featureList}>
+                <div className={styles.featureItem}>
+                  <span className={styles.featureIcon}>📄</span>
+                  <div>
+                    <h4>Document Generation</h4>
+                    <p>Creates professional Word documents with proper formatting and legal structure.</p>
+                  </div>
+                </div>
+                <div className={styles.featureItem}>
+                  <span className={styles.featureIcon}>⚙️</span>
+                  <div>
+                    <h4>Customizable Fields</h4>
+                    <p>Property details, tenant info, lease terms, and amenities all configurable.</p>
+                  </div>
+                </div>
+                <div className={styles.featureItem}>
+                  <span className={styles.featureIcon}>🏠</span>
+                  <div>
+                    <h4>Property Management</h4>
+                    <p>Multiple property support with pre-configured addresses and details.</p>
+                  </div>
+                </div>
+                <div className={styles.featureItem}>
+                  <span className={styles.featureIcon}>📅</span>
+                  <div>
+                    <h4>Date Handling</h4>
+                    <p>Automatic date calculations, prorated rent, and lease term management.</p>
+                  </div>
+                </div>
+                <div className={styles.featureItem}>
+                  <span className={styles.featureIcon}>💾</span>
+                  <div>
+                    <h4>File Export</h4>
+                    <p>Direct download of generated documents ready for printing or digital use.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.screenRail}>
+              {[
+                { label: 'Lease Generator', url: 'lease-editor', img: '/screenshot-lease-generator.png' },
+              ].map((screen) => (
+                <div key={screen.label} className={styles.screenCard}>
+                  <div className={styles.browserChrome}>
+                    <div className={styles.chromeDots}>
+                      <span className={`${styles.chromeDot} ${styles.dotRed}`} />
+                      <span className={`${styles.chromeDot} ${styles.dotYellow}`} />
+                      <span className={`${styles.chromeDot} ${styles.dotGreen}`} />
+                    </div>
+                    <div className={styles.urlBar}>{screen.url}</div>
+                  </div>
+                  <div className={styles.surface} aria-label={`${screen.label} preview`}>
+                    {screen.img ? (
+                      <>
+                        <Image
+                          src={screen.img}
+                          alt={`${screen.label} preview`}
+                          fill
+                          className={styles.screenImg}
+                          sizes="(max-width: 900px) 100vw, 33vw"
+                        />
+                        <div className={styles.surfaceBadge}>{screen.label}</div>
+                      </>
+                    ) : (
+                      screen.label
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <a href="https://github.com/kevincauto" target="_blank" rel="noopener noreferrer" className={styles.contributionLink}>
           <GitHubContributions />
         </a>
