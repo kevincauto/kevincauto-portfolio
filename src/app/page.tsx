@@ -226,9 +226,10 @@ export default function Home() {
                     <span className={styles.pill}>Professional</span>
                     <span className={styles.pill}>PDF Ready</span>
                   </div>
-                  <h3 className={styles.caseHeadline}>Streamlined lease creation for property managers.</h3>
+                  <h3 className={styles.caseHeadline}>Custom lease generation for my own rental business use.</h3>
                   <p className={styles.caseLead}>
                     Built with Next.js, React, TypeScript, and the docx library for professional document generation. 
+                    I wanted a solution that allowed me to generate very specific leases customized to my own properties. 
                     Features include customizable property details, tenant information, lease terms, and amenities. 
                     Generates properly formatted Word documents that can be easily converted to PDF for legal use.
                   </p>
