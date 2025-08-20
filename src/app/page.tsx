@@ -263,7 +263,7 @@ export default function Home() {
                   <span className={styles.featureIcon}>🏠</span>
                   <div>
                     <h4>Property Management</h4>
-                    <p>Multiple property support with pre-configured addresses and details.</p>
+                    <p>Handles each one of my properties with pre-configured addresses and details.</p>
                   </div>
                 </div>
                 <div className={styles.featureItem}>
