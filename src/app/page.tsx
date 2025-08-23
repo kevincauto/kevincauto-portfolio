@@ -228,11 +228,13 @@ export default function Home() {
                   </div>
                   <h3 className={styles.caseHeadline}>Custom lease generation for my own rental business use.</h3>
                   <p className={styles.caseLead}>
-                    Built with Next.js, React, TypeScript, and the docx library for professional document generation. 
-                    I wanted a customized solution that allowed me to generate very specific leases tailored to my own co-living properties. 
-                    Features include customizable property details, tenant information, lease terms, and amenities. 
-                    Generates properly formatted Word documents that can be easily converted to PDF for legal use.
+                    
+                    I wanted a customized solution that allowed me to generate very specific leases tailored to my 
+                    own co-living rental properties. 
+                    The features include customizable property details, tenant information, lease terms, and amenities. 
+                    It generates properly formatted Word documents that can be easily converted to PDF for legal use.
                     I use this tool every time I sign a new lease for my properties.
+                    It's built with Next.js, React, TypeScript, and the docx library for professional document generation. 
                   </p>
                   <div className={styles.spotlightCtas}>
                     <a
