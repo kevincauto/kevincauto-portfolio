@@ -228,7 +228,6 @@ export default function Home() {
                   </div>
                   <h3 className={styles.caseHeadline}>Custom lease generation for my own rental business use.</h3>
                   <p className={styles.caseLead}>
-                    
                     I wanted a customized solution that allowed me to generate very specific leases tailored to my 
                     own co-living rental properties. 
                     The features include customizable property details, tenant information, lease terms, and amenities. 
@@ -317,6 +316,44 @@ export default function Home() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Coursework Section */}
+        <section className={styles.showcase}>
+          <div className={styles.showcaseInner}>
+            <div className={styles.spotlightHeader}>
+              <div>
+                <h2 className={styles.showcaseTitle}>Recent Coursework</h2>
+                <p className={styles.showcaseSubtitle}>
+                  Continuous learning in AI engineering and software development.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.courseworkGrid}>
+              <div className={styles.courseCard}>
+                <div className={styles.courseHeader}>
+                  <span className={styles.courseBadge}>Completed 2025</span>
+                  <h3 className={styles.courseTitle}>The Complete Agentic AI Engineering Course</h3>
+                  <p className={styles.courseInstructor}>Created by Ed Donner</p>
+                </div>
+                <p className={styles.courseDescription}>
+                  Master AI Agents in 30 days: build 8 real-world projects with OpenAI Agents SDK, CrewAI, LangGraph, AutoGen and MCP.
+                </p>
+                <div className={styles.courseTech}>
+                  <span className={styles.techTag}>OpenAI Agents SDK</span>
+                  <span className={styles.techTag}>CrewAI</span>
+                  <span className={styles.techTag}>LangGraph</span>
+                  <span className={styles.techTag}>AutoGen</span>
+                  <span className={styles.techTag}>MCP</span>
+                </div>
+                <div className={styles.courseStatus}>
+                  <span className={styles.statusBadge}>Bestseller</span>
+                  <span className={styles.statusBadge}>8 Projects</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
