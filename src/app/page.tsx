@@ -233,7 +233,7 @@ export default function Home() {
                     The features include customizable property details, tenant information, lease terms, and amenities. 
                     It generates properly formatted Word documents that can be easily converted to PDF for legal use.
                     I use this tool every time I sign a new lease for my properties.
-                    It's built with Next.js, React, TypeScript, and the docx library for professional document generation. 
+                    It&apos;s built with Next.js, React, TypeScript, and the docx library for professional document generation. 
                   </p>
                   <div className={styles.spotlightCtas}>
                     <a
