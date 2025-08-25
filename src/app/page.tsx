@@ -354,6 +354,30 @@ export default function Home() {
                   <span className={styles.statusBadge}>8 Projects</span>
                 </div>
               </div>
+              
+              <div className={styles.courseCard}>
+                <div className={styles.courseHeader}>
+                  <span className={styles.courseBadge}>Completed 2024</span>
+                  <h3 className={styles.courseTitle}>Node with React: Fullstack Web Development</h3>
+                  <p className={styles.courseInstructor}>Created by Stephen Grider</p>
+                </div>
+                <p className={styles.courseDescription}>
+                  Build and deploy fullstack web apps with NodeJS, React, Redux, Express, and MongoDB. Master deployment techniques, OAuth authentication, email processing, and credit card payments.
+                </p>
+                <div className={styles.courseTech}>
+                  <span className={styles.techTag}>NodeJS</span>
+                  <span className={styles.techTag}>React</span>
+                  <span className={styles.techTag}>Redux</span>
+                  <span className={styles.techTag}>Express</span>
+                  <span className={styles.techTag}>MongoDB</span>
+                  <span className={styles.techTag}>OAuth</span>
+                  <span className={styles.techTag}>Stripe</span>
+                </div>
+                <div className={styles.courseStatus}>
+                  <span className={styles.statusBadge}>Fullstack</span>
+                  <span className={styles.statusBadge}>Production Ready</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
