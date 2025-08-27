@@ -741,13 +741,6 @@ a.secondary {
   .page {
     padding: 32px;
     padding-bottom: 80px;
-    min-width: 0;
-  }
-
-  .main {
-    align-items: center;
-    min-width: 0;
-    width: 100%;
   }
 
   .main ol {
