@@ -357,7 +357,7 @@ export default function Home() {
               
               <div className={styles.courseCard}>
                 <div className={styles.courseHeader}>
-                  <span className={styles.courseBadge}>Completed 2024</span>
+                  <span className={styles.courseBadge}>Completed 2022</span>
                   <h3 className={styles.courseTitle}>Node with React: Fullstack Web Development</h3>
                   <p className={styles.courseInstructor}>Created by Stephen Grider</p>
                 </div>
