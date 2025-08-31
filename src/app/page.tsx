@@ -382,7 +382,7 @@ export default function Home() {
               <div className={styles.courseCard}>
                 <div className={styles.courseHeader}>
                   <span className={styles.courseBadge}>Completed 2019</span>
-                  <h3 className={styles.courseTitle}>TypeScript: The Complete Developer's Guide</h3>
+                  <h3 className={styles.courseTitle}>TypeScript: The Complete Developer&apos;s Guide</h3>
                   <p className={styles.courseInstructor}>Created by Stephen Grider</p>
                 </div>
                 <p className={styles.courseDescription}>
