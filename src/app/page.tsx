@@ -378,6 +378,28 @@ export default function Home() {
                   <span className={styles.statusBadge}>Production Ready</span>
                 </div>
               </div>
+              
+              <div className={styles.courseCard}>
+                <div className={styles.courseHeader}>
+                  <span className={styles.courseBadge}>Completed 2019</span>
+                  <h3 className={styles.courseTitle}>TypeScript: The Complete Developer's Guide</h3>
+                  <p className={styles.courseInstructor}>Created by Stephen Grider</p>
+                </div>
+                <p className={styles.courseDescription}>
+                  Master TypeScript by learning popular design patterns and building complex projects. Includes React and Express integration for full-stack development.
+                </p>
+                <div className={styles.courseTech}>
+                  <span className={styles.techTag}>TypeScript</span>
+                  <span className={styles.techTag}>React</span>
+                  <span className={styles.techTag}>Express</span>
+                  <span className={styles.techTag}>Design Patterns</span>
+                  <span className={styles.techTag}>Advanced Types</span>
+                </div>
+                <div className={styles.courseStatus}>
+                  <span className={styles.statusBadge}>Bestseller</span>
+                  <span className={styles.statusBadge}>Complete Guide</span>
+                </div>
+              </div>
             </div>
           </div>
         </section>
