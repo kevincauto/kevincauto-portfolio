@@ -30,17 +30,15 @@
 .main {
   display: flex;
   flex-direction: column;
-  gap: 48px;
   grid-row-start: 2;
+  background: #f8f9fa;
 }
 .imageHero {
   position: relative;
   width: 100%;
   height: 100svh;
   min-height: 540px;
-  border-radius: var(--radius);
   overflow: hidden;
-  border: 1px solid var(--border);
 }
 
 .imageHeroImg {
@@ -146,9 +144,9 @@
   border: 1px solid var(--gray-alpha-200);
   border-radius: var(--radius);
   background:
-    linear-gradient(180deg, color-mix(in oklab, var(--accent) 10%, transparent), transparent 40%),
-    linear-gradient(0deg, color-mix(in oklab, var(--accent-2) 8%, transparent), transparent 60%);
-  margin-top: 8px;
+    linear-gradient(180deg, rgba(0, 0, 0, 0.08), transparent 40%),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.05), transparent 60%);
+  margin: 0;
 }
 
 .showcaseInner {
@@ -218,8 +216,9 @@
   border-radius: calc(var(--radius) + 2px);
   overflow: hidden;
   border: 1px solid var(--border);
-  background: color-mix(in oklab, var(--card) 80%, transparent);
+  background: #ffffff;
   margin-top: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
 }
 
 .visualImg {
@@ -269,7 +268,8 @@
   padding: 8px 12px;
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: color-mix(in oklab, var(--card) 70%, transparent);
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .featureGrid {
@@ -405,10 +405,7 @@
 .caseHero {
   border: 1px solid var(--border);
   border-radius: calc(var(--radius) + 2px);
-  background:
-    radial-gradient(120% 140% at 10% 0%, color-mix(in oklab, var(--accent) 10%, transparent), transparent 60%),
-    radial-gradient(120% 140% at 90% 100%, color-mix(in oklab, var(--accent-2) 8%, transparent), transparent 60%),
-    color-mix(in oklab, var(--card) 80%, transparent);
+  background: #ffffff;
   min-height: 220px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.25);
 }
@@ -522,8 +519,9 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: color-mix(in oklab, var(--card) 85%, transparent);
+  background: #ffffff;
   min-height: 220px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
 }
 
 @media (max-width: 768px) {
@@ -590,7 +588,7 @@
 .screenRail::-webkit-scrollbar { height: 10px; }
 .screenRail::-webkit-scrollbar-thumb { background: var(--gray-alpha-200); border-radius: 10px; }
 
-.screenCard { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; scroll-snap-align: start; background: color-mix(in oklab, var(--card) 85%, transparent); }
+.screenCard { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; scroll-snap-align: start; background: #ffffff; box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
 
 .browserChrome {
   display: grid;
@@ -599,7 +597,7 @@
   align-items: center;
   padding: 10px 12px;
   border-bottom: 1px solid var(--border);
-  background: color-mix(in oklab, var(--card) 80%, transparent);
+  background: #ffffff;
 }
 
 @media (max-width: 768px) {
@@ -619,7 +617,7 @@
   font-family: var(--font-geist-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
   font-size: 12px;
   opacity: 0.85;
-  background: color-mix(in oklab, var(--card) 70%, transparent);
+  background: #ffffff;
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 6px 8px;
@@ -785,8 +783,8 @@ a.secondary {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 24px;
-  background: color-mix(in oklab, var(--card) 85%, transparent);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
 }
 
 .courseHeader {
@@ -886,3 +884,5 @@ a.secondary {
     transform: none;
   }
 }
+
+
