@@ -366,14 +366,16 @@
   justify-content: center;
   padding: 10px 16px;
   border-radius: 10px;
-  background: var(--foreground);
-  color: var(--background);
+  background: var(--accent-red);
+  color: #ffffff;
   text-decoration: none;
   font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.35);
 }
 
 .visitButton:hover {
-  filter: brightness(0.92);
+  background: var(--accent-red-2);
 }
 
 /* Spotlight content layout */
@@ -854,12 +856,15 @@ a.secondary {
 
 .contributionLink {
   text-decoration: none;
-  color: inherit;
+  color: #ffffff;
   transition: transform 0.2s ease-in-out;
   width: 100%;
   max-width: 100%;
   display: block;
-  margin: 24px 0 64px 0;
+  margin: 0 0 64px 0;
+  background: #000000;
+  padding: 32px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
 }
 
 /* Desktop styles to maintain centering */
