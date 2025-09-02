@@ -6,14 +6,14 @@
 
 .label {
   font-weight: 500;
-  color: #ccc;
+  color: #1a1a1a;
 }
 
 .input {
   padding: 0.75rem;
-  border: 1px solid #444;
+  border: 1px solid #d1d5db;
   border-radius: 4px;
-  background-color: #2c2c2c;
-  color: #fff;
+  background-color: #ffffff;
+  color: #1a1a1a;
   font-size: 1rem;
 } 
