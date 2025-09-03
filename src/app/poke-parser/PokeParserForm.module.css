@@ -10,10 +10,10 @@
 
 .parser__input {
   padding: 0.75rem;
-  border: 1px solid #444;
+  border: 1px solid #d1d5db;
   border-radius: 4px;
-  background-color: #222;
-  color: #fff;
+  background-color: #ffffff;
+  color: #1a1a1a;
   font-size: 1rem;
   width: 80%;
   max-width: 800px;
@@ -66,8 +66,8 @@
   width: 100%;
   padding: 1.5rem;
   border-radius: 8px;
-  background-color: #1e1e1e;
-  border: 1px solid #333;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
 }
 
 .results__content {
@@ -99,14 +99,15 @@
 .jsonOutput {
   white-space: pre-wrap;
   word-wrap: break-word;
-  background-color: #111;
+  background-color: #f9fafb;
   padding: 1rem;
   border-radius: 4px;
-  color: #d4d4d4;
+  color: #1a1a1a;
   font-size: 0.9rem;
   max-height: 600px;
   overflow-y: auto;
   margin-top: 2rem;
+  border: 1px solid #d1d5db;
 }
 
 /* --- Stats Table Styles --- */
@@ -128,7 +129,7 @@
 .results__stats td {
   padding: 0.75rem 1rem;
   text-align: left;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #d1d5db;
 }
 
 .results__stats td {
@@ -137,7 +138,7 @@
 }
 
 .results__stats th {
-  background-color: #2a2a2a;
+  background-color: #f3f4f6;
   font-weight: bold;
   cursor: pointer;
   position: -webkit-sticky;
@@ -145,18 +146,19 @@
   top: 0;
   user-select: none;
   z-index: 2;
+  color: #1a1a1a;
 }
 
 .results__stats th:hover {
-  background-color: #383838;
+  background-color: #e5e7eb;
 }
 
 .results__stats tbody tr:nth-child(odd) {
-  background-color: #222;
+  background-color: #f9fafb;
 }
 
 .results__stats tbody tr:hover {
-  background-color: #3c3c3c;
+  background-color: #f3f4f6;
 }
 
 .results__stats th:first-child,
@@ -187,17 +189,17 @@
 /* Sticky cells need a solid background */
 .results__stats tbody tr td:first-child,
 .results__stats tbody tr td:nth-child(2) {
-  background-color: #1e1e1e;
+  background-color: #ffffff;
 }
 
 .results__stats tbody tr:nth-child(odd) td:first-child,
 .results__stats tbody tr:nth-child(odd) td:nth-child(2) {
-  background-color: #222;
+  background-color: #f9fafb;
 }
 
 .results__stats tbody tr:hover td:first-child,
 .results__stats tbody tr:hover td:nth-child(2) {
-  background-color: #3c3c3c;
+  background-color: #f3f4f6;
 }
 
 .rankHeader,
@@ -208,7 +210,7 @@
 
 .activeSort {
   background-color: #004d80 !important;
-  color: #fff;
+  color: #ffffff !important;
 }
 
 .sortIcon {
@@ -235,12 +237,13 @@
 }
 
 .awardCard {
-  background-color: #2a2a2a;
+  background-color: #ffffff;
   border-radius: 8px;
   padding: 1.5rem;
   text-align: center;
   width: 250px;
-  border: 1px solid #444;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .awardCard h3 {
@@ -253,7 +256,7 @@
   margin: -0.75rem 0 1rem 0;
   font-size: 0.9rem;
   font-style: italic;
-  color: #ccc;
+  color: #6b7280;
 }
 
 .awardPokemonImage {
@@ -274,7 +277,7 @@
 }
 
 .help {
-  color: #666;
+  color: #6b7280;
   font-size: 0.9rem;
   margin-top: 0.5rem;
   margin-bottom: 1rem;
