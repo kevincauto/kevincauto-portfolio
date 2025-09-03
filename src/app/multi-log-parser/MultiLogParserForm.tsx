@@ -31,7 +31,7 @@ function ResultsTable({ data }: { data: AggregatedPokemonStats[] }) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
       setSortField(field);
-      setSortDirection('asc');
+      setSortDirection('desc');
     }
   };
 
