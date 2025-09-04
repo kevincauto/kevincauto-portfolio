@@ -594,7 +594,7 @@ export function parseShowdownLog(log: string): DraftResult | null {
       const pokemon = getPokemon(targetSpecies, targetSide)
       const newStatus = parts[3] as PokemonState['status']
       pokemon.status = newStatus;
-      
+
       const fromTag = parts[4] || ''
       if (fromTag.includes('[from] item:') && (fromTag.includes('Flame Orb') || fromTag.includes('Toxic Orb'))) {
         if(pokemon.trickedBy) {
@@ -604,6 +604,24 @@ export function parseShowdownLog(log: string): DraftResult | null {
         }
       } else {
         let moveFound = false;
+
+        // Define moves that can cause secondary effects
+        const burnMoves = new Set([
+          'Ember', 'Flamethrower', 'Fire Blast', 'Fire Punch', 'Flame Wheel', 'Heat Wave',
+          'Overheat', 'Blast Burn', 'Eruption', 'Magma Storm', 'Blue Flare', 'Fiery Dance',
+          'Inferno', 'Lava Plume', 'Sacred Fire', 'Scald', 'Steam Eruption', 'Flare Blitz'
+        ]);
+
+        const poisonMoves = new Set([
+          'Poison Jab', 'Poison Sting', 'Poison Tail', 'Poison Fang', 'Cross Poison',
+          'Sludge Bomb', 'Sludge Wave', 'Sludge', 'Poison Gas', 'Smog', 'Gunk Shot'
+        ]);
+
+        const paralyzeMoves = new Set([
+          'Thunderbolt', 'Thunder', 'Thunder Punch', 'Thunder Shock', 'Spark',
+          'Zap Cannon', 'Discharge', 'Bolt Strike', 'Fusion Bolt', 'Electroweb'
+        ]);
+
         // Search for a move in the current turn that could be the cause
         for (let i = idx - 1; i >= 0; i--) {
           const prevLine = lines[i];
@@ -613,25 +631,55 @@ export function parseShowdownLog(log: string): DraftResult | null {
             const moveParts = prevLine.split('|');
             const atkField = moveParts[2];
             const defField = moveParts[4];
-            
+
             if (defField === targetField) {
               const atkSide = sideOfNick(atkField);
               const atkSlot = atkField.split(':')[0];
               const atkSpecies = activePokemonInSlot[atkSlot];
               if (atkSpecies) {
-                // Check if the move is a status move that matches the new status
-                const isMatchingStatusMove = 
+                const moveName = moveParts[3];
+
+                // Check if the move is a direct status move that matches the new status
+                const isMatchingStatusMove =
                   (newStatus === 'psn' || newStatus === 'tox') && (moveParts[3] === 'Poison Powder' || moveParts[3] === 'Toxic') ||
                   (newStatus === 'brn' && moveParts[3] === 'Will-O-Wisp') ||
                   (newStatus === 'par' && moveParts[3] === 'Thunder Wave') ||
                   (newStatus === 'slp' && moveParts[3] === 'Spore');
 
-                if (isMatchingStatusMove) {
+                // Check if the move can cause secondary status effects
+                const canCauseStatus =
+                  (newStatus === 'brn' && burnMoves.has(moveName)) ||
+                  (newStatus === 'psn' && poisonMoves.has(moveName)) ||
+                  (newStatus === 'par' && paralyzeMoves.has(moveName));
+
+                if (isMatchingStatusMove || canCauseStatus) {
                   pokemon.statusBy = getPokemonKey(atkSide, atkSpecies);
                   moveFound = true;
                 }
               }
               break;
+            }
+          }
+        }
+
+        // Check lastHit for secondary effects if no move found in current turn
+        if (!moveFound) {
+          const targetKey = getPokemonKey(targetSide, targetSpecies);
+          const lastHitData = lastHit[targetKey];
+
+          if (lastHitData && lastHitData.turn >= currentTurn - 1) { // Check recent turns
+            const attackerState = battle.pokemon[lastHitData.attackerKey];
+            if (attackerState) {
+              const moveName = lastHitData.move;
+              const canCauseSecondaryStatus =
+                (newStatus === 'brn' && burnMoves.has(moveName)) ||
+                (newStatus === 'psn' && poisonMoves.has(moveName)) ||
+                (newStatus === 'par' && paralyzeMoves.has(moveName));
+
+              if (canCauseSecondaryStatus) {
+                pokemon.statusBy = lastHitData.attackerKey;
+                moveFound = true;
+              }
             }
           }
         }
@@ -766,10 +814,10 @@ export function parseShowdownLog(log: string): DraftResult | null {
           damageType = fromContent;
         } else if (['psn', 'brn', 'tox'].includes(fromContent)) {
           const victimPokemon = getPokemon(victimSpecies, victimSide);
-          if ((fromContent === 'psn' || fromContent === 'tox')) {
+          attackerKey = victimPokemon.statusBy;
+          if (!attackerKey && (fromContent === 'psn' || fromContent === 'tox')) {
+            // Fallback to Toxic Spikes if statusBy is not set
             attackerKey = battle.hazards[victimSide].toxicSpikesSetter;
-          } else {
-            attackerKey = victimPokemon.statusBy;
           }
           damageType = fromContent === 'brn' ? 'Burn' : 'Poison';
         } else if (fromContent === 'Sandstorm') {
