@@ -287,7 +287,7 @@ export default function Home() {
 
             <div className={styles.screenRail}>
               {[
-                { label: 'Rental Real Estate Lease Generator', url: 'lease-editor', img: '/screenshot-lease-generator.png' },
+                { label: 'Rental Real Estate Lease Generator', url: 'lease-editor', img: '/lease-screenshot.png' },
               ].map((screen) => (
                 <div key={screen.label} className={styles.screenCard}>
                   <div className={styles.browserChrome}>
@@ -306,7 +306,9 @@ export default function Home() {
                           alt={`${screen.label} preview`}
                           fill
                           className={styles.screenImg}
-                          sizes="(max-width: 900px) 100vw, 33vw"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
+                          quality={95}
+                          priority={true}
                         />
                         <div className={styles.surfaceBadge}>{screen.label}</div>
                       </>

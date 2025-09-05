@@ -249,7 +249,7 @@
 }
 
 /* Screen rail image preview */
-.screenImg { object-fit: cover; }
+.screenImg { object-fit: contain; }
 .surface { position: relative; }
 .surfaceBadge {
   position: absolute;
@@ -350,7 +350,7 @@
 }
 
 .screenshotImg {
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 10px;
 }
 
@@ -635,7 +635,8 @@
 .surface {
   position: relative;
   height: 0;
-  padding-bottom: 56.25%;
+  /* Use a slightly wider aspect to better match screenshots and reduce downscaling */
+  padding-bottom: 50%;
   background:
     radial-gradient(100% 120% at 0% 0%, var(--gray-alpha-100), transparent),
     radial-gradient(100% 120% at 100% 100%, var(--gray-alpha-100), transparent);
