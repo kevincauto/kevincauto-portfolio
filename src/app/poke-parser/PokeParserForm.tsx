@@ -500,7 +500,7 @@ export default function PokeParserForm() {
               </div>
             )}
 
-            <h3 style={{ fontSize: '1.5rem' }}>Knock-outs:</h3>
+            <p><strong>Knock-outs:</strong></p>
             {data.kos.length === 0 ? (
               <p>No KOs recorded.</p>
             ) : (
