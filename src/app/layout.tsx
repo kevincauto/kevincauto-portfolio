@@ -26,7 +26,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        {children}
+        <main style={{ flex: '1 0 auto' }}>
+          {children}
+        </main>
         <Header />
       </body>
     </html>
