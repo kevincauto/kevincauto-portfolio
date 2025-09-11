@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, FormEvent, useEffect } from 'react';
+import { useState, FormEvent, useEffect, useCallback } from 'react';
 import styles from './PokeParserForm.module.css';
 import PokemonIcon from '../../components/PokemonIcon';
 import Image from 'next/image';
@@ -110,6 +110,7 @@ function AwardCard({ pokemon, award }: { pokemon: PokemonStat; award: string }) 
 
 export default function PokeParserForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [url, setUrl] = useState('https://replay.pokemonshowdown.com/gen6draft-2335637717-nwegnp5dgbuu4768334bxodu0lmvnnopw');
   const [data, setData] = useState<Parsed | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -117,35 +118,25 @@ export default function PokeParserForm() {
   const [sortField, setSortField] = useState<SortField>('kos');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
-  useEffect(() => {
-    // Create a synthetic event object
-    const event = {
-      preventDefault: () => {}
-    } as FormEvent<HTMLFormElement>;
-    
-    // Call handleSubmit with the synthetic event
-    handleSubmit(event);
-  }, []); // Empty dependency array means this runs once on mount
-
-  const normalizeUrl = (inputUrl: string): string => {
-    let normalized = inputUrl.trim();
-    if (normalized.startsWith('https://play.pokemonshowdown.com/')) {
-      normalized = normalized.replace('play.pokemonshowdown.com/', 'replay.pokemonshowdown.com/');
-      normalized = normalized.replace('/battle-', '/');
-    }
-    if (!normalized.endsWith('.log')) {
-      normalized += '.log';
-    }
-    return normalized;
-  };
-
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  const handleSubmit = useCallback(async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setData(null);
 
     try {
+      const normalizeUrl = (inputUrl: string): string => {
+        let normalized = inputUrl.trim();
+        if (normalized.startsWith('https://play.pokemonshowdown.com/')) {
+          normalized = normalized.replace('play.pokemonshowdown.com/', 'replay.pokemonshowdown.com/');
+          normalized = normalized.replace('/battle-', '/');
+        }
+        if (!normalized.endsWith('.log')) {
+          normalized += '.log';
+        }
+        return normalized;
+      };
+
       const normalizedUrl = normalizeUrl(url);
       const response = await fetch('/api/poke-parser', {
         method: 'POST',
@@ -175,7 +166,26 @@ export default function PokeParserForm() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [url, setLoading, setError, setData, router]);
+
+  useEffect(() => {
+    // Check if there's a game in the query string
+    const gameId = searchParams.get('game');
+    if (gameId) {
+      // Reconstruct the full URL
+      const fullUrl = `https://replay.pokemonshowdown.com/${gameId}`;
+      setUrl(fullUrl);
+
+      // Create a synthetic event object
+      const event = {
+        preventDefault: () => {}
+      } as FormEvent<HTMLFormElement>;
+
+      // Call handleSubmit with the synthetic event
+      handleSubmit(event);
+    }
+    // If no game in query string, don't auto-parse anything
+  }, [searchParams, handleSubmit, setUrl]); // Include all dependencies
 
   function handleClear() {
     setUrl('');
