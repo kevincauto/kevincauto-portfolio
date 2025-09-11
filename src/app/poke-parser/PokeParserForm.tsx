@@ -4,6 +4,7 @@ import { useState, FormEvent, useEffect } from 'react';
 import styles from './PokeParserForm.module.css';
 import PokemonIcon from '../../components/PokemonIcon';
 import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const awardExplanations: { [key: string]: string } = {
   'Glaceon Award (Did Nothing)': 'This Pokémon did not deal or receive any damage, and did not faint.',
@@ -108,6 +109,7 @@ function AwardCard({ pokemon, award }: { pokemon: PokemonStat; award: string }) 
 }
 
 export default function PokeParserForm() {
+  const router = useRouter();
   const [url, setUrl] = useState('https://replay.pokemonshowdown.com/gen6draft-2335637717-nwegnp5dgbuu4768334bxodu0lmvnnopw');
   const [data, setData] = useState<Parsed | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -161,6 +163,12 @@ export default function PokeParserForm() {
       const responseData = await response.json();
       
       setData(responseData.parsed);
+      
+      // Extract the battle ID from the URL
+      const battleId = normalizedUrl.match(/(?:replay\.pokemonshowdown\.com\/)(.+?)(?:\.log)?$/)?.[1];
+      if (battleId) {
+        router.push(`/poke-parser?game=${battleId}`, { scroll: false });
+      }
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
       else setError('Unknown error'); 
