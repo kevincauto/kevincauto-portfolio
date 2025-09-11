@@ -115,6 +115,16 @@ export default function PokeParserForm() {
   const [sortField, setSortField] = useState<SortField>('kos');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
+  useEffect(() => {
+    // Create a synthetic event object
+    const event = {
+      preventDefault: () => {}
+    } as FormEvent<HTMLFormElement>;
+    
+    // Call handleSubmit with the synthetic event
+    handleSubmit(event);
+  }, []); // Empty dependency array means this runs once on mount
+
   const normalizeUrl = (inputUrl: string): string => {
     let normalized = inputUrl.trim();
     if (normalized.startsWith('https://play.pokemonshowdown.com/')) {
