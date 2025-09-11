@@ -111,7 +111,16 @@ function AwardCard({ pokemon, award }: { pokemon: PokemonStat; award: string }) 
 export default function PokeParserForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [url, setUrl] = useState('https://replay.pokemonshowdown.com/gen6draft-2335637717-nwegnp5dgbuu4768334bxodu0lmvnnopw');
+  const [url, setUrl] = useState(() => {
+    // Check if there's a game in the query string
+    const gameId = searchParams.get('game');
+    if (gameId) {
+      // Reconstruct the full URL from the query string
+      return `https://replay.pokemonshowdown.com/${gameId}`;
+    }
+    // Otherwise use the default URL
+    return 'https://replay.pokemonshowdown.com/gen6draft-2335637717-nwegnp5dgbuu4768334bxodu0lmvnnopw';
+  });
   const [data, setData] = useState<Parsed | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -168,24 +177,6 @@ export default function PokeParserForm() {
     }
   }, [url, setLoading, setError, setData, router]);
 
-  useEffect(() => {
-    // Check if there's a game in the query string
-    const gameId = searchParams.get('game');
-    if (gameId) {
-      // Reconstruct the full URL
-      const fullUrl = `https://replay.pokemonshowdown.com/${gameId}`;
-      setUrl(fullUrl);
-
-      // Create a synthetic event object
-      const event = {
-        preventDefault: () => {}
-      } as FormEvent<HTMLFormElement>;
-
-      // Call handleSubmit with the synthetic event
-      handleSubmit(event);
-    }
-    // If no game in query string, don't auto-parse anything
-  }, [searchParams, handleSubmit, setUrl]); // Include all dependencies
 
   function handleClear() {
     setUrl('');
