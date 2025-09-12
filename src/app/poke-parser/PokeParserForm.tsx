@@ -509,7 +509,6 @@ export default function PokeParserForm() {
             {/* Winner and Score */}
             {(data.winner || data.score) && (
               <div className={styles.results__summary}>
-                <h3>Result</h3>
                 {data.winner && (
                   <p><strong>Winner:</strong> {data.winner}</p>
                 )}
