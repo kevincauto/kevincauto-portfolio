@@ -361,4 +361,87 @@
   font-size: 1.2rem;
   font-weight: bold;
   margin: 0;
+}
+
+/* Tab System */
+.tabContainer {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.tabButtons {
+  display: flex;
+  border-bottom: 1px solid #d1d5db;
+  margin-bottom: 1rem;
+}
+
+.tabButton {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background-color: transparent;
+  color: #6b7280;
+  font-size: 1rem;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease-in-out;
+}
+
+.tabButton:hover {
+  color: #374151;
+  background-color: #f9fafb;
+}
+
+.tabButton.active {
+  color: #1a1a1a;
+  border-bottom-color: #ffb400;
+  background-color: #ffffff;
+}
+
+/* Textarea Container */
+.textareaContainer {
+  width: 100%;
+}
+
+.textarea {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background-color: #ffffff;
+  color: #1a1a1a;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 200px;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #ffb400;
+  box-shadow: 0 0 0 3px rgba(255, 180, 0, 0.1);
+}
+
+.textareaInfo {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+}
+
+.textareaInfo p {
+  margin: 0 0 0.5rem 0;
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+.textareaInfo ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.textareaInfo li {
+  margin-bottom: 0.25rem;
 } 

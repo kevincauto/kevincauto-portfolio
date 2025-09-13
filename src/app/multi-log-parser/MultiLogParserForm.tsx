@@ -331,6 +331,8 @@ function AwardCard({ pokemon, award }: { pokemon: AggregatedPokemonStats; award:
 
 
 export default function MultiLogParserForm() {
+  const [activeTab, setActiveTab] = useState<'urls' | 'textarea'>('urls');
+  const [textareaContent, setTextareaContent] = useState('');
   const [urls, setUrls] = useState<string[]>([
     "https://replay.pokemonshowdown.com/gen6draft-2285029436",
     "https://replay.pokemonshowdown.com/gen6draft-2285062206",
@@ -567,6 +569,67 @@ export default function MultiLogParserForm() {
     return normalized;
   };
 
+  const extractUrlsFromText = (text: string): string[] => {
+    // Split by newlines and filter out empty lines
+    const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    
+    const validUrls: string[] = [];
+    
+    for (const line of lines) {
+      // Check if line contains a valid replay URL
+      if (line.includes('replay.pokemonshowdown.com') || 
+          line.includes('play.pokemonshowdown.com') ||
+          line.includes('.log')) {
+        
+        // Extract URL from line (in case there's other text)
+        const urlMatch = line.match(/(https?:\/\/[^\s]+)/);
+        if (urlMatch) {
+          const url = urlMatch[1];
+          // Check if it's a valid Pokémon Showdown URL
+          if (url.includes('pokemonshowdown.com') || url.endsWith('.log')) {
+            validUrls.push(url);
+          }
+        }
+      }
+    }
+    
+    return validUrls;
+  };
+
+  const handleParseTextarea = async () => {
+    setLoading(true);
+    setError(null);
+    setResults(null);
+
+    try {
+      const extractedUrls = extractUrlsFromText(textareaContent);
+      
+      if (extractedUrls.length === 0) {
+        throw new Error('No valid replay URLs found in the textarea. Please paste URLs that contain "replay.pokemonshowdown.com", "play.pokemonshowdown.com", or end with ".log"');
+      }
+
+      const normalizedUrls = extractedUrls.map(normalizeUrl);
+      const res = await fetch('/api/multi-poke-parser', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ urls: normalizedUrls }),
+      });
+
+      const responseData = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(responseData.message ?? 'Unknown server error');
+      }
+
+      setResults(responseData.aggregatedStats);
+    } catch (err: unknown) {
+      if (err instanceof Error) setError(err.message);
+      else setError('An unknown error occurred.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsAccordionOpen(false); // Always close accordion on submit
@@ -648,69 +711,128 @@ export default function MultiLogParserForm() {
   return (
     <>
       <form onSubmit={handleSubmit} className={styles.form}>
-        <div className={styles.accordion}>
-          <button
-            type="button"
-            onClick={() => setIsAccordionOpen(!isAccordionOpen)}
-            className={styles.accordionToggle}
-          >
-            <span>{isAccordionOpen ? 'Hide Replay URLs' : 'Show Replay URLs'}</span>
-            <span className={`${styles.accordionIcon} ${isAccordionOpen ? styles.open : ''}`}>▼</span>
-          </button>
-          <div className={`${styles.accordionContent} ${isAccordionOpen ? styles.open : ''}`}>
-            <div className={styles.inputList}>
-              {urls.map((url, index) => (
-                <div key={index} className={styles.inputRow}>
-                  <input
-                    type="url"
-                    placeholder="Paste draft replay URL"
-                    value={url}
-                    onChange={(e) => handleInputChange(index, e.target.value)}
-                    className={styles.input}
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveInput(index)}
-                    className={`${styles.iconButton} ${styles.deleteButton}`}
-                    disabled={urls.length === 1}
-                    aria-label="Remove URL"
-                  >
-                    <FaTrash />
-                  </button>
-                </div>
-              ))}
-            </div>
-            <div className={styles.buttonGroup}>
+        {/* Tab System */}
+        <div className={styles.tabContainer}>
+          <div className={styles.tabButtons}>
+            <button
+              type="button"
+              className={`${styles.tabButton} ${activeTab === 'urls' ? styles.active : ''}`}
+              onClick={() => setActiveTab('urls')}
+            >
+              Individual URLs
+            </button>
+            <button
+              type="button"
+              className={`${styles.tabButton} ${activeTab === 'textarea' ? styles.active : ''}`}
+              onClick={() => setActiveTab('textarea')}
+            >
+              Bulk Paste
+            </button>
+          </div>
+          
+          {/* Individual URLs Tab */}
+          {activeTab === 'urls' && (
+            <div className={styles.accordion}>
               <button
                 type="button"
-                onClick={handleAddInput}
-                className={styles.addButton}
-                aria-label="Add URL"
+                onClick={() => setIsAccordionOpen(!isAccordionOpen)}
+                className={styles.accordionToggle}
               >
-                <FaPlus />
-                <span>Add Another URL</span>
+                <span>{isAccordionOpen ? 'Hide Replay URLs' : 'Show Replay URLs'}</span>
+                <span className={`${styles.accordionIcon} ${isAccordionOpen ? styles.open : ''}`}>▼</span>
               </button>
+              <div className={`${styles.accordionContent} ${isAccordionOpen ? styles.open : ''}`}>
+                <div className={styles.inputList}>
+                  {urls.map((url, index) => (
+                    <div key={index} className={styles.inputRow}>
+                      <input
+                        type="url"
+                        placeholder="Paste draft replay URL"
+                        value={url}
+                        onChange={(e) => handleInputChange(index, e.target.value)}
+                        className={styles.input}
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveInput(index)}
+                        className={`${styles.iconButton} ${styles.deleteButton}`}
+                        disabled={urls.length === 1}
+                        aria-label="Remove URL"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className={styles.buttonGroup}>
+                  <button
+                    type="button"
+                    onClick={handleAddInput}
+                    className={styles.addButton}
+                    aria-label="Add URL"
+                  >
+                    <FaPlus />
+                    <span>Add Another URL</span>
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
+          
+          {/* Bulk Paste Tab */}
+          {activeTab === 'textarea' && (
+            <div className={styles.textareaContainer}>
+              <textarea
+                value={textareaContent}
+                onChange={(e) => setTextareaContent(e.target.value)}
+                placeholder="Paste multiple replay URLs here, one per line. The app will automatically extract valid URLs from the text."
+                className={styles.textarea}
+                rows={10}
+              />
+              <div className={styles.textareaInfo}>
+                <p>Paste any text containing replay URLs. The app will automatically find and extract valid URLs that contain:</p>
+                <ul>
+                  <li>replay.pokemonshowdown.com</li>
+                  <li>play.pokemonshowdown.com</li>
+                  <li>URLs ending with .log</li>
+                </ul>
+              </div>
+            </div>
+          )}
         </div>
+        
         <div className={styles.formActions}>
-          <button
-            type="button"
-            onClick={handleDeleteAll}
-            className={styles.deleteAllButton}
-          >
-            Delete All URLs
-          </button>
-          <button onClick={handleParseSeason2} className={styles.parseButton} disabled={loading}>
-            {loading ? 'Parsing...' : 'Parse Season 2'}
-          </button>
-          <button onClick={handleParseSeason3} className={styles.parseButton} disabled={loading}>
-            {loading ? 'Parsing...' : 'Parse Season 3'}
-          </button>
-          <button type="submit" className={styles.parseButton} disabled={loading}>
-            {loading ? 'Parsing...' : 'Parse All'}
-          </button>
+          {activeTab === 'urls' && (
+            <>
+              <button
+                type="button"
+                onClick={handleDeleteAll}
+                className={styles.deleteAllButton}
+              >
+                Delete All URLs
+              </button>
+              <button onClick={handleParseSeason2} className={styles.parseButton} disabled={loading}>
+                {loading ? 'Parsing...' : 'Parse Season 2'}
+              </button>
+              <button onClick={handleParseSeason3} className={styles.parseButton} disabled={loading}>
+                {loading ? 'Parsing...' : 'Parse Season 3'}
+              </button>
+              <button type="submit" className={styles.parseButton} disabled={loading}>
+                {loading ? 'Parsing...' : 'Parse All'}
+              </button>
+            </>
+          )}
+          {activeTab === 'textarea' && (
+            <button
+              type="button"
+              onClick={handleParseTextarea}
+              className={styles.parseButton}
+              disabled={loading}
+            >
+              {loading ? 'Parsing...' : 'Parse Textarea'}
+            </button>
+          )}
         </div>
       </form>
 
