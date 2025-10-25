@@ -212,7 +212,7 @@ export const generateLease = async (data: LeaseData) => {
             numbering: { reference: 'rent-numbering', level: 0 },
         }),
         new Paragraph({
-            children: [b('PARTIAL PAYMENT: '), t('LANDLORD's acceptance of any partial rent payment shall not waive LANDLORD's right to require immediate payment of the unpaid balance of rent, or waive or affect LANDLORD's rights with respect to any remaining unpaid rent.')],
+            children: [b('PARTIAL PAYMENT: '), t('LANDLORD\'s acceptance of any partial rent payment shall not waive LANDLORD\'s right to require immediate payment of the unpaid balance of rent, or waive or affect LANDLORD\'s rights with respect to any remaining unpaid rent.')],
             numbering: { reference: 'rent-numbering', level: 0 },
         }),
         new Paragraph({
