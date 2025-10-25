@@ -171,7 +171,7 @@ export const generateLease = async (data: LeaseData) => {
         new Paragraph({ children: [b('NOISE: '), t('Quiet hours for the Premises will be between 10 pm and 10 am.  TV, media, and music volume shall not disrupt other housemates.')]}),
         br(),
 
-        new Paragraph({ children: [b('TERM: '), t(`TENANT shall lease the Premises beginning ${startDate} and continuing through ${endDate}. The Lease shall continue on a month-to-month basis after this initial period. Each month period shall begin on the first day of the month and end on the last day of the month. Written or email notice of 30 days before the 1st of the month, or enough notice as needed by Pennsylvania law, from either the LANDLORD or TENANT, must be provided to terminate the lease. If proper notice is not given by the TENANT, they will be responsible for the entirety of the following month’s rent. Any rent increases by the LANDLORD will require 30 or more days of notice to the TENANT.`)]}),
+        new Paragraph({ children: [b('TERM: '), t(`TENANT shall lease the Premises beginning ${startDate} and continuing through ${endDate}. The Lease shall continue on a month-to-month basis after this initial period. Each month period shall begin on the first day of the month and end on the last day of the month. Written or email notice of 30 days before the 1st of TENANT's last month, or enough notice as needed by Pennsylvania law, from either the LANDLORD or TENANT, must be provided to terminate the lease. If proper notice is not given by the TENANT, they will be responsible for the entirety of the following month's rent. TENANT will always be responsible for their last month's full rent from the 1st to the last day of the month, even if they move-out before the last day of the month. The only exception is if a replacement tenant moves in after the TENANT's move-out date and before the last day of the month. In this case, the LANDLORD will not collect double rent for these overlapping dates and TENANT will be reimbursed or charged a prorated last month's rent based on the replacement tenant's days of occupancy.`)]}),
         br(),
         
         new Paragraph({ children: [b('RENT: '), t('The following terms apply to the rent payment for this Lease.')]}),
@@ -212,7 +212,11 @@ export const generateLease = async (data: LeaseData) => {
             numbering: { reference: 'rent-numbering', level: 0 },
         }),
         new Paragraph({
-            children: [b('PARTIAL PAYMENT: '), t('LANDLORD’s acceptance of any partial rent payment shall not waive LANDLORD’s right to require immediate payment of the unpaid balance of rent, or waive or affect LANDLORD’s rights with respect to any remaining unpaid rent.')],
+            children: [b('PARTIAL PAYMENT: '), t('LANDLORD's acceptance of any partial rent payment shall not waive LANDLORD's right to require immediate payment of the unpaid balance of rent, or waive or affect LANDLORD's rights with respect to any remaining unpaid rent.')],
+            numbering: { reference: 'rent-numbering', level: 0 },
+        }),
+        new Paragraph({
+            children: [b('RENT INCREASES: '), t('Any rent increases by the LANDLORD will require 30 or more days of notice to the TENANT.')],
             numbering: { reference: 'rent-numbering', level: 0 },
         }),
         br(),
