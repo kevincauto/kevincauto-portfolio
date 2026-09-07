@@ -24,6 +24,13 @@
   color: #1a1a1a;
 }
 
+.fieldLabel {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin: 1rem 0 0.75rem;
+}
+
 .propertyToggle {
   display: flex;
   gap: 1rem;
@@ -61,19 +68,22 @@
   gap: 1rem;
 }
 
-.checkboxGrid {
+.checkboxGrid,
+.radioGrid {
   display: flex;
   gap: 2rem;
   flex-wrap: wrap;
 }
 
-.checkboxWrapper {
+.checkboxWrapper,
+.radioWrapper {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.checkboxWrapper input {
+.checkboxWrapper input,
+.radioWrapper input {
   width: 18px;
   height: 18px;
 }
@@ -144,7 +154,8 @@
     grid-template-columns: 1fr;
   }
 
-  .checkboxGrid {
+  .checkboxGrid,
+  .radioGrid {
     gap: 1rem;
   }
 

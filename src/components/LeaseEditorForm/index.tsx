@@ -31,6 +31,12 @@ export default function LeaseEditorForm() {
     securityDeposit: '2000',
     roomName: '',
     bathroom: '',
+    furnished: false,
+    isRoomUpgrade: false,
+    previousLeaseIssuedDate: '',
+    previousLeaseEndDate: '',
+    currentSecurityDepositHeld: '',
+    additionalSecurityDepositRequested: '',
     maidService: false,
     privateParking: false,
   });
@@ -53,6 +59,16 @@ export default function LeaseEditorForm() {
           [name]: formatted,
         }));
       }
+    } else if (name === 'previousLeaseIssuedDate') {
+      const cleaned = ('' + value).replace(/\D/g, '').slice(0, 6); // MMYYYY
+      const mm = cleaned.slice(0, 2);
+      const yyyy = cleaned.slice(2, 6);
+      const formatted = yyyy.length > 0 ? `${mm}/${yyyy}` : mm;
+
+      setFormData((prev) => ({
+        ...prev,
+        [name]: formatted,
+      }));
     } else {
       setFormData((prev) => ({
         ...prev,
@@ -86,6 +102,12 @@ export default function LeaseEditorForm() {
       securityDeposit: parseFloat(formData.securityDeposit) || 0,
       roomName: formData.roomName,
       bathroom: formData.bathroom,
+      furnished: formData.furnished,
+      isRoomUpgrade: formData.isRoomUpgrade,
+      previousLeaseIssuedDate: formData.previousLeaseIssuedDate,
+      previousLeaseEndDate: formData.previousLeaseEndDate,
+      currentSecurityDepositHeld: parseFloat(formData.currentSecurityDepositHeld) || 0,
+      additionalSecurityDepositRequested: parseFloat(formData.additionalSecurityDepositRequested) || 0,
       maidService: formData.maidService,
       privateParking: formData.privateParking,
     };
@@ -125,6 +147,87 @@ export default function LeaseEditorForm() {
         <legend className={styles.legend}>Room Information</legend>
         <FormInput label="Room Name" name="roomName" placeholder="e.g., Second Floor Bedroom" onChange={handleInputChange} value={formData.roomName} required />
         <FormInput label="Bathroom" name="bathroom" placeholder="e.g., second floor shared bathroom" onChange={handleInputChange} value={formData.bathroom} required />
+
+        <div>
+          <p className={styles.fieldLabel}>Furnished?</p>
+          <div className={styles.radioGrid}>
+            <div className={styles.radioWrapper}>
+              <input
+                type="radio"
+                id="furnishedYes"
+                name="furnished"
+                checked={formData.furnished}
+                onChange={() => setFormData((prev) => ({ ...prev, furnished: true }))}
+              />
+              <label htmlFor="furnishedYes">Furnished</label>
+            </div>
+            <div className={styles.radioWrapper}>
+              <input
+                type="radio"
+                id="furnishedNo"
+                name="furnished"
+                checked={!formData.furnished}
+                onChange={() => setFormData((prev) => ({ ...prev, furnished: false }))}
+              />
+              <label htmlFor="furnishedNo">Unfurnished</label>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.checkboxWrapper} style={{ marginTop: '0.75rem' }}>
+          <input
+            type="checkbox"
+            id="isRoomUpgrade"
+            name="isRoomUpgrade"
+            onChange={handleInputChange}
+            checked={formData.isRoomUpgrade}
+          />
+          <label htmlFor="isRoomUpgrade">This is a room upgrade</label>
+        </div>
+
+        {formData.isRoomUpgrade && (
+          <div className={styles.grid} style={{ marginTop: '1rem' }}>
+            <FormInput
+              label="Previous Lease Agreement Issued (Month/Year)"
+              name="previousLeaseIssuedDate"
+              type="text"
+              placeholder="mm/yyyy"
+              inputMode="numeric"
+              pattern="^(0[1-9]|1[0-2])\/\d{4}$"
+              title="Enter a month and year like mm/yyyy (e.g. 07/2025)"
+              onChange={handleInputChange}
+              value={formData.previousLeaseIssuedDate}
+              maxLength={7}
+              required
+            />
+            <FormInput
+              label="Previous Lease End Date"
+              name="previousLeaseEndDate"
+              type="date"
+              onChange={handleInputChange}
+              value={formData.previousLeaseEndDate}
+              required
+            />
+            <FormInput
+              label="Current Security Deposit Held"
+              name="currentSecurityDepositHeld"
+              type="number"
+              placeholder="0"
+              onChange={handleInputChange}
+              value={formData.currentSecurityDepositHeld}
+              required
+            />
+            <FormInput
+              label="Additional Security Deposit Requested"
+              name="additionalSecurityDepositRequested"
+              type="number"
+              placeholder="0"
+              onChange={handleInputChange}
+              value={formData.additionalSecurityDepositRequested}
+              required
+            />
+          </div>
+        )}
       </fieldset>
 
       <fieldset className={styles.fieldset}>

@@ -9,6 +9,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
   gap: 2rem;
   max-width: 1200px;
   margin: 0 auto;
@@ -24,4 +25,18 @@
 
 .link:hover {
   color: #ffb400; /* ESPN Gold */
+}
+
+@media (max-width: 600px) {
+  .header {
+    padding: 0.75rem 1rem;
+  }
+
+  .nav {
+    gap: 0.85rem 1.25rem;
+  }
+
+  .link {
+    font-size: 0.95rem;
+  }
 } 

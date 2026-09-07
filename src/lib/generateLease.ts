@@ -17,6 +17,12 @@ export interface LeaseData {
   securityDeposit: number;
   roomName: string;
   bathroom: string;
+  furnished: boolean;
+  isRoomUpgrade?: boolean;
+  previousLeaseIssuedDate?: string;
+  previousLeaseEndDate?: string;
+  currentSecurityDepositHeld?: number;
+  additionalSecurityDepositRequested?: number;
   maidService: boolean;
   privateParking: boolean;
 }
@@ -33,6 +39,36 @@ const formatPhoneNumber = (phoneStr: string): string => {
   return phoneStr;
 };
 
+const formatDateInputLocal = (dateStr?: string): string => {
+  if (!dateStr) return '';
+  const d = new Date(dateStr.replace(/-/g, '/'));
+  return d.toLocaleDateString();
+};
+
+const formatMonthYearInput = (monthStr?: string): string => {
+  if (!monthStr) return '';
+  // Accept either "YYYY-MM" (native month input) or "MM/YYYY" (text input).
+  if (monthStr.includes('/')) {
+    const [mmStr, yyyyStr] = monthStr.split('/');
+    const monthIndex = Number(mmStr) - 1;
+    const year = Number(yyyyStr);
+    if (!Number.isFinite(year) || !Number.isFinite(monthIndex)) return monthStr;
+    const d = new Date(year, monthIndex, 1);
+    return d.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+  }
+
+  if (monthStr.includes('-')) {
+    const [yearStr, monthStrPart] = monthStr.split('-');
+    const year = Number(yearStr);
+    const monthIndex = Number(monthStrPart) - 1;
+    if (!Number.isFinite(year) || !Number.isFinite(monthIndex)) return monthStr;
+    const d = new Date(year, monthIndex, 1);
+    return d.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+  }
+
+  return monthStr;
+};
+
 export const generateLease = async (data: LeaseData) => {
   const landlordName = 'Kevin Cauto';
   const landlordEmail = 'KevinMCauto@gmail.com';
@@ -45,6 +81,8 @@ export const generateLease = async (data: LeaseData) => {
 
   const startDate = localStartDate.toLocaleDateString();
   const endDate = localEndDate.toLocaleDateString();
+  const roomUpgradeIssuedMonthYear = formatMonthYearInput(data.previousLeaseIssuedDate);
+  const roomUpgradeEndDate = formatDateInputLocal(data.previousLeaseEndDate);
   
   const nextMonthDate = new Date(localStartDate);
   nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
@@ -69,11 +107,19 @@ export const generateLease = async (data: LeaseData) => {
       firstMonthRentText = `${firstMonthName} prorated rent`;
   }
   
-  const totalPaidPriorToMoveIn = firstMonthRentAmount + data.securityDeposit;
+  const currentSecurityDepositHeld = data.currentSecurityDepositHeld ?? 0;
+  const additionalSecurityDepositRequested = data.additionalSecurityDepositRequested ?? 0;
+  const totalNewSecurityDeposit = currentSecurityDepositHeld + additionalSecurityDepositRequested;
+
+  const depositToHoldAmount = data.isRoomUpgrade ? additionalSecurityDepositRequested : data.securityDeposit;
+  const totalPaidPriorToMoveIn = firstMonthRentAmount + depositToHoldAmount;
   
   const storageArea = data.property.address === '900 E Hector St' ? 'basement' : 'garage';
   const outdoorArea = data.property.address === '900 E Hector St' ? 'porch' : 'deck';
 
+  const roomUpgradeParagraphText = data.isRoomUpgrade
+    ? `The previous lease agreement issued${roomUpgradeIssuedMonthYear ? ` in ${roomUpgradeIssuedMonthYear}` : ''} between the LANDLORD and TENANT will end ${roomUpgradeEndDate}. TENANT will be changing rooms and this lease will replace the previous one. The current security deposit of $${currentSecurityDepositHeld} will continue to be held, and an additional $${additionalSecurityDepositRequested} will be requested so that the total security deposit will be $${totalNewSecurityDeposit}.`
+    : '';
 
   const doc = new Document({
     numbering: {
@@ -144,39 +190,48 @@ export const generateLease = async (data: LeaseData) => {
         new Paragraph({ children: [b('NAMES: '), t(`This Lease is entered into between ${data.tenantName} (TENANT) and ${landlordName} (LANDLORD), on ${today} (today’s date). The TENANT is liable for the payment of rent and performance of all other terms of this Lease.`)]}),
         br(),
 
-        new Paragraph({ children: [b('ADDRESS: '), t(`Subject to the terms and conditions in this Lease, LANDLORD rents to TENANT, and TENANT rents from LANDLORD, a room for residential purposes only, at the premises located at: ${data.property.address}, ${data.property.city}, ${data.property.state} ${data.property.zip} (Hereinafter referred to as the Premises).`)]}),
+        new Paragraph({ children: [b('ADDRESS: '), t(`Subject to the terms and conditions in this Lease, LANDLORD rents to TENANT, and TENANT rents from LANDLORD, a room for residential purposes only, at the premises located at: ${data.property.address}, ${data.property.city}, ${data.property.state} ${data.property.zip} (Hereinafter referred to as the PREMISES).`)]}),
         br(),
 
         new Paragraph({ children: [b('CONTACT INFORMATION: '), t(`LANDLORD’s Current Phone Number: ${formatPhoneNumber(landlordPhone)}. TENANT’s Current Phone Number: ${formatPhoneNumber(data.tenantPhone)}. LANDLORD’s Current Email Address: ${landlordEmail}. TENANT’s Current Email Address: ${data.tenantEmail}. TENANT shall notify the LANDLORD of any change to their telephone number or email immediately, if there is a change.`)]}),
         br(),
+
+        ...(data.isRoomUpgrade
+          ? [
+              new Paragraph({
+                children: [new TextRun({ text: roomUpgradeParagraphText, bold: true })],
+              }),
+              br(),
+            ]
+          : []),
         
-        new Paragraph({ children: [b('BEDROOM: '), t(`The TENANT will occupy the ${data.roomName}. The TENANT is prohibited from entering any other bedroom. This bedroom is unfurnished and is single-occupancy.`)]}),
+        new Paragraph({ children: [b('BEDROOM: '), t(`The TENANT will occupy the ${data.roomName}. The TENANT is prohibited from entering any other bedroom. This bedroom is ${data.furnished ? 'furnished' : 'unfurnished'} and is single-occupancy.`)]}),
         br(),
 
         new Paragraph({ children: [b('BATHROOM: '), t(`The TENANT may use the ${data.bathroom} or the main floor half bathroom.`)]}),
         br(),
 
-        new Paragraph({ children: [b('HOUSEMATE/HOUSEHOLD RULES: '), t('TENANT understands they will be sharing the Premises with several other housemates. TENANT will be respectful and amicable towards other housemates. The TENANT will not use, consume, or touch other housemates’ property, food, or possessions without permission. TENANT acknowledges that housemates will move-out over time and they will be replaced by new housemates selected by the LANDLORD.')]}),
+        new Paragraph({ children: [b('HOUSEMATE/HOUSEHOLD RULES: '), t('TENANT understands they will be sharing the PREMISES with several other housemates. TENANT will be respectful and amicable towards other housemates. The TENANT will not use, consume, or touch other housemates’ property, food, or possessions without permission. TENANT acknowledges that housemates will move-out over time and they will be replaced by new housemates selected by the LANDLORD.')]}),
         br(),
 
-        new Paragraph({ children: [b('CLEAN SHARED AREAS: '), t(`The living room, kitchen, and ${outdoorArea} is to be shared by all housemates and kept in a clean condition.  Personal items should not be left on the main floor.  Shoes should be removed immediately upon entering the Premises.`)]}),
+        new Paragraph({ children: [b('CLEAN SHARED AREAS: '), t(`The living room, kitchen, and ${outdoorArea} is to be shared by all housemates and kept in a clean condition.  Personal items should not be left on the main floor.  Shoes should be removed immediately upon entering the PREMISES.`)]}),
         br(),
 
         new Paragraph({ children: [b('KITCHEN RULES: '), t('TENANT will clean up after cooking and eating.  TENANT will not leave dirty dishes in the sink, but rather place them in the dishwasher or hand-wash them. Communal kitchen items like pots, pans, and spatulas need to be hand-washed right after use so others can use them.  Hand-washed items should be dried and put away immediately.')]}),
         br(),
         
-        new Paragraph({ children: [b('COMMUNAL TASKS AND RESTOCKING RESOURCES: '), t('As a member of the household, TENANT will take out the trash and recycling, unload the dishwasher, and help stock communal items like paper towels, trash bags, and dish soap from time to time to keep the household running. If the TENANT shares a bathroom with other housemates, they will be required to purchase and share toilet paper and hand soap with all those using that bathroom. Batteries for the keypad door entrance(s) will need to be replaced and are the responsibility of the TENANT. If lightbulbs need to be replaced, this responsibility also falls on the TENANT.')]}),
+        new Paragraph({ children: [b('COMMUNAL TASKS AND RESTOCKING RESOURCES: '), t('As a member of the household, TENANT will take out the trash and recycling, unload the dishwasher, and help stock communal items like paper towels, trash bags, and dish soap from time to time to keep the household running. If the TENANT shares a bathroom with other housemates, they will be required to purchase and share toilet paper and hand soap with all those using that bathroom. Batteries for the keypad door entrance(s) will need to be replaced and are the responsibility of the TENANT. If lightbulbs or refrigerator filters need to be replaced, this responsibility also falls on the TENANT.')]}),
         br(),
 
-        new Paragraph({ children: [b('NOISE: '), t('Quiet hours for the Premises will be between 10 pm and 10 am.  TV, media, and music volume shall not disrupt other housemates.')]}),
+        new Paragraph({ children: [b('NOISE: '), t('Quiet hours for the PREMISES will be between 10 pm and 10 am.  TV, media, and music volume shall not disrupt other housemates.')]}),
         br(),
 
-        new Paragraph({ children: [b('TERM: '), t(`TENANT shall lease the Premises beginning ${startDate} and continuing through ${endDate}. The Lease shall continue on a month-to-month basis after this initial period. Each month period shall begin on the first day of the month and end on the last day of the month. Written or email notice of 30 days before the 1st of the last month, or enough notice as needed by Pennsylvania law, from either the LANDLORD or TENANT, must be provided to terminate the lease. If proper notice is not given by the TENANT, they will be responsible for the entirety of the following month's rent. TENANT will always be responsible for the last month's full rent from the 1st to the last day of the month, even if they move-out before the last day of the month. The only exception is if a replacement tenant moves in after the TENANT's move-out date and before the last day of the month. In this case, the LANDLORD will not collect double rent for these overlapping dates and TENANT will be reimbursed or charged a prorated last month's rent based on the replacement tenant's days of occupancy.`)]}),
+        new Paragraph({ children: [b('TERM: '), t(`TENANT shall lease the PREMISES beginning ${startDate} and continuing through ${endDate}. The Lease shall continue on a month-to-month basis after this initial period. Each month period shall begin on the first day of the month and end on the last day of the month. Written or email notice of 30 days before the 1st of the last month, or enough notice as needed by Pennsylvania law, from either the LANDLORD or TENANT, must be provided to terminate the lease. If proper notice is not given by the TENANT, they will be responsible for the entirety of the following month's rent. TENANT will always be responsible for the last month's full rent from the 1st to the last day of the month, even if they move-out before the last day of the month. The only exception is if a replacement tenant moves in after the TENANT's move-out date and before the last day of the month. In this case, the LANDLORD will not collect double rent for these overlapping dates and TENANT will be reimbursed or charged a prorated last month's rent based on the replacement tenant's days of occupancy.`)]}),
         br(),
         
         new Paragraph({ children: [b('RENT: '), t('The following terms apply to the rent payment for this Lease.')]}),
         new Paragraph({
-          children: [b('RENT AMOUNT: '), t(`The rent for the Premises will be $${data.monthlyRent} per month. This amount includes utilities, internet, and cleaning service of the shared spaces${data.maidService ? ' and the TENANT\'s bedroom' : ''}.`)],
+          children: [b('RENT AMOUNT: '), t(`The rent for the PREMISES will be $${data.monthlyRent} per month. This amount includes utilities, internet, and cleaning service of the shared spaces${data.maidService ? ' and the TENANT\'s bedroom' : ''}.`)],
           numbering: { reference: 'rent-numbering', level: 0 },
         }),
         new Paragraph({
@@ -188,7 +243,7 @@ export const generateLease = async (data: LeaseData) => {
             numbering: { reference: 'rent-numbering', level: 0 },
         }),
         new Paragraph({ 
-            text: `$${data.securityDeposit} for the deposit-to-hold/security deposit (due within 48 hours of lease signing)`,
+            text: `$${depositToHoldAmount} for the deposit-to-hold/security deposit (due within 48 hours of lease signing)`,
             numbering: { reference: 'rent-numbering', level: 1 },
         }),
         new Paragraph({ 
@@ -204,7 +259,7 @@ export const generateLease = async (data: LeaseData) => {
             numbering: { reference: 'rent-numbering', level: 0 },
         }),
         new Paragraph({
-            children: [b('EVICTION NOTICE: '), t('Should the TENANT fail to pay rent by the due date, LANDLORD may terminate the month-to-month lease at the end of the current month in accordance with Pennsylvania law. Any eviction proceedings will be conducted in compliance with the Pennsylvania Landlord and Tenant Act, including any required notice periods. LANDLORD may serve an eviction notice as required by applicable Pennsylvania law, and TENANT agrees to vacate the Premises within the legally prescribed time frame.')],
+            children: [b('EVICTION NOTICE: '), t('Should the TENANT fail to pay rent by the due date, LANDLORD may terminate the month-to-month lease at the end of the current month in accordance with Pennsylvania law. Any eviction proceedings will be conducted in compliance with the Pennsylvania Landlord and Tenant Act, including any required notice periods. LANDLORD may serve an eviction notice as required by applicable Pennsylvania law, and TENANT agrees to vacate the PREMISES within the legally prescribed time frame.')],
             numbering: { reference: 'rent-numbering', level: 0 },
         }),
         new Paragraph({
@@ -227,94 +282,94 @@ export const generateLease = async (data: LeaseData) => {
         new Paragraph({ children: [b('SECURITY DEPOSIT: '), t(`Contemporaneously with the execution of this Lease, TENANT shall deposit with LANDLORD a security deposit in the amount of $${data.securityDeposit}. The deposit will be returned to TENANT within the lesser of (i) sixty (60) days after the expiration of the term of this Lease or (ii) the maximum time period allowed by Pennsylvania law. Deductions from the security deposit will be itemized in writing and provided to the TENANT. Acceptable deductions include, but are not limited to: Unpaid rent, utilities, or other outstanding balances; Excessive damage beyond normal wear and tear (e.g., holes in walls, broken fixtures, stained carpets); Cleaning fees if the unit is left in an unsanitary condition; Costs associated with abandoned property removal. If the security deposit is held for more than two (2) years, it will be placed in an interest-bearing escrow account as required by Pennsylvania law.`)]}),
         br(),
 
-        new Paragraph({ children: [b('FURNISHINGS AND APPLIANCES: '), t(`The following appliances are supplied with the Premises: Refrigerator, Stove, Dishwasher, Washer, Dryer, and Microwave,. TENANT agrees to keep the appliances they use in good condition. Supplied appliances may not be removed.  Furniture and decor in the main level will be supplied solely by the LANDLORD unless otherwise expressed by the LANDLORD.  No furniture may be added to the first floor without the LANDLORD’s approval. Televisions, electronics, or other devices may not be added to the shared common space. LANDLORD can remove furniture, televisions, and electronics from the first floor. Storage of large items in the ${storageArea} is at the LANDLORD’s discretion. The LANDLORD is not liable for any damage done to TENANT’s items while stored in the ${storageArea} by moisture, dust, pests, or otherwise.`)]}),
+        new Paragraph({ children: [b('FURNISHINGS AND APPLIANCES: '), t(`The following appliances are supplied with the PREMISES: Refrigerator, Stove, Dishwasher, Washer, Dryer, and Microwave,. TENANT agrees to keep the appliances they use in good condition. Supplied appliances may not be removed.  Furniture and decor in the main level will be supplied solely by the LANDLORD unless otherwise expressed by the LANDLORD.  No furniture may be added to the first floor without the LANDLORD’s approval. Televisions, electronics, or other devices may not be added to the shared common space. LANDLORD can remove furniture, televisions, and electronics from the first floor. Storage of large items in the ${storageArea} is at the LANDLORD’s discretion. The LANDLORD is not liable for any damage done to TENANT’s items while stored in the ${storageArea} by moisture, dust, pests, or otherwise.`)]}),
         br(),
 
-        new Paragraph({ children: [b('GUESTS: '), t(`The TENANT’s room is single-occupancy and may only have one person, the TENANT, living there. No other person may live in the ${data.roomName}.  Overnight guests are allowed, but should not live at the Premises. Guests must abide by all applicable terms and conditions of this Lease, including any rules and regulations applicable to the Premises. Guest(s) should not sleep in the common area. If the TENANT has a guest or combination of guests staying more than eight (8) days within any thirty (30) day period, it is considered a violation of the lease agreement.`)]}),
+        new Paragraph({ children: [b('GUESTS: '), t(`The TENANT’s room is single-occupancy and may only have one person, the TENANT, living there. No other person may live in the ${data.roomName}.  Overnight guests are allowed, but should not live at the PREMISES. Guests must abide by all applicable terms and conditions of this Lease, including any rules and regulations applicable to the PREMISES. Guest(s) should not sleep in the common area. If the TENANT has a guest or combination of guests staying more than eight (8) days within any thirty (30) day period, it is considered a violation of the lease agreement.`)]}),
         br(),
 
-        new Paragraph({ children: [b('PREMISES USE: '), t('TENANT shall not use the Premises, nor any neighboring premises, for any illegal purpose, or for any other purpose than that of a residence. TENANT agrees to comply with and abide by all federal, state, county and municipal laws and ordinances in connection with TENANT’s occupancy and use of the Premises. No illegal drugs or controlled substances (unless specifically prescribed by a physician for a specific person residing or present on the Premises) are permitted on the Premises. No hazardous or dangerous activities are permitted on the Premises. TENANT  is to stay off the roof.  Absolutely no illegal drug use, public disturbances, physical abuse, verbal abuse, threats, pets, animals, firearms, or smoking is permitted on Premises. Any violations of the foregoing paragraph shall be an immediate and incurable default of this Lease and shall be cause for ending the lease or eviction.')]}),
+        new Paragraph({ children: [b('PREMISES USE: '), t('TENANT shall not use the PREMISES, nor any neighboring premises, for any illegal purpose, or for any other purpose than that of a residence. TENANT agrees to comply with and abide by all federal, state, county and municipal laws and ordinances in connection with TENANT’s occupancy and use of the PREMISES. No illegal drugs or controlled substances (unless specifically prescribed by a physician for a specific person residing or present on the PREMISES) are permitted on the PREMISES. No hazardous or dangerous activities are permitted on the PREMISES. TENANT  is to stay off the roof.  Absolutely no illegal drug use, public disturbances, physical abuse, verbal abuse, threats, pets, animals, firearms, or smoking is permitted on PREMISES. Any violations of the foregoing paragraph shall be an immediate and incurable default of this Lease and shall be cause for ending the lease or eviction.')]}),
         br(),
         
         new Paragraph({ children: [b('INTERNET USE: '), t('The LANDLORD provides shared internet access for tenant use. By using this service, Tenant agrees to: Use the internet legally and responsibly, without engaging in illegal downloads, hacking, or disruptive activities. Avoid excessive bandwidth use (e.g., torrenting, running servers) that may interfere with others. Indemnify the Landlord against any claims or legal issues arising from misuse. Understand that network activity is not private, and the Landlord may cooperate with authorities if unlawful use is suspected. Internet access may be restricted or terminated for misuse, without prior notice.')]}),
         br(),
 
-        new Paragraph({ children: [b('SUBLETTING: '), t('TENANT may not sublease the Premises or any portion thereof nor assign this Lease.')]}),
+        new Paragraph({ children: [b('SUBLETTING: '), t('TENANT may not sublease the PREMISES or any portion thereof nor assign this Lease.')]}),
         br(),
 
-        new Paragraph({ children: [b('PEST CONTROL: '), t('TENANT shall inform LANDLORD at first sighting of any pests in order to avoid any infestation of pests. In signing this Lease, TENANT has first inspected the Premises and certifies that it has not observed any pests in their designated room.')]}),
+        new Paragraph({ children: [b('PEST CONTROL: '), t('TENANT shall inform LANDLORD at first sighting of any pests in order to avoid any infestation of pests. In signing this Lease, TENANT has first inspected the PREMISES and certifies that it has not observed any pests in their designated room.')]}),
         br(),
 
-        new Paragraph({ children: [b('MOLD: '), t('TENANT acknowledges the necessity of housekeeping, ventilation, and moisture control (especially in the bathrooms) for mold prevention.  When moisture is present in the bathroom, TENANT will turn the bathroom fan on and keep the door open to prevent mold growth.  In signing this Lease, TENANT has first inspected the Premises and certifies that it has not observed mold, mildew or moisture within the Premises.  TENANT agrees to immediately notify LANDLORD if it observes mold/mildew and/or moisture conditions (from any source, including leaks), and allow LANDLORD to evaluate and make recommendations and/or take appropriate corrective action.  TENANT relieves LANDLORD from any liability for any bodily injury or damages to property caused by or associated with moisture or the growth of or occurrence of mold or mildew on the Premises.  In addition, execution of this Lease constitutes acknowledgement by TENANT that control of moisture and mold prevention are TENANT’s obligations under this Lease.')]}),
+        new Paragraph({ children: [b('MOLD: '), t('TENANT acknowledges the necessity of housekeeping, ventilation, and moisture control (especially in the bathrooms) for mold prevention.  When moisture is present in the bathroom, TENANT will turn the bathroom fan on and keep the door open to prevent mold growth.  In signing this Lease, TENANT has first inspected the PREMISES and certifies that it has not observed mold, mildew or moisture within the PREMISES.  TENANT agrees to immediately notify LANDLORD if it observes mold/mildew and/or moisture conditions (from any source, including leaks), and allow LANDLORD to evaluate and make recommendations and/or take appropriate corrective action.  TENANT relieves LANDLORD from any liability for any bodily injury or damages to property caused by or associated with moisture or the growth of or occurrence of mold or mildew on the PREMISES.  In addition, execution of this Lease constitutes acknowledgement by TENANT that control of moisture and mold prevention are TENANT’s obligations under this Lease.')]}),
         br(),
 
-        new Paragraph({ children: [b('DEFAULT: '), t('Should TENANT default under any of the terms and conditions of this Lease, LANDLORD shall have any and all remedies available under this Lease, at law, or in equity, including, without limitation: 1. The right to repossess the Premises through lawful eviction proceedings. 2. The right to recover unpaid rent, damages, and associated costs. 3. The right to recover reasonable expenses incurred by LANDLORD in re-renting, cleaning, and repairing the Premises. If evicted, TENANT shall remain responsible for rent payments until the unit is re-rented, in accordance with Pennsylvania law. LANDLORD will make reasonable efforts to mitigate damages by seeking a replacement tenant. TENANT acknowledges that they may not be charged rent for a period in which the Premises is occupied by a new tenant.')]}),
+        new Paragraph({ children: [b('DEFAULT: '), t('Should TENANT default under any of the terms and conditions of this Lease, LANDLORD shall have any and all remedies available under this Lease, at law, or in equity, including, without limitation: 1. The right to repossess the PREMISES through lawful eviction proceedings. 2. The right to recover unpaid rent, damages, and associated costs. 3. The right to recover reasonable expenses incurred by LANDLORD in re-renting, cleaning, and repairing the PREMISES. If evicted, TENANT shall remain responsible for rent payments until the unit is re-rented, in accordance with Pennsylvania law. LANDLORD will make reasonable efforts to mitigate damages by seeking a replacement tenant. TENANT acknowledges that they may not be charged rent for a period in which the PREMISES is occupied by a new tenant.')]}),
         br(),
 
-        new Paragraph({ children: [b('ABANDONMENT: '), t('The Premises will be deemed abandoned if TENANT defaults in rent payment, appears absent from the Premises, and there is reason to believe that TENANT will not be returning to the Premises, as determined by LANDLORD in its reasonable discretion. Should the Premises be considered abandoned, LANDLORD will take possession immediately, and store TENANT’s personal property items, at TENANT’s expense.  LANDLORD shall have no liability to TENANT whatsoever in connection with the storage of any of TENANT’s personal property. TENANT shall indemnify, defend and hold LANDLORD harmless from and against any and all penalties, damages, fines, causes of action, liabilities, judgments, expenses (including, without limitation, attorneys’ fees) or charges incurred in connection with or arising from LANDLORD’s storage of TENANT’s personal property.')]}),
+        new Paragraph({ children: [b('ABANDONMENT: '), t('The PREMISES will be deemed abandoned if TENANT defaults in rent payment, appears absent from the PREMISES, and there is reason to believe that TENANT will not be returning to the PREMISES, as determined by LANDLORD in its reasonable discretion. Should the PREMISES be considered abandoned, LANDLORD will take possession immediately, and store TENANT’s personal property items, at TENANT’s expense.  LANDLORD shall have no liability to TENANT whatsoever in connection with the storage of any of TENANT’s personal property. TENANT shall indemnify, defend and hold LANDLORD harmless from and against any and all penalties, damages, fines, causes of action, liabilities, judgments, expenses (including, without limitation, attorneys’ fees) or charges incurred in connection with or arising from LANDLORD’s storage of TENANT’s personal property.')]}),
         br(),
 
         new Paragraph({ children: [b('DEATH/DISABILITY DURING LEASE: '), t('A representative of the deceased TENANT may terminate this Lease by providing verified written documentation testifying to such TENANT’s death.')]}),
         br(),
         
-        new Paragraph({ children: [b('UTILITIES: '), t(`The electric, gas, water, cleaning service, and internet bill will be covered by the tenant’s rent. ${data.maidService ? 'Maid cleaning will occur about once a month in the shared areas of the Premises.' : ''}`)]}),
+        new Paragraph({ children: [b('UTILITIES: '), t(`The electric, gas, water, cleaning service, and internet bill will be covered by the tenant’s rent. ${data.maidService ? 'Maid cleaning will occur about once a month in the shared areas of the PREMISES.' : ''}`)]}),
         br(),
         
         new Paragraph({ children: [b('PLUMBING: '), t('TENANT agrees not to place into any drain lines non-approved substances such as cooking grease, sanitary napkins, or other similar objects that may cause a stoppage. TENANT shall notify the LANDLORD of any plumbing leak, flooding, or water damage right away. . If a toilet is clogged, the TENANT is responsible to plunge the toilet. If there is occasional slow drainage in the shower or sink, TENANT should take reasonable measures (clearing visible debris, pouring kettle-hot water, using a plunger, or using a product like Drano) to resolve this before contacting the LANDLORD. Once contacted, LANDLORD shall use all reasonable efforts to remedy the plumbing problem.')]}),
         br(),
         
-        new Paragraph({ children: [b('LIABILITY AND RENTERS INSURANCE: '), t('TENANT understands and agrees that LANDLORD has no obligation to obtain insurance for TENANT including, but not limited to, liability, hazard, or contents insurance.  TENANT shall, at TENANT’s sole cost and expense, obtain renter’s insurance covering the full value of all personal property of TENANT in the Premises, and providing liability coverage to TENANT, which policy shall name LANDLORD as an additional insured.  TENANT shall maintain such renter’s insurance at all times during the term of this Lease.  TENANT acknowledges that if TENANT fails to obtain and maintain renter’s insurance, TENANT alone shall bear the consequences of the loss or damage to TENANT’s personal property.')]}),
+        new Paragraph({ children: [b('LIABILITY AND RENTERS INSURANCE: '), t('TENANT understands and agrees that LANDLORD has no obligation to obtain insurance for TENANT including, but not limited to, liability, hazard, or contents insurance.  TENANT shall, at TENANT’s sole cost and expense, obtain renter’s insurance covering the full value of all personal property of TENANT in the PREMISES, and providing liability coverage to TENANT, which policy shall name LANDLORD as an additional insured.  TENANT shall maintain such renter’s insurance at all times during the term of this Lease.  TENANT acknowledges that if TENANT fails to obtain and maintain renter’s insurance, TENANT alone shall bear the consequences of the loss or damage to TENANT’s personal property.')]}),
         br(),
         
-        new Paragraph({ children: [b('ACCESS/PRIVACY: '), t('The LANDLORD may enter common areas of the Premises at any time. The LANDLORD may enter the TENANT\'s room only for the following reasons: (a) in case of emergency; (b) to make necessary or agreed-upon repairs or improvements, supply necessary or agreed-upon services, or exhibit the dwelling unit to prospective or actual purchasers, appraisers, mortgagees, prospective tenants, workers, or contractors; (c) when the TENANT has abandoned or surrendered the premises; or (d) pursuant to court order. The landlord must give the tenant 24 hours notice of intent to enter and may enter only during reasonable hours, except by necessity, cases (a) and (c) above. TENANT’s request for service or maintenance shall be considered TENANT’s approval for all necessary access by LANDLORD or LANDLORD’s agent in connection with such service or maintenance, if no other written arrangement related to such access between LANDLORD and TENANT is made.')]}),
+        new Paragraph({ children: [b('ACCESS/PRIVACY: '), t('The LANDLORD may enter common areas of the PREMISES at any time. The LANDLORD may enter the TENANT\'s room only for the following reasons: (a) in case of emergency; (b) to make necessary or agreed-upon repairs or improvements, supply necessary or agreed-upon services, or exhibit the dwelling unit to prospective or actual purchasers, appraisers, mortgagees, prospective tenants, workers, or contractors; (c) when the TENANT has abandoned or surrendered the PREMISES; or (d) pursuant to court order. The landlord must give the tenant 24 hours notice of intent to enter and may enter only during reasonable hours, except by necessity, cases (a) and (c) above. TENANT’s request for service or maintenance shall be considered TENANT’s approval for all necessary access by LANDLORD or LANDLORD’s agent in connection with such service or maintenance, if no other written arrangement related to such access between LANDLORD and TENANT is made.')]}),
         br(),
         
-        new Paragraph({ children: [b('MAINTENANCE: '), t('LANDLORD agrees to maintain the structure, roof and foundation of the Premises, and the heating, plumbing and electrical systems of the Premises unless the repairs needed are a result of any act or omission of TENANT (excluding normal wear and tear).  In such case that the damage is a result of the act or omission of TENANT, TENANT will be billed for the repair. LANDLORD will carry out all required repairs in as reasonable a time as possible in accordance to applicable laws,  but will not be liable to TENANT for any disruptions or inconvenience to TENANT or any claim that the Premises is uninhabitable (except to the extent of any non-waivable warranty of habitability provided by applicable laws).')]}),
+        new Paragraph({ children: [b('MAINTENANCE: '), t('LANDLORD agrees to maintain the structure, roof and foundation of the PREMISES, and the heating, plumbing and electrical systems of the PREMISES unless the repairs needed are a result of any act or omission of TENANT (excluding normal wear and tear).  In such case that the damage is a result of the act or omission of TENANT, TENANT will be billed for the repair. LANDLORD will carry out all required repairs in as reasonable a time as possible in accordance to applicable laws,  but will not be liable to TENANT for any disruptions or inconvenience to TENANT or any claim that the PREMISES is uninhabitable (except to the extent of any non-waivable warranty of habitability provided by applicable laws).')]}),
         br(),
         
-        new Paragraph({ children: [b('CARE OF THE PREMISES - '), t('TENANT agrees to care for the Premises and keep it in a good, neat and sanitary condition. Trash shall be placed in approved receptacles only and may not be left outside for any amount of time. TENANT shall report all building damage, water leaks, or other maintenance issues immediately to LANDLORD or will be held liable for the costs of repairing any unreported damage. If the need to repair is caused by TENANT or TENANT’s family, visiting friends, dependents, guests, licensees or invitees, LANDLORD may make the necessary repairs and the cost of which will be treated as additional rent to be paid by the TENANT upon notification of amount. Failure to pay costs of repairs will be treated as additional rent payable by TENANT and due immediately. TENANT agrees not to affix any structures to the Premises including, but not limited to, antennas, satellite dishes, or signs, without prior written consent of LANDLORD, which may be granted or withheld in LANDLORD’s sole and absolute discretion. After contacting emergency services, TENANT agrees to give immediate notice to LANDLORD of any fire, flood, or other damage to or within the Premises. If the Premises is damaged and the Premises rendered uninhabitable, the rent shall cease until such a time as the Premises has been repaired or LANDLORD shall have the option of terminating this Lease upon five (5) days’ prior written notice. TENANT agrees not to store boats, motorcycles, RVs, waterbeds, firearms, equipment, hazardous materials, paints, fuel, chemicals, waste, and non-usable items, including non-operating vehicles, in or around the Premises without prior written consent of LANDLORD, which may be granted or withheld in LANDLORD’s sole and absolute discretion.')]}),
+        new Paragraph({ children: [b('CARE OF THE PREMISES - '), t('TENANT agrees to care for the PREMISES and keep it in a good, neat and sanitary condition. Trash shall be placed in approved receptacles only and may not be left outside for any amount of time. TENANT shall report all building damage, water leaks, or other maintenance issues immediately to LANDLORD or will be held liable for the costs of repairing any unreported damage. If the need to repair is caused by TENANT or TENANT’s family, visiting friends, dependents, guests, licensees or invitees, LANDLORD may make the necessary repairs and the cost of which will be treated as additional rent to be paid by the TENANT upon notification of amount. Failure to pay costs of repairs will be treated as additional rent payable by TENANT and due immediately. TENANT agrees not to affix any structures to the PREMISES including, but not limited to, antennas, satellite dishes, or signs, without prior written consent of LANDLORD, which may be granted or withheld in LANDLORD’s sole and absolute discretion. After contacting emergency services, TENANT agrees to give immediate notice to LANDLORD of any fire, flood, or other damage to or within the PREMISES. If the PREMISES is damaged and the PREMISES rendered uninhabitable, the rent shall cease until such a time as the PREMISES has been repaired or LANDLORD shall have the option of terminating this Lease upon five (5) days’ prior written notice. TENANT agrees not to store boats, motorcycles, RVs, waterbeds, firearms, equipment, hazardous materials, paints, fuel, chemicals, waste, and non-usable items, including non-operating vehicles, in or around the PREMISES without prior written consent of LANDLORD, which may be granted or withheld in LANDLORD’s sole and absolute discretion.')]}),
         br(),
         
-        new Paragraph({ children: [b('ANIMALS: '), t('Pets or any animals are not allowed to reside or enter the Premises.')]}),
+        new Paragraph({ children: [b('ANIMALS: '), t('Pets or any animals are not allowed to reside or enter the PREMISES.')]}),
         br(),
 
-        new Paragraph({ children: [b('SMOKING: '), t('TENANT shall not smoke on the Premises, including the use of any vapor products.  The TENANT shall not smell like smoke or tobacco on the Premises.')]}),
+        new Paragraph({ children: [b('SMOKING: '), t('TENANT shall not smoke on the PREMISES, including the use of any vapor products.  The TENANT shall not smell like smoke or tobacco on the PREMISES.')]}),
         br(),
 
-        new Paragraph({ children: [b('MARIJUANA AND OTHER DRUGS: '), t('TENANT shall not be permitted to, and shall not permit any family, visiting friends, dependents, guests, licensees or invitees of TENANT to grow, produce, possess, consume, use, or smoke any marijuana, cannabis or any products containing marijuana or cannabis in any location in, on or about the Premises; the foregoing prohibition to be absolute and without exception and shall include any growing, production, possession, use or consumption pursuant to any medical use or medical prescription, or any medical, retail or recreational marijuana activities that may otherwise be permitted under any local, state or federal laws, rules or regulations now or hereafter in effect.  TENANT’s violation of this rule shall be an immediate default of this Lease.')]}),
+        new Paragraph({ children: [b('MARIJUANA AND OTHER DRUGS: '), t('TENANT shall not be permitted to, and shall not permit any family, visiting friends, dependents, guests, licensees or invitees of TENANT to grow, produce, possess, consume, use, or smoke any marijuana, cannabis or any products containing marijuana or cannabis in any location in, on or about the PREMISES; the foregoing prohibition to be absolute and without exception and shall include any growing, production, possession, use or consumption pursuant to any medical use or medical prescription, or any medical, retail or recreational marijuana activities that may otherwise be permitted under any local, state or federal laws, rules or regulations now or hereafter in effect.  TENANT’s violation of this rule shall be an immediate default of this Lease.')]}),
         br(),
         
-        new Paragraph({ children: [b('QUIET ENJOYMENT: '), t('TENANT is entitled to quiet enjoyment of the Premises during the duration of the term of this Lease, subject to all the terms and conditions of this Lease. TENANT may not infringe upon the quiet enjoyment right of other tenants through disturbances including but not limited to TVs, computers, stereos, musical instruments, other loud noises, heavy walking, or other disturbing actions.')]}),
+        new Paragraph({ children: [b('QUIET ENJOYMENT: '), t('TENANT is entitled to quiet enjoyment of the PREMISES during the duration of the term of this Lease, subject to all the terms and conditions of this Lease. TENANT may not infringe upon the quiet enjoyment right of other tenants through disturbances including but not limited to TVs, computers, stereos, musical instruments, other loud noises, heavy walking, or other disturbing actions.')]}),
         br(),
         
         new Paragraph({ children: [b('LAWN: '), t('TENANT is not responsible for lawn maintenance.')]}),
         br(),
         
-        new Paragraph({ children: [b('ALTERATIONS: '), t('TENANT agrees not to make any repairs, improvements, or alterations to the Premises unless prior written permission is given by LANDLORD, which may be given or withheld in LANDLORD’s sole and absolute discretion.  Any repairs, improvements, or alterations made by TENANT must be completed in compliance with all local, state, and federal laws.  As used herein “repairs, improvements, or alterations” includes, without limitation, lock changes, painting, replacing fixtures, installing wallpaper, attaching shelves, installing curtains or shades, or other permanent or semi-permanent changes to the Premises.')]}),
+        new Paragraph({ children: [b('ALTERATIONS: '), t('TENANT agrees not to make any repairs, improvements, or alterations to the PREMISES unless prior written permission is given by LANDLORD, which may be given or withheld in LANDLORD’s sole and absolute discretion.  Any repairs, improvements, or alterations made by TENANT must be completed in compliance with all local, state, and federal laws.  As used herein “repairs, improvements, or alterations” includes, without limitation, lock changes, painting, replacing fixtures, installing wallpaper, attaching shelves, installing curtains or shades, or other permanent or semi-permanent changes to the PREMISES.')]}),
         br(),
         
-        new Paragraph({ children: [b('KEYS AND LOCKOUTS: '), t('LANDLORD shall provide a unique number combination for the Premise’s front-door keypad lock to the TENANT and a physical key to lock their designated room.  If TENANT changes the lock, and LANDLORD is prevented from entering the Premises or room due to the lock change, TENANT shall bear the financial cost of LANDLORD’s effort to enter by force. If LANDLORD or contractor is unable to enter the Premises or designated room to perform repair or maintenance tasks due to the TENANT’s unauthorized lock change, TENANT will be charged $100.00 for each violation, which will be charged to TENANT as additional rent and due immediately.  Upon vacating the Premises, TENANT shall return all keys to LANDLORD or TENANT will be charged $50.00 per unreturned key.  If TENANT is locked out of the Premises or their designated room, and LANDLORD must unlock the door for TENANT, then TENANT will be charged a $100.00 lock-out fee.')]}),
+        new Paragraph({ children: [b('KEYS AND LOCKOUTS: '), t('LANDLORD shall provide a unique number combination for the PREMISES’ front-door keypad lock to the TENANT and a physical key to lock their designated room.  If TENANT changes the lock, and LANDLORD is prevented from entering the PREMISES or room due to the lock change, TENANT shall bear the financial cost of LANDLORD’s effort to enter by force. If LANDLORD or contractor is unable to enter the PREMISES or designated room to perform repair or maintenance tasks due to the TENANT’s unauthorized lock change, TENANT will be charged $100.00 for each violation, which will be charged to TENANT as additional rent and due immediately.  Upon vacating the PREMISES, TENANT shall return all keys to LANDLORD or TENANT will be charged $50.00 per unreturned key.  If TENANT is locked out of the PREMISES or their designated room, and LANDLORD must unlock the door for TENANT, then TENANT will be charged a $100.00 lock-out fee.')]}),
         br(),
         
-        new Paragraph({ children: [b('SMOKE AND CARBON MONOXIDE DETECTORS: '), t('The Premises has been equipped with smoke detectors. TENANT agrees these detectors are in working order and agrees to periodically test and maintain the smoke detector in their designated bedroom and shared spaces.')]}),
+        new Paragraph({ children: [b('SMOKE AND CARBON MONOXIDE DETECTORS: '), t('The PREMISES has been equipped with smoke detectors. TENANT agrees these detectors are in working order and agrees to periodically test and maintain the smoke detector in their designated bedroom and shared spaces.')]}),
         br(),
         
-        new Paragraph({ children: [b('MOVE-IN: '), t('As of the commencement of the Lease, TENANT acknowledges that TENANT has examined the Premises and approves of the condition of the Premises, including all systems and appliances in the Premises. Taking possession of the Premises by TENANT is conclusive that the Premises are in good order and satisfactory condition.')]}),
+        new Paragraph({ children: [b('MOVE-IN: '), t('As of the commencement of the Lease, TENANT acknowledges that TENANT has examined the PREMISES and approves of the condition of the PREMISES, including all systems and appliances in the PREMISES. Taking possession of the PREMISES by TENANT is conclusive that the PREMISES are in good order and satisfactory condition.')]}),
         br(),
         
-        new Paragraph({ children: [b('MOVE OUT INSTRUCTIONS: '), t('If the TENANT intends to move out, the TENANT is asked to give the LANDLORD at least 30 days notice, or the required number of days under Pennsylvania law, written or email notice before the 1st of the month. TENANT will be responsible for paying the next month\'s rent in its entirety if the required number of days notice is not given. TENANT will always be responsible for the last month\'s full rent from the 1st to the last day of the month, even if they move-out before the last day of the month. The only exception is if a replacement tenant moves in after the TENANT\'s move-out date and before the last day of the month. In this case, the LANDLORD will not collect double rent for these overlapping dates and TENANT will be reimbursed or charged a prorated last month\'s rent based on the replacement tenant\'s days of occupancy. TENANT must supply a forwarding address to LANDLORD. TENANT agrees that TENANT will leave the Premises, their room, and designated bathroom in the same or better condition than when TENANT moved in (ordinary wear and tear excepted), or may be charged for any repairs or cleaning needed to prepare the Premises for the next tenant.  Upon receipt of TENANT\'s notice to vacate the Premises, LANDLORD will schedule a move-out inspection of the Premises. TENANT has the right, but not the obligation, to be present for this inspection, which will take place after all of TENANT\'s belongings have been removed from the Premises.  The TENANT will allow tours of the room, for new potential tenants, to take place if 24-hour notice is given by the LANDLORD.')]}),
+        new Paragraph({ children: [b('MOVE OUT INSTRUCTIONS: '), t('If the TENANT intends to move out, the TENANT is asked to give the LANDLORD at least 30 days notice, or the required number of days under Pennsylvania law, written or email notice before the 1st of the month. TENANT will be responsible for paying the next month\'s rent in its entirety if the required number of days notice is not given. TENANT will always be responsible for the last month\'s full rent from the 1st to the last day of the month, even if they move-out before the last day of the month. The only exception is if a replacement tenant moves in after the TENANT\'s move-out date and before the last day of the month. In this case, the LANDLORD will not collect double rent for these overlapping dates and TENANT will be reimbursed or charged a prorated last month\'s rent based on the replacement tenant\'s days of occupancy. TENANT must supply a forwarding address to LANDLORD. TENANT agrees that TENANT will leave the PREMISES, their room, and designated bathroom in the same or better condition than when TENANT moved in (ordinary wear and tear excepted), or may be charged for any repairs or cleaning needed to prepare the PREMISES for the next tenant.  Upon receipt of TENANT\'s notice to vacate the PREMISES, LANDLORD will schedule a move-out inspection of the PREMISES. TENANT has the right, but not the obligation, to be present for this inspection, which will take place after all of TENANT\'s belongings have been removed from the PREMISES.  The TENANT will allow tours of the room, for new potential tenants, to take place if 24-hour notice is given by the LANDLORD.')]}),
         br(),
 
         new Paragraph({ children: [b('NOTICES: '), t('Any notices required by either law or this Lease may be mailed, emailed, hand delivered to TENANT, or left posted on the door as long as it is applicable by law. Notices will be posted after the grace period for rental payment.')]}),
         br(),
 
-        new Paragraph({ children: [b('INDEMNIFICATION & LIABILITY: '), t('LANDLORD shall not be held liable for any acts by, or injury or damage to, any persons on or about the Premises, except in cases of LANDLORD’s gross negligence or willful misconduct. TENANT shall indemnify, defend, and hold LANDLORD harmless from claims or damages arising from TENANT’s use or occupancy of the Premises, except in cases where such claims result from LANDLORD’s failure to maintain a safe and habitable environment as required by Pennsylvania law.')]}),
+        new Paragraph({ children: [b('INDEMNIFICATION & LIABILITY: '), t('LANDLORD shall not be held liable for any acts by, or injury or damage to, any persons on or about the PREMISES, except in cases of LANDLORD’s gross negligence or willful misconduct. TENANT shall indemnify, defend, and hold LANDLORD harmless from claims or damages arising from TENANT’s use or occupancy of the PREMISES, except in cases where such claims result from LANDLORD’s failure to maintain a safe and habitable environment as required by Pennsylvania law.')]}),
         br(),
 
         new Paragraph({ children: [b('INVALID CLAUSES: '), t('Any provision of this Lease that is found unenforceable or invalid shall not affect any other term or provision contained herein and all other provisions of this Lease shall be enforceable and valid as permitted by applicable laws. If such invalid or unenforceable provisions exist, at LANDLORD’s sole discretion, those provisions shall be (a) modified to the extent necessary to comply with such law, or (b) removed from this Lease and will cease to be a part thereof.')]}),
         br(),
 
-        new Paragraph({ children: [b('SUBORDINATION: '), t('The Lease is subordinate to all existing and future mortgages, deeds of trust and other security interests on the Premises.')]}),
+        new Paragraph({ children: [b('SUBORDINATION: '), t('The Lease is subordinate to all existing and future mortgages, deeds of trust and other security interests on the PREMISES.')]}),
         br(),
 
         new Paragraph({ children: [b('WAIVER: '), t('The failure of the LANDLORD to insist, in any one or more instances, upon strict performance of any of the covenants of this Lease, or to exercise any option herein contained, shall not be construed as a waiver or a relinquishment for the future of such covenant or option, but the same shall continue and remain in full force and effect.')]}),
@@ -335,7 +390,7 @@ export const generateLease = async (data: LeaseData) => {
         new Paragraph({ children: [b('NOTICE OF LANDLORD DEFAULT: '), t('In the event of any alleged default in the obligation of LANDLORD under this Lease, TENANT will deliver to LANDLORD written notice specifying the nature of LANDLORD\'s default and LANDLORD will have thirty (30) days following receipt of such notice to cure such alleged default or, in the event the alleged default cannot reasonably be cured within a 30-day period, to commence action and proceed diligently to cure such alleged default.')]}),
         br(),
         
-        new Paragraph({ children: [b('COVENANTS, CONDITIONS AND RESTRICTIONS: '), t('This Lease shall be subject to and TENANT shall comply with all recorded covenants, conditions and restrictions affecting the Premises.  TENANT’s failure to comply with such covenants, conditions and restrictions shall be a default of this Lease.')]}),
+        new Paragraph({ children: [b('COVENANTS, CONDITIONS AND RESTRICTIONS: '), t('This Lease shall be subject to and TENANT shall comply with all recorded covenants, conditions and restrictions affecting the PREMISES.  TENANT’s failure to comply with such covenants, conditions and restrictions shall be a default of this Lease.')]}),
         br(),
 
         new Paragraph({ children: [b('IN WITNESS WHEREOF, '), t('TENANT hereby acknowledges they have read this Lease, understand both the TENANT’s and LANDLORD’s rights and responsibilities, and agrees to abide by the terms set forth in this Lease and any attached addendums.')]}),

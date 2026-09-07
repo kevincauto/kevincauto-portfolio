@@ -17,6 +17,9 @@ export default function Header() {
         <Link href="/lease-editor" className={styles.link}>
           Lease Editor
         </Link>
+        <Link href="/rental-ad" className={styles.link}>
+          Rental Ad
+        </Link>
       </nav>
     </header>
   );

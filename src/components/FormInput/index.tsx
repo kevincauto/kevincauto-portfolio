@@ -11,6 +11,9 @@ interface FormInputProps {
   value: string | number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   maxLength?: number;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
+  pattern?: string;
+  title?: string;
 }
 
 export default function FormInput({
@@ -22,6 +25,9 @@ export default function FormInput({
   value,
   onChange,
   maxLength,
+  inputMode,
+  pattern,
+  title,
 }: FormInputProps) {
   return (
     <div className={styles.inputGroup}>
@@ -38,6 +44,9 @@ export default function FormInput({
         value={value}
         onChange={onChange}
         maxLength={maxLength}
+        inputMode={inputMode}
+        pattern={pattern}
+        title={title}
       />
     </div>
   );

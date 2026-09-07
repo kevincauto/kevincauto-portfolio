@@ -1,0 +1,220 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.fieldset {
+  border: 1px solid #d1d5db;
+  padding: 1.5rem;
+  border-radius: 6px;
+}
+
+.legend {
+  padding: 0 0.5rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #1a1a1a;
+}
+
+.fieldLabel {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin: 1rem 0 0.75rem;
+}
+
+.propertyToggle {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.toggleButton {
+  padding: 0.8rem 1.2rem;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background-color: #f9fafb;
+  color: #374151;
+  font-size: 1rem;
+  font-weight: 600;
+  min-width: 120px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.toggleButton:hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.toggleButton.active {
+  background-color: #ffb400;
+  color: #1a1a1a;
+  border-color: #ffb400;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.checkboxGrid,
+.radioGrid {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.checkboxWrapper,
+.radioWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkboxWrapper input,
+.radioWrapper input {
+  width: 18px;
+  height: 18px;
+}
+
+.button {
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.2s ease-in-out;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.button:hover {
+  background-color: #005bb5;
+}
+
+.errorText {
+  color: #ff4d4f;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.previewHeader {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.copyButton {
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  padding: 0.55rem 1.1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: background-color 0.2s ease-in-out;
+  white-space: nowrap;
+}
+
+.copyButton:hover {
+  background-color: #005bb5;
+}
+
+.copyButton.copied {
+  background-color: #16a34a;
+}
+
+.copyButton.copied:hover {
+  background-color: #15803d;
+}
+
+.previewTextarea {
+  width: 100%;
+  min-height: 28rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background-color: #ffffff;
+  color: #1a1a1a;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  font-family: inherit;
+  resize: vertical;
+}
+
+@media (max-width: 900px) {
+  .form {
+    padding: 1.5rem;
+    margin: 1.5rem auto;
+  }
+
+  .grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.875rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .form {
+    padding: 1.125rem;
+    margin: 1rem auto;
+  }
+
+  .fieldset {
+    padding: 1rem;
+  }
+
+  .legend {
+    font-size: 1.05rem;
+  }
+
+  .propertyToggle {
+    gap: 0.5rem;
+  }
+
+  .toggleButton {
+    padding: 0.6rem 0.9rem;
+    font-size: 0.95rem;
+    min-width: 100px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .checkboxGrid,
+  .radioGrid {
+    gap: 1rem;
+  }
+
+  .button {
+    padding: 0.85rem 1.25rem;
+    font-size: 0.95rem;
+  }
+
+  .previewHeader {
+    flex-wrap: wrap;
+  }
+
+  .previewTextarea {
+    min-height: 22rem;
+  }
+}
