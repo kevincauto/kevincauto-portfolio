@@ -116,6 +116,9 @@ export const generateLease = async (data: LeaseData) => {
   
   const storageArea = data.property.address === '900 E Hector St' ? 'basement' : 'garage';
   const outdoorArea = data.property.address === '900 E Hector St' ? 'porch' : 'deck';
+  const bathroomAccessText = data.property.address === '503 E 9th Ave'
+    ? `The TENANT may use the ${data.bathroom}.`
+    : `The TENANT may use the ${data.bathroom} or the main floor half bathroom.`;
 
   const roomUpgradeParagraphText = data.isRoomUpgrade
     ? `The previous lease agreement issued${roomUpgradeIssuedMonthYear ? ` in ${roomUpgradeIssuedMonthYear}` : ''} between the LANDLORD and TENANT will end ${roomUpgradeEndDate}. TENANT will be changing rooms and this lease will replace the previous one. The current security deposit of $${currentSecurityDepositHeld} will continue to be held, and an additional $${additionalSecurityDepositRequested} will be requested so that the total security deposit will be $${totalNewSecurityDeposit}.`
@@ -208,7 +211,7 @@ export const generateLease = async (data: LeaseData) => {
         new Paragraph({ children: [b('BEDROOM: '), t(`The TENANT will occupy the ${data.roomName}. The TENANT is prohibited from entering any other bedroom. This bedroom is ${data.furnished ? 'furnished' : 'unfurnished'} and is single-occupancy.`)]}),
         br(),
 
-        new Paragraph({ children: [b('BATHROOM: '), t(`The TENANT may use the ${data.bathroom} or the main floor half bathroom.`)]}),
+        new Paragraph({ children: [b('BATHROOM: '), t(bathroomAccessText)]}),
         br(),
 
         new Paragraph({ children: [b('HOUSEMATE/HOUSEHOLD RULES: '), t('TENANT understands they will be sharing the PREMISES with several other housemates. TENANT will be respectful and amicable towards other housemates. The TENANT will not use, consume, or touch other housemates’ property, food, or possessions without permission. TENANT acknowledges that housemates will move-out over time and they will be replaced by new housemates selected by the LANDLORD.')]}),
