@@ -27,6 +27,15 @@
   color: #ffb400; /* ESPN Gold */
 }
 
+:global(html[data-re-theme='dark']) .header {
+  background-color: #161311;
+  border-top-color: #2c2825;
+}
+
+:global(html[data-re-theme='dark']) .link {
+  color: #f4efe8;
+}
+
 @media (max-width: 600px) {
   .header {
     padding: 0.75rem 1rem;

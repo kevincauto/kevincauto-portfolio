@@ -20,6 +20,9 @@ export default function Header() {
         <Link href="/rental-ad" className={styles.link}>
           Rental Ad
         </Link>
+        <Link href="/re" className={styles.link}>
+          Apartments
+        </Link>
       </nav>
     </header>
   );

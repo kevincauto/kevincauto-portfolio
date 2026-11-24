@@ -1,0 +1,572 @@
+[
+  {
+    "slug": "265-flats",
+    "name": "265 Flats",
+    "region": "city",
+    "onsiteIds": [
+      "185513"
+    ],
+    "lat": 40.05496007940879,
+    "lng": -75.1958617847347,
+    "address": "265 W Mt Pleasant Ave",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19119",
+    "url": "https://galmangroup.com/property/265-flats/"
+  },
+  {
+    "slug": "algon-flats",
+    "name": "Algon Flats",
+    "region": "city",
+    "onsiteIds": [
+      "231455"
+    ],
+    "lat": 40.0633353,
+    "lng": -75.0666935,
+    "address": "7810-20 Algon Ave",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19111",
+    "url": "https://galmangroup.com/property/algon-flats/"
+  },
+  {
+    "slug": "canterbury-apartments",
+    "name": "Canterbury Apartments",
+    "region": "city",
+    "onsiteIds": [
+      "185497"
+    ],
+    "lat": 40.06557957940754,
+    "lng": -75.1969665847032,
+    "address": "33 Roumfort Rd",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19119",
+    "url": "https://galmangroup.com/property/canterbury-apartments/"
+  },
+  {
+    "slug": "chestnut-terrace",
+    "name": "Chestnut Terrace",
+    "region": "city",
+    "onsiteIds": [
+      "185498"
+    ],
+    "lat": 40.07094007940682,
+    "lng": -75.18832678470305,
+    "address": "7412 Stenton Avenue",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19150",
+    "url": "https://galmangroup.com/property/chestnut-terrace/"
+  },
+  {
+    "slug": "coventry-apartments",
+    "name": "Coventry House",
+    "region": "city",
+    "onsiteIds": [
+      "227936"
+    ],
+    "lat": 40.07806697940586,
+    "lng": -75.08865958470288,
+    "address": "8048 Oxford Avenue",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19111",
+    "url": "https://galmangroup.com/property/coventry-apartments/"
+  },
+  {
+    "slug": "donna-court",
+    "name": "Donna Court",
+    "region": "city",
+    "onsiteIds": [
+      "185512"
+    ],
+    "lat": 40.03640797941114,
+    "lng": -75.21422718470411,
+    "address": "631 Dupont St",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19128",
+    "url": "https://galmangroup.com/property/donna-court/"
+  },
+  {
+    "slug": "dupont-towers",
+    "name": "Dupont Towers",
+    "region": "city",
+    "onsiteIds": [
+      "185504"
+    ],
+    "lat": 40.03728957941095,
+    "lng": -75.21354228391422,
+    "address": "6100 Henry Ave",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19128",
+    "url": "https://galmangroup.com/property/dupont-towers/"
+  },
+  {
+    "slug": "exeter-village",
+    "name": "Exeter Village",
+    "region": "suburbs",
+    "onsiteIds": [
+      "211527"
+    ],
+    "lat": 40.29801317937906,
+    "lng": -75.85421438469594,
+    "address": "200 Eastwick Drive",
+    "city": "Reading",
+    "state": "PA",
+    "zip": "19606",
+    "url": "https://galmangroup.com/property/exeter-village/"
+  },
+  {
+    "slug": "forest-station",
+    "name": "Forest Station",
+    "region": "city",
+    "onsiteIds": [
+      "185499"
+    ],
+    "lat": 40.12589697929884,
+    "lng": -75.02264694906907,
+    "address": "450 Byberry Rd",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19116",
+    "url": "https://galmangroup.com/property/forest-station/"
+  },
+  {
+    "slug": "gail-court-apartments",
+    "name": "Gail Court Apartments",
+    "region": "city",
+    "onsiteIds": [
+      "221928"
+    ],
+    "lat": 40.07459380587908,
+    "lng": -75.07875457893567,
+    "address": "713-717 Rhawn Street",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19111",
+    "url": "https://galmangroup.com/property/gail-court-apartments/"
+  },
+  {
+    "slug": "green-valley-manor",
+    "name": "Green Valley Manor",
+    "region": "suburbs",
+    "onsiteIds": [
+      "185496"
+    ],
+    "lat": 40.09141397930327,
+    "lng": -75.27898504907017,
+    "address": "150 Ridge Pike",
+    "city": "Lafayette Hill",
+    "state": "PA",
+    "zip": "19444",
+    "url": "https://galmangroup.com/property/green-valley-manor/"
+  },
+  {
+    "slug": "hampton-gardens",
+    "name": "Hampton Gardens",
+    "region": "city",
+    "onsiteIds": [
+      "185507"
+    ],
+    "lat": 40.13139037929817,
+    "lng": -75.01799054906895,
+    "address": "13451 Philmont Ave",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19116",
+    "url": "https://galmangroup.com/property/hampton-gardens/"
+  },
+  {
+    "slug": "hillside-apartments",
+    "name": "Hillside Apartments",
+    "region": "suburbs",
+    "onsiteIds": [
+      "185516"
+    ],
+    "lat": 40.24117237928481,
+    "lng": -75.61773244906554,
+    "address": "94 Hillside Drive",
+    "city": "Pottstown",
+    "state": "PA",
+    "zip": "19464",
+    "url": "https://galmangroup.com/property/hillside-apartments/"
+  },
+  {
+    "slug": "knightsbridge",
+    "name": "Knightsbridge",
+    "region": "suburbs",
+    "onsiteIds": [
+      "185527"
+    ],
+    "lat": 40.10494317930145,
+    "lng": -74.95463544906981,
+    "address": "2900 Knights Rd",
+    "city": "Bensalem",
+    "state": "PA",
+    "zip": "19020",
+    "url": "https://galmangroup.com/property/knightsbridge/"
+  },
+  {
+    "slug": "lansdowne-station",
+    "name": "Lansdowne Station",
+    "region": "suburbs",
+    "onsiteIds": [
+      "185521"
+    ],
+    "lat": 39.93050407932365,
+    "lng": -75.2719152490751,
+    "address": "504 S Lansdowne Ave",
+    "city": "Yeadon",
+    "state": "PA",
+    "zip": "19050",
+    "url": "https://galmangroup.com/property/lansdowne-station/"
+  },
+  {
+    "slug": "leverington-court",
+    "name": "Leverington Court",
+    "region": "city",
+    "onsiteIds": [
+      "185528"
+    ],
+    "lat": 40.0374326793098,
+    "lng": -75.21459224907187,
+    "address": "631 Leverington Ave",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19128",
+    "url": "https://galmangroup.com/property/leverington-court/"
+  },
+  {
+    "slug": "lions-gate-apartments",
+    "name": "Lion's Gate Apartments",
+    "region": "city",
+    "onsiteIds": [
+      "185526"
+    ],
+    "lat": 40.10204487930186,
+    "lng": -75.02774104906985,
+    "address": "10101 Northeast Ave",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19116",
+    "url": "https://galmangroup.com/property/lions-gate-apartments/"
+  },
+  {
+    "slug": "lolas-place",
+    "name": "Lola's Place",
+    "region": "suburbs",
+    "onsiteIds": [
+      "510005"
+    ],
+    "lat": 40.09822287930243,
+    "lng": -75.212361248939,
+    "address": "20 Haws Lane",
+    "city": "Flourtown",
+    "state": "PA",
+    "zip": "19031",
+    "url": "https://galmangroup.com/property/lolas-place/"
+  },
+  {
+    "slug": "millstone-village-apartments",
+    "name": "Millstone Village",
+    "region": "suburbs",
+    "onsiteIds": [
+      "722781"
+    ],
+    "lat": 40.2332753,
+    "lng": -75.6523853,
+    "address": "206 E. Schuylkill Rd #33",
+    "city": "Pottstown",
+    "state": "PA",
+    "zip": "19465",
+    "url": "https://galmangroup.com/property/millstone-village-apartments/"
+  },
+  {
+    "slug": "montgomery-court",
+    "name": "Montgomery Court",
+    "region": "suburbs",
+    "onsiteIds": [
+      "185518"
+    ],
+    "lat": 40.01028377941442,
+    "lng": -75.26477238473622,
+    "address": "214 Price Ave",
+    "city": "Narberth",
+    "state": "PA",
+    "zip": "19072",
+    "url": "https://galmangroup.com/property/montgomery-court/"
+  },
+  {
+    "slug": "north-lane-apartments",
+    "name": "North Lane Apartments",
+    "region": "suburbs",
+    "onsiteIds": [
+      "185500"
+    ],
+    "lat": 40.091685379404296,
+    "lng": -75.29641158473355,
+    "address": "110 W North Ln",
+    "city": "Conshohocken",
+    "state": "PA",
+    "zip": "19428",
+    "url": "https://galmangroup.com/property/north-lane-apartments/"
+  },
+  {
+    "slug": "pine-manor",
+    "name": "Pine Manor",
+    "region": "city",
+    "onsiteIds": [
+      "185505"
+    ],
+    "lat": 40.07987857940574,
+    "lng": -75.08351628473395,
+    "address": "415 Solly Ave",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19111",
+    "url": "https://galmangroup.com/property/pine-manor/"
+  },
+  {
+    "slug": "plymouth-flats",
+    "name": "Plymouth Flats",
+    "region": "suburbs",
+    "onsiteIds": [
+      "649091"
+    ],
+    "lat": 40.11183167401989,
+    "lng": -75.32409708753195,
+    "address": "349 Chilton Ct",
+    "city": "Plymouth Meeting",
+    "state": "PA",
+    "zip": "19462",
+    "url": "https://galmangroup.com/property/plymouth-flats/"
+  },
+  {
+    "slug": "pottsgrove-townhomes",
+    "name": "Pottsgrove Townhomes",
+    "region": "suburbs",
+    "onsiteIds": [
+      "185511"
+    ],
+    "lat": 40.24878407938503,
+    "lng": -75.69136428472852,
+    "address": "201 Jay St",
+    "city": "Stowe",
+    "state": "PA",
+    "zip": "19464",
+    "url": "https://galmangroup.com/property/pottsgrove-townhomes/"
+  },
+  {
+    "slug": "regency-towers",
+    "name": "Regency Towers",
+    "region": "suburbs",
+    "onsiteIds": [
+      "185509"
+    ],
+    "lat": 40.15426197939651,
+    "lng": -75.12165498391185,
+    "address": "1001 Easton Road",
+    "city": "Willow Grove",
+    "state": "PA",
+    "zip": "19090",
+    "url": "https://galmangroup.com/property/regency-towers/"
+  },
+  {
+    "slug": "ridge-court",
+    "name": "Ridge Court",
+    "region": "city",
+    "onsiteIds": [
+      "185529"
+    ],
+    "lat": 40.0439894794103,
+    "lng": -75.23145038473507,
+    "address": "7014 Ridge Ave",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19128",
+    "url": "https://galmangroup.com/property/ridge-court/"
+  },
+  {
+    "slug": "ridgeview-apartments",
+    "name": "Ridgeview Apartments",
+    "region": "city",
+    "onsiteIds": [
+      "185520"
+    ],
+    "lat": 40.04149427941057,
+    "lng": -75.2265300847352,
+    "address": "6725 Ridge Ave",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19128",
+    "url": "https://galmangroup.com/property/ridgeview-apartments/"
+  },
+  {
+    "slug": "rock-hill-apartments",
+    "name": "Rock Hill Apartments",
+    "region": "city",
+    "onsiteIds": [
+      "185530"
+    ],
+    "lat": 40.02142367941305,
+    "lng": -75.20901438473587,
+    "address": "209 Rock St",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19128",
+    "url": "https://galmangroup.com/property/rock-hill-apartments/"
+  },
+  {
+    "slug": "sedgwick-station",
+    "name": "Sedgwick Station",
+    "region": "city",
+    "onsiteIds": [
+      "185501"
+    ],
+    "lat": 40.06387697940768,
+    "lng": -75.1869826839136,
+    "address": "303 E Mt Pleasant Ave",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19119",
+    "url": "https://galmangroup.com/property/sedgwick-station/"
+  },
+  {
+    "slug": "spruce-court-apartments",
+    "name": "Spruce Court Apartments",
+    "region": "suburbs",
+    "onsiteIds": [
+      "185514"
+    ],
+    "lat": 40.191400679391855,
+    "lng": -75.54134498410143,
+    "address": "630 Spruce St. 02",
+    "city": "Royersford",
+    "state": "PA",
+    "zip": "19468",
+    "url": "https://galmangroup.com/property/spruce-court-apartments/"
+  },
+  {
+    "slug": "stenton-plaza",
+    "name": "Stenton Plaza",
+    "region": "city",
+    "onsiteIds": [
+      "185503"
+    ],
+    "lat": 40.07202287940671,
+    "lng": -75.18152938391336,
+    "address": "1061 E Mt Airy Ave",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19150",
+    "url": "https://galmangroup.com/property/stenton-plaza/"
+  },
+  {
+    "slug": "the-edge-at-yardley",
+    "name": "The Edge at Yardley",
+    "region": "suburbs",
+    "onsiteIds": [
+      "206960"
+    ],
+    "lat": 40.20493357939024,
+    "lng": -74.87951908469887,
+    "address": "26000 Cornerstone Dr",
+    "city": "Yardley",
+    "state": "PA",
+    "zip": "19067",
+    "url": "https://galmangroup.com/property/the-edge-at-yardley/"
+  },
+  {
+    "slug": "the-flats-at-jenkintown",
+    "name": "The Flats at Jenkintown",
+    "region": "suburbs",
+    "onsiteIds": [
+      "476911"
+    ],
+    "lat": 40.09350088305576,
+    "lng": -75.12513644850505,
+    "address": "1300 Greenwood Avenue",
+    "city": "Jenkintown",
+    "state": "PA",
+    "zip": "19046",
+    "url": "https://galmangroup.com/property/the-flats-at-jenkintown/"
+  },
+  {
+    "slug": "the-mccallum",
+    "name": "The McCallum",
+    "region": "city",
+    "onsiteIds": [
+      "185510"
+    ],
+    "lat": 40.045344679410206,
+    "lng": -75.19343318391398,
+    "address": "6635 McCallum St",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19119",
+    "url": "https://galmangroup.com/property/the-mccallum/"
+  },
+  {
+    "slug": "plaza-apartments",
+    "name": "The Plaza Apartments",
+    "region": "suburbs",
+    "onsiteIds": [
+      "185515"
+    ],
+    "lat": 40.091866379404266,
+    "lng": -75.12507478391304,
+    "address": "1250 Greenwood Ave",
+    "city": "Jenkintown",
+    "state": "PA",
+    "zip": "19046",
+    "url": "https://galmangroup.com/property/plaza-apartments/"
+  },
+  {
+    "slug": "the-ridge-apartments",
+    "name": "The Ridge Apartments",
+    "region": "city",
+    "onsiteIds": [
+      "185525"
+    ],
+    "lat": 40.05557307940875,
+    "lng": -75.23686548473476,
+    "address": "7949 Ridge Ave",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19128",
+    "url": "https://galmangroup.com/property/the-ridge-apartments/"
+  },
+  {
+    "slug": "valley-forge-towers",
+    "name": "Valley Forge Towers",
+    "region": "suburbs",
+    "onsiteIds": [
+      "185508"
+    ],
+    "lat": 40.10398477940283,
+    "lng": -75.41533228391275,
+    "address": "3000 Valley Forge Cir",
+    "city": "King of Prussia",
+    "state": "PA",
+    "zip": "19406",
+    "url": "https://galmangroup.com/property/valley-forge-towers/"
+  },
+  {
+    "slug": "westfield-apartments",
+    "name": "Westfield Apartments",
+    "region": "city",
+    "onsiteIds": [
+      "185502"
+    ],
+    "lat": 39.9921615794168,
+    "lng": -75.22844458391504,
+    "address": "2237 Bryn Mawr Ave",
+    "city": "Philadelphia",
+    "state": "PA",
+    "zip": "19131",
+    "url": "https://galmangroup.com/property/westfield-apartments/"
+  }
+]
