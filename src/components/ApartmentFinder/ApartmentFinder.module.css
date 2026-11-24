@@ -789,13 +789,13 @@
   font-weight: 700;
 }
 
-:global(.finder-pin-wrap),
-:global(.finder-center-icon) {
+.page :global(.finder-pin-wrap),
+.page :global(.finder-center-icon) {
   background: none;
   border: none;
 }
 
-:global(.finder-pin) {
+.page :global(.finder-pin) {
   position: absolute;
   left: 50%;
   bottom: 0;
@@ -813,7 +813,7 @@
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
 }
 
-:global(.finder-pin b) {
+.page :global(.finder-pin b) {
   min-width: 18px;
   padding: 1px 5px;
   border-radius: 999px;
@@ -822,14 +822,14 @@
   text-align: center;
 }
 
-:global(.finder-pin-hot),
-:global(.finder-pin-on) {
+.page :global(.finder-pin-hot),
+.page :global(.finder-pin-on) {
   background: #c0453c;
   color: white;
 }
 
-:global(.finder-pin-hot b),
-:global(.finder-pin-on b) {
+.page :global(.finder-pin-hot b),
+.page :global(.finder-pin-on b) {
   background: white;
   color: #c0453c;
 }
@@ -856,7 +856,7 @@
   color: #8c1d18;
 }
 
-:global(.finder-center-dot) {
+.page :global(.finder-center-dot) {
   display: block;
   width: 16px;
   height: 16px;
@@ -896,7 +896,7 @@
   color: var(--accent);
 }
 
-:global(html[data-re-theme='dark'] body) {
+.reBody {
   background: #12100e;
   color: #f4efe8;
 }

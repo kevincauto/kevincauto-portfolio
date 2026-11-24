@@ -96,11 +96,13 @@ export default function ApartmentFinder() {
 
   useLayoutEffect(() => {
     document.documentElement.dataset.reTheme = theme
+    document.body.classList.toggle(styles.reBody, theme === 'dark')
   }, [theme])
 
   useLayoutEffect(() => {
     return () => {
       delete document.documentElement.dataset.reTheme
+      document.body.classList.remove(styles.reBody)
     }
   }, [])
 
