@@ -3,6 +3,8 @@
 import dynamic from 'next/dynamic'
 import { Fragment, useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { laundryLabel } from '@/lib/galman/laundry'
+import { unitSpecial } from '@/lib/galman/specials'
 import type { PropertyRecord, UnitsResponse } from '@/lib/galman/types'
 import {
   activeFilterCount,
@@ -16,7 +18,6 @@ import {
   filtersToQuery,
   formatDate,
   money,
-  moneyPerFoot,
   relativeTime,
   summarize,
   todayIso,
@@ -36,7 +37,9 @@ const PropertyMap = dynamic(() => import('./PropertyMap'), {
 
 const SORT_OPTIONS: { value: SortKey; label: string }[] = [
   { value: 'rent', label: 'Price' },
-  { value: 'ppsf', label: 'Price / sq ft' },
+  { value: 'net', label: 'Net effective' },
+  { value: 'netb', label: 'Net effective / bedroom' },
+  { value: 'ppb', label: 'Price / bedroom' },
   { value: 'beds', label: 'Bedrooms' },
   { value: 'sqft', label: 'Square feet' },
   { value: 'available', label: 'Available date' },
@@ -261,17 +264,27 @@ export default function ApartmentFinder() {
     }))
   }
 
+  function toggleFavorites() {
+    setFilters((current) => ({
+      ...current,
+      favorites: !current.favorites,
+      props: current.favorites ? current.props : [],
+    }))
+  }
+
   function toggleProperty(slug: string) {
     setFilters((current) => ({
       ...current,
-      props: current.props.includes(slug) ? current.props.filter((value) => value !== slug) : [...current.props, slug],
+      favorites: false,
+      props: current.favorites ? [slug] : current.props.includes(slug) ? current.props.filter((value) => value !== slug) : [...current.props, slug],
     }))
   }
 
   function focusProperty(slug: string) {
     setFilters((current) => ({
       ...current,
-      props: current.props.length === 1 && current.props[0] === slug ? [] : [slug],
+      favorites: false,
+      props: !current.favorites && current.props.length === 1 && current.props[0] === slug ? [] : [slug],
     }))
   }
 
@@ -580,6 +593,25 @@ export default function ApartmentFinder() {
               </div>
             </div>
 
+            <div className={styles.group}>
+              <button
+                type="button"
+                className={filters.favorites ? styles.textOn : styles.linkish}
+                aria-pressed={filters.favorites}
+                onClick={toggleFavorites}
+              >
+                Favorites
+              </button>
+              <button
+                type="button"
+                className={filters.laundry ? styles.textOn : styles.linkish}
+                aria-pressed={filters.laundry}
+                onClick={() => setFilters((current) => ({ ...current, laundry: !current.laundry }))}
+              >
+                In-unit laundry
+              </button>
+            </div>
+
             <div className={styles.row2}>
               <label className={styles.group}>
                 <span className={styles.label}>Baths</span>
@@ -731,6 +763,17 @@ export default function ApartmentFinder() {
                 <button type="button" className={styles.button} aria-pressed={showMap} onClick={() => setShowMap((open) => !open)}>
                   {showMap ? 'Hide map' : 'Show map'}
                 </button>
+                <button type="button" className={styles.button} aria-pressed={filters.favorites} onClick={toggleFavorites}>
+                  Favorites
+                </button>
+                <button
+                  type="button"
+                  className={styles.button}
+                  aria-pressed={filters.laundry}
+                  onClick={() => setFilters((current) => ({ ...current, laundry: !current.laundry }))}
+                >
+                  In-unit laundry
+                </button>
                 <strong>
                   {summary.count} unit{summary.count === 1 ? '' : 's'}
                 </strong>
@@ -803,13 +846,17 @@ export default function ApartmentFinder() {
                         <input className={styles.check} type="checkbox" checked={allVisibleSelected} onChange={toggleAll} aria-label="Select all visible units" />
                       </th>
                       <SortHeader label="Property" sort="property" filters={filters} onSort={sortBy} />
-                      <th>Unit</th>
                       <SortHeader label="Beds" sort="beds" filters={filters} onSort={sortBy} />
                       <th>Baths</th>
-                      <SortHeader label="Sq ft" sort="sqft" filters={filters} onSort={sortBy} />
                       <SortHeader label="Rent" sort="rent" filters={filters} onSort={sortBy} />
-                      <SortHeader label="$/sq ft" sort="ppsf" filters={filters} onSort={sortBy} />
+                      <SortHeader label="Net" sort="net" filters={filters} onSort={sortBy} />
+                      <SortHeader label="Net/bed" sort="netb" filters={filters} onSort={sortBy} />
+                      <SortHeader label="$/bed" sort="ppb" filters={filters} onSort={sortBy} />
+                      <th>Special</th>
                       <SortHeader label="Available" sort="available" filters={filters} onSort={sortBy} />
+                      <th>Laundry</th>
+                      <SortHeader label="Sq ft" sort="sqft" filters={filters} onSort={sortBy} />
+                      <th>Unit</th>
                       {located && <SortHeader label="Distance" sort="distance" filters={filters} onSort={sortBy} />}
                       <th>Galman</th>
                     </tr>
@@ -819,7 +866,8 @@ export default function ApartmentFinder() {
                       const key = unitKey(unit)
                       const available = formatDate(unit.availableDate)
                       const open = openRows.has(key)
-                      const columns = located ? 12 : 11
+                      const columns = located ? 16 : 15
+                      const special = unitSpecial(unit.description)
                       const canExpand = Boolean(unit.description || unit.floorPlan)
                       return (
                         <Fragment key={key}>
@@ -870,13 +918,23 @@ export default function ApartmentFinder() {
                               </button>
                               <span className={styles.city}>{unit.city}</span>
                             </td>
-                            <td className={styles.unitName}>{unit.unit || 'Unit'}</td>
                             <td className={styles.num}>{bedsLabel(unit.beds)}</td>
                             <td className={styles.num}>{unit.baths ?? '—'}</td>
-                            <td className={styles.num}>{unit.sqft ? unit.sqft.toLocaleString() : '—'}</td>
                             <td className={`${styles.num} ${styles.rent}`}>{money(unit.rent)}</td>
-                            <td className={styles.num}>{unit.pricePerSqft == null ? '—' : moneyPerFoot(unit.pricePerSqft)}</td>
+                            <td className={`${styles.num} ${styles.rent}`} title={unit.netEffective === unit.rent ? undefined : 'Net effective on a 12-month lease'}>
+                              {money(unit.netEffective)}
+                            </td>
+                            <td className={styles.num} title={unit.netEffective === unit.rent ? undefined : 'Net effective rent per bedroom'}>
+                              {money(unit.netPerBedroom)}
+                            </td>
+                            <td className={styles.num}>{unit.pricePerBedroom == null ? '—' : money(unit.pricePerBedroom)}</td>
+                            <td className={special ? styles.special : styles.num} title={special?.detail}>
+                              {special ? special.label : '—'}
+                            </td>
                             <td className={available === 'Now' ? styles.now : styles.num}>{available}</td>
+                            <td className={unit.inUnitLaundry ? styles.now : styles.num}>{laundryLabel(unit.inUnitLaundry, unit.sharedLaundry)}</td>
+                            <td className={styles.num}>{unit.sqft ? unit.sqft.toLocaleString() : '—'}</td>
+                            <td className={styles.unitName}>{unit.unit || 'Unit'}</td>
                             {located && <td className={styles.num}>{unit.distance == null ? '—' : `${unit.distance.toFixed(1)} mi`}</td>}
                             <td>
                               <a
@@ -1022,6 +1080,8 @@ function ActiveChips({
     })
   }
   if (filters.q.trim()) chips.push({ key: 'q', label: filters.q.trim(), clear: () => onChange((current) => ({ ...current, q: '' })) })
+  if (filters.favorites) chips.push({ key: 'favorites', label: 'Favorites', clear: () => onChange((current) => ({ ...current, favorites: false })) })
+  if (filters.laundry) chips.push({ key: 'laundry', label: 'In-unit laundry', clear: () => onChange((current) => ({ ...current, laundry: false })) })
   if (filters.props.length) {
     chips.push({
       key: 'props',
@@ -1101,22 +1161,31 @@ function CardList({
             {group.map((unit) => {
               const key = unitKey(unit)
               const available = formatDate(unit.availableDate)
+              const special = unitSpecial(unit.description)
               return (
                 <div key={key} className={styles.cardUnit}>
                   <input className={styles.check} type="checkbox" checked={selected.has(key)} onChange={() => onToggle(key)} aria-label={`Select ${unit.unit}`} />
                   <div>
                     <div className={styles.unitName}>{unit.unit || 'Unit'}</div>
+                    {special && <div className={styles.special}>{special.label}</div>}
                     <div className={styles.unitMeta}>
                       {unit.beds == null ? 'Beds unknown' : unit.beds === 0 ? 'Studio' : `${unit.beds} bed${unit.beds === 1 ? '' : 's'}`}
                       {unit.baths != null ? ` · ${unit.baths} bath${unit.baths === 1 ? '' : 's'}` : ''}
                       {unit.sqft ? ` · ${unit.sqft.toLocaleString()} sq ft` : ''}
                       {unit.floorPlan ? ` · ${unit.floorPlan}` : ''}
+                      {laundryLabel(unit.inUnitLaundry, unit.sharedLaundry) === '—'
+                        ? ''
+                        : ` · ${laundryLabel(unit.inUnitLaundry, unit.sharedLaundry)}`}
                     </div>
                     {unit.description && <div className={styles.unitDesc}>{unit.description}</div>}
                   </div>
                   <div>
                     <div className={styles.rent}>{money(unit.rent)}</div>
-                    <div className={styles.unitMeta}>{unit.pricePerSqft == null ? '' : `${moneyPerFoot(unit.pricePerSqft)} / sq ft`}</div>
+                    {unit.netEffective !== unit.rent && <div className={styles.unitMeta}>{`${money(unit.netEffective)} net`}</div>}
+                    {unit.netEffective !== unit.rent && unit.beds != null && unit.beds > 0 && (
+                      <div className={styles.unitMeta}>{`${money(unit.netPerBedroom)} net / bed`}</div>
+                    )}
+                    {unit.pricePerBedroom != null && <div className={styles.unitMeta}>{`${money(unit.pricePerBedroom)} / bed`}</div>}
                   </div>
                   <div className={available === 'Now' ? styles.now : undefined}>{available}</div>
                 </div>

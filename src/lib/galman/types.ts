@@ -1,3 +1,5 @@
+import type { LaundryPolicy } from '@/lib/galman/laundry'
+
 export type Region = 'city' | 'suburbs'
 
 export type GalmanProperty = {
@@ -12,6 +14,8 @@ export type GalmanProperty = {
   state: string
   zip: string
   url: string
+  laundry: LaundryPolicy
+  sharedLaundry: boolean
 }
 
 export type ParsedUnit = {
@@ -41,6 +45,8 @@ export type UnitRecord = ParsedUnit & {
   lat: number | null
   lng: number | null
   galmanUrl: string
+  laundry: LaundryPolicy
+  sharedLaundry: boolean
 }
 
 export type PropertyRecord = {

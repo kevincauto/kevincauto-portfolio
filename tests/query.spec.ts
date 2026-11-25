@@ -1,4 +1,4 @@
-import { applyQuery, defaultFilters, filtersFromSearchParams, summarize, type Filters } from '@/lib/galman/query'
+import { DEFAULT_PROPERTIES, applyQuery, defaultFilters, filtersFromSearchParams, filtersToQuery, summarize, type Filters } from '@/lib/galman/query'
 import type { UnitRecord } from '@/lib/galman/types'
 
 function unit(overrides: Partial<UnitRecord>): UnitRecord {
@@ -26,6 +26,8 @@ function unit(overrides: Partial<UnitRecord>): UnitRecord {
     lat: 40.1118,
     lng: -75.3241,
     galmanUrl: 'https://galmangroup.com/property/plymouth-flats/',
+    laundry: 'none',
+    sharedLaundry: false,
     ...overrides,
   }
 }
@@ -63,12 +65,21 @@ const units = [
   }),
 ]
 
-const filters = (overrides: Partial<Filters> = {}): Filters => ({ ...defaultFilters, ...overrides })
+const filters = (overrides: Partial<Filters> = {}): Filters => ({ ...defaultFilters, props: [], favorites: false, ...overrides })
 
 describe('filtersFromSearchParams', () => {
   it('does not treat a missing bedroom filter as studio', () => {
     expect(filtersFromSearchParams(new URLSearchParams()).beds).toEqual([])
     expect(filtersFromSearchParams(new URLSearchParams('beds=0,2')).beds).toEqual([0, 2])
+  })
+
+  it('opens on favorites and can show every property', () => {
+    expect(filtersFromSearchParams(new URLSearchParams()).favorites).toBe(true)
+    expect(filtersFromSearchParams(new URLSearchParams()).props).toEqual([])
+    expect(filtersFromSearchParams(new URLSearchParams('fav=0')).favorites).toBe(false)
+    expect(filtersFromSearchParams(new URLSearchParams('props=hampton-gardens')).favorites).toBe(false)
+    expect(filtersToQuery(defaultFilters)).toBe('')
+    expect(filtersToQuery({ ...defaultFilters, favorites: false })).toBe('fav=0')
   })
 })
 
@@ -84,6 +95,55 @@ describe('applyQuery', () => {
     expect(near.map((unit) => unit.unit)).toEqual(['A1'])
     expect(near[0].distance).not.toBeNull()
     expect(near[0].distance as number).toBeLessThan(0.2)
+  })
+
+  it('divides rent by bedroom count and leaves studios blank', () => {
+    const listed = applyQuery(units, filters())
+    const byUnit = Object.fromEntries(listed.map((item) => [item.unit, item.pricePerBedroom]))
+    expect(byUnit.A1).toBe(1800)
+    expect(byUnit.B2).toBe(1200)
+    expect(byUnit.S1).toBeNull()
+
+    const sorted = applyQuery(units, filters({ sort: 'ppb', dir: 'asc' }))
+    expect(sorted.map((item) => item.unit)).toEqual(['B2', 'A1', 'S1'])
+  })
+
+  it('keeps in-unit laundry when a complex promises it, and only matching units when it varies', () => {
+    const listed = applyQuery(
+      [
+        unit({ unitId: 'edge', unit: 'E1', description: 'Quartz counters', laundry: 'all' }),
+        unit({ unitId: 'court-yes', unit: 'D22', description: 'Luxury upgrade with washer and dryer.', laundry: 'unit', sharedLaundry: true }),
+        unit({ unitId: 'court-no', unit: 'A1b', description: 'Classic carpet and dishwasher.', laundry: 'unit', sharedLaundry: true }),
+        unit({ unitId: 'hampton', unit: 'H1', description: 'Washer & Dryer', laundry: 'none' }),
+      ],
+      filters({ laundry: true })
+    )
+    expect(listed.map((item) => item.unit).sort()).toEqual(['D22', 'E1'])
+    expect(listed.every((item) => item.inUnitLaundry)).toBe(true)
+  })
+
+  it('divides net effective rent by the bedroom count', () => {
+    const listed = applyQuery(
+      [unit({ unitId: 'two', unit: 'B2', rent: 1800, beds: 2, description: 'special Holiday Savings! One Month FREE!' })],
+      filters()
+    )
+    expect(listed[0].netEffective).toBeCloseTo(1650)
+    expect(listed[0].netPerBedroom).toBeCloseTo(825)
+
+    const fullPrice = applyQuery([unit({ unitId: 'full', unit: 'F1', rent: 1500, beds: 2, description: 'Carpet' })], filters())
+    expect(fullPrice[0].netEffective).toBe(1500)
+    expect(fullPrice[0].netPerBedroom).toBe(750)
+
+    const studio = applyQuery([unit({ unitId: 'studio', unit: 'S', rent: 1100, beds: 0, description: 'Studio' })], filters())
+    expect(studio[0].netEffective).toBe(1100)
+    expect(studio[0].netPerBedroom).toBe(1100)
+  })
+
+  it('limits favorites to the saved complexes', () => {
+    const listed = applyQuery(units, filters({ favorites: true }))
+    expect(listed.map((item) => item.slug).sort()).toEqual(['north-lane-apartments', 'plymouth-flats'])
+    expect(DEFAULT_PROPERTIES).toContain('plymouth-flats')
+    expect(DEFAULT_PROPERTIES).not.toContain('algon-flats')
   })
 
   it('sorts by price per foot with missing values last', () => {

@@ -107,6 +107,8 @@ async function loadProperty(
           lat: property.lat,
           lng: property.lng,
           galmanUrl: property.url,
+          laundry: property.laundry,
+          sharedLaundry: property.sharedLaundry,
         })
       }
     })

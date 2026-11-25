@@ -1,7 +1,9 @@
 import { milesBetween } from '@/lib/geo'
+import { laundryLabel, unitHasInUnitLaundry } from '@/lib/galman/laundry'
+import { netEffectiveRent, unitSpecial } from '@/lib/galman/specials'
 import type { UnitRecord } from '@/lib/galman/types'
 
-export const SORTS = ['rent', 'ppsf', 'beds', 'sqft', 'available', 'distance', 'property'] as const
+export const SORTS = ['rent', 'net', 'netb', 'ppb', 'ppsf', 'beds', 'sqft', 'available', 'distance', 'property'] as const
 export type SortKey = (typeof SORTS)[number]
 export type SortDir = 'asc' | 'desc'
 
@@ -23,12 +25,28 @@ export type Filters = {
   lng: number | null
   radius: number
   near: string
+  laundry: boolean
+  favorites: boolean
 }
 
 export type ListedUnit = UnitRecord & {
   distance: number | null
   pricePerSqft: number | null
+  pricePerBedroom: number | null
+  netEffective: number
+  netPerBedroom: number
+  inUnitLaundry: boolean
 }
+
+export const DEFAULT_PROPERTIES = [
+  'green-valley-manor',
+  'montgomery-court',
+  'north-lane-apartments',
+  'plymouth-flats',
+  'regency-towers',
+  'rock-hill-apartments',
+  'valley-forge-towers',
+]
 
 export const defaultFilters: Filters = {
   min: null,
@@ -48,6 +66,8 @@ export const defaultFilters: Filters = {
   lng: null,
   radius: 5,
   near: '',
+  laundry: false,
+  favorites: true,
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -71,6 +91,8 @@ export function filtersFromSearchParams(params: URLSearchParams): Filters {
   const region = params.get('region')
   const then = params.get('then')
   const sort = params.get('sort')
+  const rawProps = params.get('props')
+  const explicitProps = Boolean(rawProps && rawProps !== 'all')
   return {
     min: num(params.get('min')),
     max: num(params.get('max')),
@@ -79,7 +101,7 @@ export function filtersFromSearchParams(params: URLSearchParams): Filters {
     sqft: num(params.get('sqft')),
     by: /^\d{4}-\d{2}-\d{2}$/.test(params.get('by') || '') ? params.get('by') || '' : '',
     region: region === 'city' || region === 'suburbs' ? region : 'all',
-    props: (params.get('props') || '').split(',').map((slug) => slug.trim()).filter(Boolean),
+    props: explicitProps ? (rawProps || '').split(',').map((slug) => slug.trim()).filter(Boolean) : [],
     q: params.get('q') || '',
     sort: isSort(sort) ? sort : 'rent',
     dir: params.get('dir') === 'desc' ? 'desc' : 'asc',
@@ -89,6 +111,8 @@ export function filtersFromSearchParams(params: URLSearchParams): Filters {
     lng: num(params.get('lng')),
     radius: Math.min(25, Math.max(0.5, num(params.get('mi')) ?? 5)),
     near: params.get('near') || '',
+    laundry: params.get('wd') === '1',
+    favorites: params.get('fav') === '1' || (params.get('fav') !== '0' && !explicitProps && rawProps !== 'all'),
   }
 }
 
@@ -113,6 +137,8 @@ export function filtersToQuery(filters: Filters): string {
     params.set('mi', String(filters.radius))
     if (filters.near) params.set('near', filters.near)
   }
+  if (filters.laundry) params.set('wd', '1')
+  if (!filters.favorites) params.set('fav', '0')
   return params.toString()
 }
 
@@ -132,6 +158,7 @@ export function activeFilterCount(filters: Filters): number {
   if (filters.props.length) count += 1
   if (filters.q.trim()) count += 1
   if (filters.lat != null && filters.lng != null) count += 1
+  if (filters.laundry) count += 1
   return count
 }
 
@@ -198,10 +225,15 @@ export function withMetrics(unit: UnitRecord, filters: Filters): ListedUnit {
     hasLocation(filters) && unit.lat != null && unit.lng != null
       ? milesBetween(filters.lat as number, filters.lng as number, unit.lat, unit.lng)
       : null
+  const netEffective = netEffectiveRent(unit.rent, unit.description) ?? unit.rent
   return {
     ...unit,
     distance,
     pricePerSqft: unit.sqft ? unit.rent / unit.sqft : null,
+    pricePerBedroom: unit.beds != null && unit.beds > 0 ? unit.rent / unit.beds : null,
+    netEffective,
+    netPerBedroom: unit.beds != null && unit.beds > 0 ? netEffective / unit.beds : netEffective,
+    inUnitLaundry: unitHasInUnitLaundry(unit.laundry, unit.description),
   }
 }
 
@@ -221,8 +253,10 @@ export function matches(unit: ListedUnit, filters: Filters): boolean {
   if (filters.sqft != null && (unit.sqft == null || unit.sqft < filters.sqft)) return false
   if (filters.by && (!unit.availableDate || unit.availableDate > filters.by)) return false
   if (filters.region !== 'all' && unit.region !== filters.region) return false
+  if (filters.favorites && !DEFAULT_PROPERTIES.includes(unit.slug)) return false
   if (filters.props.length && !filters.props.includes(unit.slug)) return false
   if (hasLocation(filters) && (unit.distance == null || unit.distance > filters.radius + 0.001)) return false
+  if (filters.laundry && !unit.inUnitLaundry) return false
   const terms = filters.q.toLowerCase().split(/[^a-z0-9.]+/).filter((term) => term.length > 1 || /\d/.test(term))
   if (terms.length) {
     const haystack = [
@@ -245,6 +279,12 @@ function sortValue(unit: ListedUnit, key: SortKey): number | string | null {
   switch (key) {
     case 'rent':
       return unit.rent
+    case 'net':
+      return unit.netEffective
+    case 'netb':
+      return unit.netPerBedroom
+    case 'ppb':
+      return unit.pricePerBedroom
     case 'ppsf':
       return unit.pricePerSqft
     case 'beds':
@@ -288,7 +328,7 @@ export function applyQuery(units: UnitRecord[], filters: Filters): ListedUnit[] 
 }
 
 export function countsByProperty(units: UnitRecord[], filters: Filters): Map<string, number> {
-  const matched = applyQuery(units, { ...filters, props: [] })
+  const matched = applyQuery(units, { ...filters, props: [], favorites: false })
   const counts = new Map<string, number>()
   for (const unit of matched) counts.set(unit.slug, (counts.get(unit.slug) || 0) + 1)
   return counts
@@ -342,7 +382,12 @@ export function toCsv(units: ListedUnit[]): string {
     'Baths',
     'Sq Ft',
     'Rent',
+    'Special',
+    'Net effective',
+    'Net / bedroom',
+    '$/Bedroom',
     '$/Sq Ft',
+    'Laundry',
     'Available',
     'Move in by',
     'Distance (mi)',
@@ -366,7 +411,12 @@ export function toCsv(units: ListedUnit[]): string {
         unit.baths ?? '',
         unit.sqft ?? '',
         unit.rent,
+        unitSpecial(unit.description)?.label ?? '',
+        unit.netEffective.toFixed(2),
+        unit.netPerBedroom.toFixed(2),
+        unit.pricePerBedroom == null ? '' : unit.pricePerBedroom.toFixed(2),
         unit.pricePerSqft == null ? '' : unit.pricePerSqft.toFixed(2),
+        laundryLabel(unit.inUnitLaundry, unit.sharedLaundry),
         unit.availableDate,
         unit.maxMoveIn ?? '',
         unit.distance == null ? '' : unit.distance.toFixed(2),
@@ -400,6 +450,8 @@ export function toClientText(units: ListedUnit[], filters: Filters): string {
   if (filters.sqft != null) bits.push(`${filters.sqft.toLocaleString()}+ sq ft`)
   if (filters.by) bits.push(`available by ${formatDate(filters.by)}`)
   if (filters.q.trim()) bits.push(`matching "${filters.q.trim()}"`)
+  if (filters.laundry) bits.push('in-unit laundry')
+  if (filters.favorites) bits.push('favorites')
   if (bits.length) lines.push(bits.join(' · '))
   lines.push(`${units.length} unit${units.length === 1 ? '' : 's'}`, '')
 
@@ -430,7 +482,14 @@ export function toClientText(units: ListedUnit[], filters: Filters): string {
       ]
         .filter(Boolean)
         .join(' · ')
-      lines.push(`• ${unit.unit || 'Unit'} · ${size} · ${money(unit.rent)} · available ${formatDate(unit.availableDate)}`)
+      const laundry = unit.inUnitLaundry ? ' · in-unit laundry' : ''
+      const special = unitSpecial(unit.description)
+      const deal = special ? ` · ${special.label}` : ''
+      const net =
+        unit.netEffective === unit.rent
+          ? ''
+          : ` · net ${money(unit.netEffective)}${unit.beds != null && unit.beds > 0 ? ` (${money(unit.netPerBedroom)}/bed)` : ''}`
+      lines.push(`• ${unit.unit || 'Unit'} · ${size} · ${money(unit.rent)}${deal}${net}${laundry} · available ${formatDate(unit.availableDate)}`)
       if (unit.description) lines.push(`  ${unit.description}`)
     }
     lines.push(first.galmanUrl, '')

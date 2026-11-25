@@ -195,6 +195,15 @@ async function main() {
   await mkdir(cacheDir, { recursive: true })
   await mkdir(path.dirname(outFile), { recursive: true })
   const seen = new Map()
+  let previous = []
+  try {
+    previous = JSON.parse(await readFile(outFile, 'utf8'))
+  } catch {
+    previous = []
+  }
+  const laundryBySlug = new Map(
+    previous.filter((property) => property.laundry).map((property) => [property.slug, property])
+  )
 
   for (const [region, url] of regions) {
     console.log(`listing ${region}`)
@@ -230,6 +239,11 @@ async function main() {
         state: address.state || 'PA',
         zip: address.zip,
         url: pageUrl,
+      }
+      const kept = laundryBySlug.get(slug)
+      if (kept) {
+        property.laundry = kept.laundry
+        property.sharedLaundry = Boolean(kept.sharedLaundry)
       }
       seen.set(slug, property)
       console.log(

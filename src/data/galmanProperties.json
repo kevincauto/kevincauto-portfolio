@@ -12,7 +12,9 @@
     "city": "Philadelphia",
     "state": "PA",
     "zip": "19119",
-    "url": "https://galmangroup.com/property/265-flats/"
+    "url": "https://galmangroup.com/property/265-flats/",
+    "laundry": "unit",
+    "sharedLaundry": true
   },
   {
     "slug": "algon-flats",
@@ -27,7 +29,9 @@
     "city": "Philadelphia",
     "state": "PA",
     "zip": "19111",
-    "url": "https://galmangroup.com/property/algon-flats/"
+    "url": "https://galmangroup.com/property/algon-flats/",
+    "laundry": "unit",
+    "sharedLaundry": false
   },
   {
     "slug": "canterbury-apartments",
@@ -42,7 +46,9 @@
     "city": "Philadelphia",
     "state": "PA",
     "zip": "19119",
-    "url": "https://galmangroup.com/property/canterbury-apartments/"
+    "url": "https://galmangroup.com/property/canterbury-apartments/",
+    "laundry": "all",
+    "sharedLaundry": false
   },
   {
     "slug": "chestnut-terrace",
@@ -57,7 +63,9 @@
     "city": "Philadelphia",
     "state": "PA",
     "zip": "19150",
-    "url": "https://galmangroup.com/property/chestnut-terrace/"
+    "url": "https://galmangroup.com/property/chestnut-terrace/",
+    "laundry": "none",
+    "sharedLaundry": false
   },
   {
     "slug": "coventry-apartments",
@@ -72,7 +80,9 @@
     "city": "Philadelphia",
     "state": "PA",
     "zip": "19111",
-    "url": "https://galmangroup.com/property/coventry-apartments/"
+    "url": "https://galmangroup.com/property/coventry-apartments/",
+    "laundry": "none",
+    "sharedLaundry": true
   },
   {
     "slug": "donna-court",
@@ -87,7 +97,9 @@
     "city": "Philadelphia",
     "state": "PA",
     "zip": "19128",
-    "url": "https://galmangroup.com/property/donna-court/"
+    "url": "https://galmangroup.com/property/donna-court/",
+    "laundry": "all",
+    "sharedLaundry": false
   },
   {
     "slug": "dupont-towers",
@@ -102,7 +114,9 @@
     "city": "Philadelphia",
     "state": "PA",
     "zip": "19128",
-    "url": "https://galmangroup.com/property/dupont-towers/"
+    "url": "https://galmangroup.com/property/dupont-towers/",
+    "laundry": "unit",
+    "sharedLaundry": true
   },
   {
     "slug": "exeter-village",
@@ -117,7 +131,9 @@
     "city": "Reading",
     "state": "PA",
     "zip": "19606",
-    "url": "https://galmangroup.com/property/exeter-village/"
+    "url": "https://galmangroup.com/property/exeter-village/",
+    "laundry": "all",
+    "sharedLaundry": false
   },
   {
     "slug": "forest-station",
@@ -132,7 +148,9 @@
     "city": "Philadelphia",
     "state": "PA",
     "zip": "19116",
-    "url": "https://galmangroup.com/property/forest-station/"
+    "url": "https://galmangroup.com/property/forest-station/",
+    "laundry": "unit",
+    "sharedLaundry": false
   },
   {
     "slug": "gail-court-apartments",
@@ -147,7 +165,9 @@
     "city": "Philadelphia",
     "state": "PA",
     "zip": "19111",
-    "url": "https://galmangroup.com/property/gail-court-apartments/"
+    "url": "https://galmangroup.com/property/gail-court-apartments/",
+    "laundry": "unit",
+    "sharedLaundry": false
   },
   {
     "slug": "green-valley-manor",
@@ -162,7 +182,9 @@
     "city": "Lafayette Hill",
     "state": "PA",
     "zip": "19444",
-    "url": "https://galmangroup.com/property/green-valley-manor/"
+    "url": "https://galmangroup.com/property/green-valley-manor/",
+    "laundry": "all",
+    "sharedLaundry": false
   },
   {
     "slug": "hampton-gardens",
@@ -177,7 +199,9 @@
     "city": "Philadelphia",
     "state": "PA",
     "zip": "19116",
-    "url": "https://galmangroup.com/property/hampton-gardens/"
+    "url": "https://galmangroup.com/property/hampton-gardens/",
+    "laundry": "none",
+    "sharedLaundry": false
   },
   {
     "slug": "hillside-apartments",
@@ -192,7 +216,9 @@
     "city": "Pottstown",
     "state": "PA",
     "zip": "19464",
-    "url": "https://galmangroup.com/property/hillside-apartments/"
+    "url": "https://galmangroup.com/property/hillside-apartments/",
+    "laundry": "unit",
+    "sharedLaundry": false
   },
   {
     "slug": "knightsbridge",
@@ -207,7 +233,9 @@
     "city": "Bensalem",
     "state": "PA",
     "zip": "19020",
-    "url": "https://galmangroup.com/property/knightsbridge/"
+    "url": "https://galmangroup.com/property/knightsbridge/",
+    "laundry": "unit",
+    "sharedLaundry": false
   },
   {
     "slug": "lansdowne-station",
@@ -222,7 +250,9 @@
     "city": "Yeadon",
     "state": "PA",
     "zip": "19050",
-    "url": "https://galmangroup.com/property/lansdowne-station/"
+    "url": "https://galmangroup.com/property/lansdowne-station/",
+    "laundry": "all",
+    "sharedLaundry": false
   },
   {
     "slug": "leverington-court",
@@ -237,7 +267,9 @@
     "city": "Philadelphia",
     "state": "PA",
     "zip": "19128",
-    "url": "https://galmangroup.com/property/leverington-court/"
+    "url": "https://galmangroup.com/property/leverington-court/",
+    "laundry": "none",
+    "sharedLaundry": false
   },
   {
     "slug": "lions-gate-apartments",
@@ -252,7 +284,9 @@
     "city": "Philadelphia",
     "state": "PA",
     "zip": "19116",
-    "url": "https://galmangroup.com/property/lions-gate-apartments/"
+    "url": "https://galmangroup.com/property/lions-gate-apartments/",
+    "laundry": "unit",
+    "sharedLaundry": false
   },
   {
     "slug": "lolas-place",
@@ -267,7 +301,9 @@
     "city": "Flourtown",
     "state": "PA",
     "zip": "19031",
-    "url": "https://galmangroup.com/property/lolas-place/"
+    "url": "https://galmangroup.com/property/lolas-place/",
+    "laundry": "all",
+    "sharedLaundry": false
   },
   {
     "slug": "millstone-village-apartments",
@@ -282,7 +318,9 @@
     "city": "Pottstown",
     "state": "PA",
     "zip": "19465",
-    "url": "https://galmangroup.com/property/millstone-village-apartments/"
+    "url": "https://galmangroup.com/property/millstone-village/",
+    "laundry": "unit",
+    "sharedLaundry": false
   },
   {
     "slug": "montgomery-court",
@@ -297,7 +335,9 @@
     "city": "Narberth",
     "state": "PA",
     "zip": "19072",
-    "url": "https://galmangroup.com/property/montgomery-court/"
+    "url": "https://galmangroup.com/property/montgomery-court/",
+    "laundry": "unit",
+    "sharedLaundry": true
   },
   {
     "slug": "north-lane-apartments",
@@ -312,7 +352,9 @@
     "city": "Conshohocken",
     "state": "PA",
     "zip": "19428",
-    "url": "https://galmangroup.com/property/north-lane-apartments/"
+    "url": "https://galmangroup.com/property/north-lane-apartments/",
+    "laundry": "unit",
+    "sharedLaundry": false
   },
   {
     "slug": "pine-manor",
@@ -327,7 +369,9 @@
     "city": "Philadelphia",
     "state": "PA",
     "zip": "19111",
-    "url": "https://galmangroup.com/property/pine-manor/"
+    "url": "https://galmangroup.com/property/pine-manor/",
+    "laundry": "none",
+    "sharedLaundry": false
   },
   {
     "slug": "plymouth-flats",
@@ -342,7 +386,9 @@
     "city": "Plymouth Meeting",
     "state": "PA",
     "zip": "19462",
-    "url": "https://galmangroup.com/property/plymouth-flats/"
+    "url": "https://galmangroup.com/property/plymouth-flats/",
+    "laundry": "all",
+    "sharedLaundry": false
   },
   {
     "slug": "pottsgrove-townhomes",
@@ -357,7 +403,9 @@
     "city": "Stowe",
     "state": "PA",
     "zip": "19464",
-    "url": "https://galmangroup.com/property/pottsgrove-townhomes/"
+    "url": "https://galmangroup.com/property/pottsgrove-townhomes/",
+    "laundry": "unit",
+    "sharedLaundry": false
   },
   {
     "slug": "regency-towers",
@@ -372,7 +420,9 @@
     "city": "Willow Grove",
     "state": "PA",
     "zip": "19090",
-    "url": "https://galmangroup.com/property/regency-towers/"
+    "url": "https://galmangroup.com/property/regency-towers/",
+    "laundry": "unit",
+    "sharedLaundry": false
   },
   {
     "slug": "ridge-court",
@@ -387,7 +437,9 @@
     "city": "Philadelphia",
     "state": "PA",
     "zip": "19128",
-    "url": "https://galmangroup.com/property/ridge-court/"
+    "url": "https://galmangroup.com/property/ridge-court/",
+    "laundry": "none",
+    "sharedLaundry": false
   },
   {
     "slug": "ridgeview-apartments",
@@ -402,7 +454,9 @@
     "city": "Philadelphia",
     "state": "PA",
     "zip": "19128",
-    "url": "https://galmangroup.com/property/ridgeview-apartments/"
+    "url": "https://galmangroup.com/property/ridgeview-apartments/",
+    "laundry": "none",
+    "sharedLaundry": false
   },
   {
     "slug": "rock-hill-apartments",
@@ -417,7 +471,9 @@
     "city": "Philadelphia",
     "state": "PA",
     "zip": "19128",
-    "url": "https://galmangroup.com/property/rock-hill-apartments/"
+    "url": "https://galmangroup.com/property/rock-hill-apartments/",
+    "laundry": "unit",
+    "sharedLaundry": false
   },
   {
     "slug": "sedgwick-station",
@@ -432,7 +488,9 @@
     "city": "Philadelphia",
     "state": "PA",
     "zip": "19119",
-    "url": "https://galmangroup.com/property/sedgwick-station/"
+    "url": "https://galmangroup.com/property/sedgwick-station/",
+    "laundry": "all",
+    "sharedLaundry": false
   },
   {
     "slug": "spruce-court-apartments",
@@ -447,7 +505,9 @@
     "city": "Royersford",
     "state": "PA",
     "zip": "19468",
-    "url": "https://galmangroup.com/property/spruce-court-apartments/"
+    "url": "https://galmangroup.com/property/spruce-court-apartments/",
+    "laundry": "unit",
+    "sharedLaundry": true
   },
   {
     "slug": "stenton-plaza",
@@ -462,7 +522,9 @@
     "city": "Philadelphia",
     "state": "PA",
     "zip": "19150",
-    "url": "https://galmangroup.com/property/stenton-plaza/"
+    "url": "https://galmangroup.com/property/stenton-plaza/",
+    "laundry": "none",
+    "sharedLaundry": true
   },
   {
     "slug": "the-edge-at-yardley",
@@ -477,7 +539,9 @@
     "city": "Yardley",
     "state": "PA",
     "zip": "19067",
-    "url": "https://galmangroup.com/property/the-edge-at-yardley/"
+    "url": "https://galmangroup.com/property/the-edge-at-yardley/",
+    "laundry": "all",
+    "sharedLaundry": false
   },
   {
     "slug": "the-flats-at-jenkintown",
@@ -492,7 +556,9 @@
     "city": "Jenkintown",
     "state": "PA",
     "zip": "19046",
-    "url": "https://galmangroup.com/property/the-flats-at-jenkintown/"
+    "url": "https://galmangroup.com/property/the-flats-at-jenkintown/",
+    "laundry": "all",
+    "sharedLaundry": false
   },
   {
     "slug": "the-mccallum",
@@ -507,7 +573,9 @@
     "city": "Philadelphia",
     "state": "PA",
     "zip": "19119",
-    "url": "https://galmangroup.com/property/the-mccallum/"
+    "url": "https://galmangroup.com/property/the-mccallum/",
+    "laundry": "all",
+    "sharedLaundry": false
   },
   {
     "slug": "plaza-apartments",
@@ -522,7 +590,9 @@
     "city": "Jenkintown",
     "state": "PA",
     "zip": "19046",
-    "url": "https://galmangroup.com/property/plaza-apartments/"
+    "url": "https://galmangroup.com/property/plaza-apartments/",
+    "laundry": "none",
+    "sharedLaundry": false
   },
   {
     "slug": "the-ridge-apartments",
@@ -537,7 +607,9 @@
     "city": "Philadelphia",
     "state": "PA",
     "zip": "19128",
-    "url": "https://galmangroup.com/property/the-ridge-apartments/"
+    "url": "https://galmangroup.com/property/the-ridge-apartments/",
+    "laundry": "all",
+    "sharedLaundry": false
   },
   {
     "slug": "valley-forge-towers",
@@ -552,7 +624,9 @@
     "city": "King of Prussia",
     "state": "PA",
     "zip": "19406",
-    "url": "https://galmangroup.com/property/valley-forge-towers/"
+    "url": "https://galmangroup.com/property/valley-forge-towers/",
+    "laundry": "none",
+    "sharedLaundry": false
   },
   {
     "slug": "westfield-apartments",
@@ -567,6 +641,8 @@
     "city": "Philadelphia",
     "state": "PA",
     "zip": "19131",
-    "url": "https://galmangroup.com/property/westfield-apartments/"
+    "url": "https://galmangroup.com/property/westfield-apartments/",
+    "laundry": "all",
+    "sharedLaundry": false
   }
 ]

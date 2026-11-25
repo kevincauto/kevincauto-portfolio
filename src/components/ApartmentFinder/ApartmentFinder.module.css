@@ -122,6 +122,12 @@
   border-color: var(--muted);
 }
 
+.button[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--on-ink);
+  border-color: var(--ink);
+}
+
 .buttonPrimary {
   background: var(--accent-deep);
   color: white;
@@ -705,6 +711,12 @@
 .now {
   color: var(--good);
   font-weight: 750;
+  white-space: nowrap;
+}
+
+.special {
+  color: var(--accent);
+  font-weight: 700;
   white-space: nowrap;
 }
 
