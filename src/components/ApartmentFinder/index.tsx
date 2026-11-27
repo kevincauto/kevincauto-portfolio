@@ -40,7 +40,6 @@ const SORT_OPTIONS: { value: SortKey; label: string }[] = [
   { value: 'rent', label: 'Price' },
   { value: 'net', label: 'Net effective' },
   { value: 'netb', label: 'Net effective / bedroom' },
-  { value: 'ppb', label: 'Price / bedroom' },
   { value: 'beds', label: 'Bedrooms' },
   { value: 'sqft', label: 'Square feet' },
   { value: 'available', label: 'Available date' },
@@ -853,7 +852,6 @@ export default function ApartmentFinder() {
                       <SortHeader label="Rent" sort="rent" filters={filters} onSort={sortBy} />
                       <SortHeader label="Net" sort="net" filters={filters} onSort={sortBy} />
                       <SortHeader label="Net/bed" sort="netb" filters={filters} onSort={sortBy} />
-                      <SortHeader label="$/bed" sort="ppb" filters={filters} onSort={sortBy} />
                       <th>Special</th>
                       <SortHeader label="Available" sort="available" filters={filters} onSort={sortBy} />
                       <th>Laundry</th>
@@ -869,7 +867,7 @@ export default function ApartmentFinder() {
                       const key = unitKey(unit)
                       const available = formatDate(unit.availableDate)
                       const open = openRows.has(key)
-                      const columns = located ? 17 : 16
+                      const columns = located ? 16 : 15
                       const special = unitSpecial(unit.description)
                       const canExpand = Boolean(unit.description || unit.floorPlan)
                       return (
@@ -930,7 +928,6 @@ export default function ApartmentFinder() {
                             <td className={styles.num} title={unit.netEffective === unit.rent ? undefined : 'Net effective rent per bedroom'}>
                               {money(unit.netPerBedroom)}
                             </td>
-                            <td className={styles.num}>{unit.pricePerBedroom == null ? '—' : money(unit.pricePerBedroom)}</td>
                             <td className={special ? styles.special : styles.num} title={special?.detail}>
                               {special ? special.label : '—'}
                             </td>
@@ -1205,7 +1202,6 @@ function CardList({
                     {unit.netEffective !== unit.rent && unit.beds != null && unit.beds > 0 && (
                       <div className={styles.unitMeta}>{`${money(unit.netPerBedroom)} net / bed`}</div>
                     )}
-                    {unit.pricePerBedroom != null && <div className={styles.unitMeta}>{`${money(unit.pricePerBedroom)} / bed`}</div>}
                   </div>
                   <div className={available === 'Now' ? styles.now : undefined}>{available}</div>
                 </div>
