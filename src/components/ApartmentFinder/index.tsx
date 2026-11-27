@@ -5,6 +5,7 @@ import { Fragment, useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { laundryLabel } from '@/lib/galman/laundry'
 import { unitSpecial } from '@/lib/galman/specials'
+import { onsiteListingUrl } from '@/lib/onsite/listingUrl'
 import type { PropertyRecord, UnitsResponse } from '@/lib/galman/types'
 import {
   activeFilterCount,
@@ -206,6 +207,7 @@ export default function ApartmentFinder() {
       count: group.length,
       minRent: Math.min(...group.map((unit) => unit.rent)),
       url: group[0].galmanUrl,
+      onsiteUrl: onsiteListingUrl(group[0].propertyId),
     }))
   }, [visible])
 
@@ -858,6 +860,7 @@ export default function ApartmentFinder() {
                       <SortHeader label="Sq ft" sort="sqft" filters={filters} onSort={sortBy} />
                       <th>Unit</th>
                       {located && <SortHeader label="Distance" sort="distance" filters={filters} onSort={sortBy} />}
+                      <th>On-Site</th>
                       <th>Galman</th>
                     </tr>
                   </thead>
@@ -866,7 +869,7 @@ export default function ApartmentFinder() {
                       const key = unitKey(unit)
                       const available = formatDate(unit.availableDate)
                       const open = openRows.has(key)
-                      const columns = located ? 16 : 15
+                      const columns = located ? 17 : 16
                       const special = unitSpecial(unit.description)
                       const canExpand = Boolean(unit.description || unit.floorPlan)
                       return (
@@ -936,6 +939,18 @@ export default function ApartmentFinder() {
                             <td className={styles.num}>{unit.sqft ? unit.sqft.toLocaleString() : '—'}</td>
                             <td className={styles.unitName}>{unit.unit || 'Unit'}</td>
                             {located && <td className={styles.num}>{unit.distance == null ? '—' : `${unit.distance.toFixed(1)} mi`}</td>}
+                            <td>
+                              <a
+                                className={styles.apply}
+                                href={onsiteListingUrl(unit.propertyId)}
+                                target="_blank"
+                                rel="noreferrer"
+                                aria-label={`On-Site page for ${unit.propertyName}`}
+                                onClick={(event) => event.stopPropagation()}
+                              >
+                                Page
+                              </a>
+                            </td>
                             <td>
                               <a
                                 className={styles.apply}
@@ -1154,9 +1169,14 @@ function CardList({
                   {located && first.distance != null ? ` · ${first.distance.toFixed(1)} mi` : ''}
                 </p>
               </div>
-              <a className={styles.apply} href={first.galmanUrl} target="_blank" rel="noreferrer">
-                Property page
-              </a>
+              <div className={styles.cardLinks}>
+                <a className={styles.apply} href={onsiteListingUrl(first.propertyId)} target="_blank" rel="noreferrer">
+                  On-Site
+                </a>
+                <a className={styles.apply} href={first.galmanUrl} target="_blank" rel="noreferrer">
+                  Property page
+                </a>
+              </div>
             </header>
             {group.map((unit) => {
               const key = unitKey(unit)

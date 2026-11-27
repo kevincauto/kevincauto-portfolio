@@ -743,6 +743,12 @@
   margin-top: 3px;
 }
 
+.cardLinks {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
 .cardUnit {
   display: grid;
   grid-template-columns: 22px minmax(0, 1.6fr) 120px 110px auto;

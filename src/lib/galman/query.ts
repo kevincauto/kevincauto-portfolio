@@ -1,6 +1,7 @@
 import { milesBetween } from '@/lib/geo'
 import { laundryLabel, unitHasInUnitLaundry } from '@/lib/galman/laundry'
 import { netEffectiveRent, unitSpecial } from '@/lib/galman/specials'
+import { onsiteListingUrl } from '@/lib/onsite/listingUrl'
 import type { UnitRecord } from '@/lib/galman/types'
 
 export const SORTS = ['rent', 'net', 'netb', 'ppb', 'ppsf', 'beds', 'sqft', 'available', 'distance', 'property'] as const
@@ -492,7 +493,7 @@ export function toClientText(units: ListedUnit[], filters: Filters): string {
       lines.push(`• ${unit.unit || 'Unit'} · ${size} · ${money(unit.rent)}${deal}${net}${laundry} · available ${formatDate(unit.availableDate)}`)
       if (unit.description) lines.push(`  ${unit.description}`)
     }
-    lines.push(first.galmanUrl, '')
+    lines.push(first.galmanUrl, onsiteListingUrl(first.propertyId), '')
   }
 
   lines.push('Rents and dates come from On-Site and can change.')

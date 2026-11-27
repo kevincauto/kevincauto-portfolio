@@ -1,6 +1,7 @@
 import { revalidateTag } from 'next/cache'
 import properties from '@/data/galmanProperties.json'
 import type { GalmanProperty, PropertyRecord, UnitRecord, UnitsResponse } from '@/lib/galman/types'
+import { onsiteListingUrl } from '@/lib/onsite/listingUrl'
 import { parseUnits, propertyNameFromPage } from '@/lib/onsite/parseUnits'
 
 export const dynamic = 'force-dynamic'
@@ -15,17 +16,13 @@ const directory = properties as GalmanProperty[]
 type Memory = { at: number; body: UnitsResponse }
 let memory: Memory | null = null
 
-function listingUrl(propertyId: string): string {
-  return `https://www.on-site.com/web/online_app/choose_unit?goal=6&attr=x20&property_id=${propertyId}&lease_id=0&unit_id=0&required=`
-}
-
 async function fetchHtml(propertyId: string, fresh: boolean): Promise<string> {
   let lastError: unknown
   for (let attempt = 0; attempt < 2; attempt += 1) {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), 25000)
     try {
-      const response = await fetch(listingUrl(propertyId), {
+      const response = await fetch(onsiteListingUrl(propertyId), {
         signal: controller.signal,
         headers: {
           'User-Agent':

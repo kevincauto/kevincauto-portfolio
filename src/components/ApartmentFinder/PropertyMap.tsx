@@ -17,6 +17,7 @@ export type MapProperty = {
   count: number
   minRent: number
   url: string
+  onsiteUrl: string
 }
 
 type PropertyMapProps = {
@@ -171,6 +172,9 @@ export default function PropertyMap({
                 <button type="button" onClick={() => onSelectProperty(property.slug)}>
                   {active ? 'Show all properties' : 'Only this property'}
                 </button>
+                <a href={property.onsiteUrl} target="_blank" rel="noreferrer">
+                  On-Site
+                </a>
                 <a href={property.url} target="_blank" rel="noreferrer">
                   Galman page
                 </a>
