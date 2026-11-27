@@ -45,7 +45,6 @@ export const DEFAULT_PROPERTIES = [
   'north-lane-apartments',
   'plymouth-flats',
   'regency-towers',
-  'rock-hill-apartments',
   'valley-forge-towers',
 ]
 

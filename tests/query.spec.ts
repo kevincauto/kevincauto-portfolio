@@ -144,6 +144,7 @@ describe('applyQuery', () => {
     expect(listed.map((item) => item.slug).sort()).toEqual(['north-lane-apartments', 'plymouth-flats'])
     expect(DEFAULT_PROPERTIES).toContain('plymouth-flats')
     expect(DEFAULT_PROPERTIES).not.toContain('algon-flats')
+    expect(DEFAULT_PROPERTIES).not.toContain('rock-hill-apartments')
   })
 
   it('sorts by price per foot with missing values last', () => {
